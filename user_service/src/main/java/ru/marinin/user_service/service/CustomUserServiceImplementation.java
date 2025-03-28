@@ -14,8 +14,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerUserServiceImplementation implements UserDetailsService {
-    private UserRepository userRepository;
+public class CustomUserServiceImplementation implements UserDetailsService {
+    private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByEmail(username);
