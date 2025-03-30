@@ -1,7 +1,6 @@
-package ru.marinin.user_service.controller;
+package ru.marinin.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.marinin.user_service.config.JwtProvider;
-import ru.marinin.user_service.model.User;
-import ru.marinin.user_service.repository.UserRepository;
-import ru.marinin.user_service.request.LoginRequest;
-import ru.marinin.user_service.response.AuthResponse;
-import ru.marinin.user_service.service.CustomUserServiceImplementation;
+import ru.marinin.config.JwtProvider;
+import ru.marinin.model.User;
+import ru.marinin.repository.UserRepository;
+import ru.marinin.request.LoginRequest;
+import ru.marinin.response.AuthResponse;
+import ru.marinin.service.CustomUserServiceImplementation;
 
 @RestController
 @RequiredArgsConstructor

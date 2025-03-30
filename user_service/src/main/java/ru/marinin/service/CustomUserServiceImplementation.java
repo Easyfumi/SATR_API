@@ -1,4 +1,4 @@
-package ru.marinin.user_service.service;
+package ru.marinin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -6,8 +6,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.marinin.user_service.model.User;
-import ru.marinin.user_service.repository.UserRepository;
+import ru.marinin.model.User;
+import ru.marinin.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.marinin.user_service;
+package ru.marinin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

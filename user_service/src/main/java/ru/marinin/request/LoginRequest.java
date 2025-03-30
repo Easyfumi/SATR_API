@@ -1,4 +1,4 @@
-package ru.marinin.user_service.request;
+package ru.marinin.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

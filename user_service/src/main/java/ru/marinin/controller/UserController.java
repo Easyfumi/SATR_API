@@ -1,4 +1,4 @@
-package ru.marinin.user_service.controller;
+package ru.marinin.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.marinin.user_service.model.User;
-import ru.marinin.user_service.service.UserService;
+import ru.marinin.model.User;
+import ru.marinin.service.UserService;
 
 import java.util.List;
 

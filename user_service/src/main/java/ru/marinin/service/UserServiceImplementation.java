@@ -1,10 +1,10 @@
-package ru.marinin.user_service.service;
+package ru.marinin.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.marinin.user_service.config.JwtProvider;
-import ru.marinin.user_service.model.User;
-import ru.marinin.user_service.repository.UserRepository;
+import ru.marinin.config.JwtProvider;
+import ru.marinin.model.User;
+import ru.marinin.repository.UserRepository;
 
 import java.util.List;
 

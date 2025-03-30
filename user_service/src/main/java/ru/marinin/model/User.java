@@ -1,4 +1,4 @@
-package ru.marinin.user_service.model;
+package ru.marinin.model;
 
 
 import jakarta.persistence.*;

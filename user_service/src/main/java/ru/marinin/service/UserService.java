@@ -1,6 +1,6 @@
-package ru.marinin.user_service.service;
+package ru.marinin.service;
 
-import ru.marinin.user_service.model.User;
+import ru.marinin.model.User;
 
 import java.util.List;
 
