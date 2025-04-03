@@ -1,6 +1,7 @@
 package ru.marinin.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.marinin.model.Task;
 import ru.marinin.model.TaskStatus;
@@ -11,10 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+
 public class TaskServiceImplementation implements TaskService{
 
-    private final TaskRepository taskRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Override
     public Task createTask(Task task, String requesterRole) throws Exception {

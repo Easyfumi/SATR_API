@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import ru.marinin.model.UserDto;
 
-@FeignClient(name="user_service", url="http://localhost:5001")
+@FeignClient(name="USER-SERVICE", url="http://localhost:5001")
 public interface UserService {
 
 
