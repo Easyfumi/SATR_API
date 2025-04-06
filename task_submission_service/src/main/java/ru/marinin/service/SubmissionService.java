@@ -6,11 +6,13 @@ import java.util.List;
 
 public interface SubmissionService {
 
-    Submission submitTask(Long taskId, String comment, Long userId) throws Exception;
+    Submission submitTask(Long taskId, String comment, Long userId, String jwt) throws Exception;
+
+    Submission getTaskSubmissionsById(Long submissionId) throws Exception;
 
     List<Submission> getAllTasksSubmissions();
 
-    List<Submission> getTaskSubmissionsByTaskId(Long taskId);
+    List<Submission> getTaskSubmissionByTaskId(Long taskId);
 
     Submission acceptDeclineSubmission(Long id, String status) throws Exception;
 }

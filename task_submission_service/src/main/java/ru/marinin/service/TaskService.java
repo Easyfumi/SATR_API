@@ -13,12 +13,12 @@ import ru.marinin.model.TaskDto;
 public interface TaskService {
 
     @GetMapping("/api/tasks/{id}")
-    public ResponseEntity<TaskDto> getTaskById(
+    public TaskDto getTaskById(
             @PathVariable Long id,
             @RequestHeader("Authorization") String jwt) throws Exception;
 
     @PutMapping("/api/tasks/{id}/complete")
-    public ResponseEntity<TaskDto> completeTask(
+    public TaskDto completeTask(
             @PathVariable Long id) throws Exception;
 
 }
