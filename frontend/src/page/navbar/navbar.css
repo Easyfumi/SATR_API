@@ -1,0 +1,7 @@
+.container{
+    background-image: linear-gradient(150deg, #00BFFF, #0000FF);
+}
+.logoutButton{
+    color:white !important;
+    background-image: linear-gradient(150deg, #00BFFF, #191970);
+}
