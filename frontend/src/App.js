@@ -1,5 +1,6 @@
+
 import Home from "./page/home/home";
-import Navbar from "./page/navbar/navbar";
+import Navbar from "./page/navbars/navbar";
 
 
 
