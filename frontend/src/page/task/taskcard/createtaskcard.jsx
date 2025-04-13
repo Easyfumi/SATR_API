@@ -18,7 +18,7 @@ const style = {
 };
 
 
-export default function EditTaskCard({ handleClose, open }) {
+export default function CreateNewTask({ handleClose, open }) {
 
     const [formData, setFormData] = useState({
         title:" ",
@@ -121,7 +121,7 @@ export default function EditTaskCard({ handleClose, open }) {
                                 className='customeButtom'
                                 type="submit"
                                 sx={{padding:".9rem"}}>
-                                    Update
+                                    Create
                                 </Button>
                             </Grid>
                             

@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react'
 import "./sidebar.css"
+import CreateNewTask from '../task/taskcard/createtaskcard'
 
 const menu = [
     {name:"Home", value:"Home", role:["ROLE_ADMIN", "ROLE_CUSTOMER"]},
@@ -16,10 +17,26 @@ const role ="ROLE_ADMIN"
 
 const Sidebar = () => {
     const [activeMenu, setActiveMenu]=useState("Home")
+
+
+    
+    const [openCreateTask, setOpenCreateTask] = useState(false);
+    const handleCloseCreateTask = () => {
+      setOpenCreateTask(false)
+    };
+    const handleOpenCreateTask = () => {
+      setOpenCreateTask(true);
+    };
+
     const handleMenuChange=(item)=>{
+        if (item.name==="Create New Task") {
+            handleOpenCreateTask()
+        }
+
         setActiveMenu(item.name)
     }
 return (
+    <>
     <div className='card min-h-[85] flex flex-col justify-center fixed  w-[15vw]'>
         <div className='space-y-5 h-full'>
             <div className='flex justify-center'>
@@ -38,6 +55,9 @@ return (
         </div>
         
     </div>
+    <CreateNewTask open={openCreateTask} handleClose={handleCloseCreateTask}/>
+    </>
+    
   )
 }
   
