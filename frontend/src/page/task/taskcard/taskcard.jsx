@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import UserList from '../userlist';
+import EditTaskCard from'./edittaskcard';
 
 const role = "ROLE_ADMIN"
 
@@ -13,25 +14,36 @@ const TaskCard = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const open = Boolean(anchorEl);
-
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const [openUserList, setOpenUserList] = useState(false);
 
-  const handleCloseUserList = () => {
-    setOpenUserList(false)
+
+  const [openUpdateTask, setOpenUpdateTask] = useState(false);
+  const handleCloseUpdateTask = () => {
+    setOpenUpdateTask(false)
+  };
+  const handleOpenUpdateTask = () => {
+    setOpenUpdateTask(true);
+    handleClose();
   };
 
+
+  const [openUserList, setOpenUserList] = useState(false);
   const handleOpenUserList = () => {
     setOpenUserList(true);
     handleClose()
   };
+  const handleCloseUserList = () => {
+    setOpenUserList(false)
+  };
+
+
+
 
   const handleDeleteTask = () => {
     handleClose()
@@ -39,14 +51,14 @@ const TaskCard = () => {
 
   return (
     <div className='card lg:flex justify-between'>
-      
+
       <div className='lg:flex gap-5 items-center space-y-2 w-[90%] lg:w-[70%]'>
         <div className='space-y-2'>
           <h1 className='font-bold text-lg'>Task</h1>
           <p className='text-sm'>description</p>
         </div>
       </div>
-      
+
       <div>
         <IconButton id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}
@@ -66,7 +78,7 @@ const TaskCard = () => {
           }}
         >
           <MenuItem onClick={handleClose}>Profile</MenuItem>
-          <MenuItem onClick={handleClose}>My account</MenuItem>
+          <MenuItem onClick={handleOpenUpdateTask}>Edit</MenuItem>
           {
             role === "ROLE_ADMIN" ? <>
               <MenuItem onClick={handleOpenUserList}>Assined User</MenuItem>
@@ -77,8 +89,9 @@ const TaskCard = () => {
         </Menu>
 
         <UserList open={openUserList} handleClose={handleCloseUserList} />
+        <EditTaskCard open={openUpdateTask} handleClose={handleCloseUpdateTask} />
       </div>
-    
+
     </div>
   )
 }
