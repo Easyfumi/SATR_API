@@ -1,39 +1,52 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import UserList from '../userlist';
 
 const role = "ROLE_ADMIN"
 
 const TaskCard = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
+
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleOpenUserList=()=>{
+  const [openUserList, setOpenUserList] = useState(false);
 
+  const handleCloseUserList = () => {
+    setOpenUserList(false)
   };
 
-  const handleDeleteTask=()=>{
-    
+  const handleOpenUserList = () => {
+    setOpenUserList(true);
+    handleClose()
+  };
+
+  const handleDeleteTask = () => {
+    handleClose()
   };
 
   return (
     <div className='card lg:flex justify-between'>
+      
       <div className='lg:flex gap-5 items-center space-y-2 w-[90%] lg:w-[70%]'>
         <div className='space-y-2'>
           <h1 className='font-bold text-lg'>Task</h1>
           <p className='text-sm'>description</p>
         </div>
       </div>
+      
       <div>
         <IconButton id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}
@@ -42,6 +55,7 @@ const TaskCard = () => {
           onClick={handleClick}>
           <EditIcon sx={{ color: "#FFFFFF" }} />
         </IconButton>
+
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
@@ -60,9 +74,11 @@ const TaskCard = () => {
             </> : <>
             </>
           }
-
         </Menu>
+
+        <UserList open={openUserList} handleClose={handleCloseUserList} />
       </div>
+    
     </div>
   )
 }
