@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Button, Grid, Modal, TextField } from '@mui/material';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -70,6 +70,10 @@ export default function EditTaskCard({ handleClose, open }) {
         console.log("formData",formData,"deadline :", formData.deadline)
         handleClose()
     }
+
+    useEffect(()=> {
+        
+    }, [])
     
     return (
         <div>
