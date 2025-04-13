@@ -5,6 +5,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
+const role = "ROLE_ADMIN"
+
 const TaskCard = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -14,6 +16,14 @@ const TaskCard = () => {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleOpenUserList=()=>{
+
+  };
+
+  const handleDeleteTask=()=>{
+    
   };
 
   return (
@@ -43,7 +53,14 @@ const TaskCard = () => {
         >
           <MenuItem onClick={handleClose}>Profile</MenuItem>
           <MenuItem onClick={handleClose}>My account</MenuItem>
-          <MenuItem onClick={handleClose}>Logout</MenuItem>
+          {
+            role === "ROLE_ADMIN" ? <>
+              <MenuItem onClick={handleOpenUserList}>Assined User</MenuItem>
+              <MenuItem onClick={handleDeleteTask}>Delete</MenuItem>
+            </> : <>
+            </>
+          }
+
         </Menu>
       </div>
     </div>
