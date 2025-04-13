@@ -1,12 +1,12 @@
 
 import React from 'react'
-import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
 const TaskCard = () => {
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -15,6 +15,7 @@ const TaskCard = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <div className='card lg:flex justify-between'>
       <div className='lg:flex gap-5 items-center space-y-2 w-[90%] lg:w-[70%]'>
@@ -24,15 +25,13 @@ const TaskCard = () => {
         </div>
       </div>
       <div>
-        <Button
-          id="basic-button"
+        <IconButton id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
-        >
-          Dashboard
-        </Button>
+          onClick={handleClick}>
+          <EditIcon sx={{ color: "#FFFFFF" }} />
+        </IconButton>
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
@@ -46,11 +45,6 @@ const TaskCard = () => {
           <MenuItem onClick={handleClose}>My account</MenuItem>
           <MenuItem onClick={handleClose}>Logout</MenuItem>
         </Menu>
-      </div>
-      <div>
-        <IconButton>
-          <EditIcon sx = {{color: "#FFFFFF"}}/>
-        </IconButton>
       </div>
     </div>
   )
