@@ -1,0 +1,85 @@
+/* AuthPage.module.css */
+.container {
+    max-width: 440px;
+    margin: 4rem auto;
+    padding: 2.5rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #1a1a1a;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  
+  .input {
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .input .MuiOutlinedInput-root {
+    border-radius: 8px;
+  }
+  
+  .button {
+    padding: 12px 24px;
+    text-transform: none;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  }
+  
+  .button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  }
+  
+  .switchButton {
+    text-transform: none;
+    font-weight: 500;
+    color: #6366f1;
+  }
+  
+  .switchButton:hover {
+    background: rgba(99, 102, 241, 0.05);
+  }
+  
+  .error {
+    padding: 12px;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    animation: slideIn 0.3s ease;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .container {
+      margin: 2rem 1rem;
+      padding: 1.5rem;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+    }
+  }
