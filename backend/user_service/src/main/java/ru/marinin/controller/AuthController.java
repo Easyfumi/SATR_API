@@ -9,16 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.marinin.config.JwtProvider;
+import ru.marinin.error.ErrorResponse;
 import ru.marinin.model.User;
 import ru.marinin.repository.UserRepository;
 import ru.marinin.request.LoginRequest;
 import ru.marinin.response.AuthResponse;
 import ru.marinin.service.CustomUserServiceImplementation;
+
+import java.util.Collections;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class AuthController {
     private final CustomUserServiceImplementation customUserServiceImplementation;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> createUserHandler(
+    public ResponseEntity<?> createUserHandler(
             @RequestBody User user) throws Exception {
 
         String email = user.getEmail();
@@ -38,12 +38,9 @@ public class AuthController {
         String fullName = user.getFullName();
         String role = user.getRole();
 
-
-
-        User isEmailExist = userRepository.findByEmail(email);
-
-        if (isEmailExist!=null) {
-            throw new Exception("Email is already used with another account");
+        if (userRepository.existsByEmail(email)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("message", "Email is already registered"));
         }
 
         User createdUser = new User();
@@ -64,11 +61,18 @@ public class AuthController {
         authResponse.setMessage("Register success");
         authResponse.setStatus(true);
 
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+        return ResponseEntity.ok(authResponse);
     }
 
-@PostMapping("/signin")
-    public ResponseEntity<AuthResponse> signin(@RequestBody LoginRequest loginRequest) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> signin(@RequestBody LoginRequest loginRequest) {
+        try {
         String username = loginRequest.getEmail();
         String password = loginRequest.getPassword();
 
@@ -82,14 +86,19 @@ public class AuthController {
         authResponse.setJwt(token);
         authResponse.setStatus(true);
 
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+            return ResponseEntity.ok(authResponse);
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid email or password"));
+        }
     }
+
 
     private Authentication authenticate(String username, String password) {
         UserDetails userDetails = customUserServiceImplementation.loadUserByUsername(username);
 
         if (userDetails == null) {
-            throw  new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException("Invalid username or password");
         }
 
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
