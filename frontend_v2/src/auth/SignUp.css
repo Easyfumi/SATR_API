@@ -1,0 +1,27 @@
+.signup-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.signup-avatar {
+  margin: 16px;
+  background-color: #1976d2 !important;
+  width: 56px;
+  height: 56px;
+}
+
+.signup-title {
+  margin-bottom: 32px !important;
+  font-weight: 500 !important;
+  color: #1976d2;
+}
+
+.signup-form {
+  width: 100%;
+}
+
+.signup-button {
+  margin: 24px 0 !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+}

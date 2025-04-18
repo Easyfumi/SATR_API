@@ -1,0 +1,17 @@
+.profile-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .profile-info p {
+    font-size: 1.1rem;
+    margin: 1rem 0;
+  }
+  
+  .profile-info strong {
+    display: inline-block;
+    width: 120px;
+    color: #666;
+  }

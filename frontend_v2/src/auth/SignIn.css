@@ -1,0 +1,27 @@
+.signin-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.signin-avatar {
+  margin: 16px;
+  background-color: #1976d2 !important;
+  width: 56px;
+  height: 56px;
+}
+
+.signin-title {
+  margin-bottom: 32px !important;
+  font-weight: 500 !important;
+  color: #1976d2;
+}
+
+.signin-form {
+  width: 100%;
+}
+
+.signin-button {
+  margin: 24px 0 !important;
+  padding: 12px 0 !important;
+  font-weight: 600 !important;
+}

@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class ApplicationConfiguration {
@@ -44,12 +45,26 @@ public class ApplicationConfiguration {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
-                cfg.setAllowedOrigins(Collections.singletonList("*"));
-                cfg.setAllowedMethods(Collections.singletonList("*"));
+
+                // Заменяем setAllowedOrigins на setAllowedOriginPatterns
+                cfg.setAllowedOriginPatterns(List.of(
+                        "http://localhost:3000", // Для локальной разработки
+                        "https://your-production-domain.com" // Ваш продакшен домен
+                ));
+
+                cfg.setAllowedMethods(List.of(
+                        "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+                ));
+
                 cfg.setAllowCredentials(true);
-                cfg.setAllowedHeaders(Collections.singletonList("*"));
-                cfg.setExposedHeaders(Arrays.asList("Authorization"));
+                cfg.setAllowedHeaders(List.of("*"));
+                cfg.setExposedHeaders(List.of(
+                        "Authorization",
+                        "Content-Type",
+                        "Content-Disposition"
+                ));
                 cfg.setMaxAge(3600L);
+
                 return cfg;
             }
         };
