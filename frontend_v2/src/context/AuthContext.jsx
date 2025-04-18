@@ -8,6 +8,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser(null);
+  }, []);
+
   const checkAuth = useCallback(async () => {
     try {
       const response = await getProfile();
@@ -18,19 +24,12 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [logout]);
 
   const login = useCallback(async (token) => {
     localStorage.setItem('token', token);
-    setIsAuthenticated(true); // Немедленно устанавливаем аутентификацию
-    await checkAuth(); // Проверяем профиль в фоне
+    await checkAuth();
   }, [checkAuth]);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
-    setUser(null);
-  }, []);
 
   useEffect(() => {
     if (localStorage.getItem('token')) {

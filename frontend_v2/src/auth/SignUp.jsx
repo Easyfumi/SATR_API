@@ -9,6 +9,8 @@ import {
   Grid,
   FormControlLabel,
   Checkbox,
+  Snackbar,
+  Alert,
   Avatar
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -23,16 +25,29 @@ export default function SignUp() {
     agreeTerms: false
   });
   const [error, setError] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signUp(formData);
+      setError('');
+      await signUp(formData); 
       navigate('/signin');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      let errorMessage = 'Registration failed';
+      
+      if (err.response) {
+        errorMessage = err.response.data?.message || errorMessage;
+      }
+      
+      setError(errorMessage);
+      setOpenSnackbar(true);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -91,11 +106,6 @@ export default function SignUp() {
             />
           </Grid>
         </Grid>
-        {error && (
-          <Typography color="error" variant="body2" className="signup-error">
-            {error}
-          </Typography>
-        )}
         <Button
           type="submit"
           fullWidth
@@ -106,12 +116,28 @@ export default function SignUp() {
         </Button>
         <Grid container justifyContent="flex-end">
           <Grid item>
-            <Link href="/signin" className="signup-link">
+            <Link href="/signin" variant="body2">
               Already have an account? Sign in
             </Link>
           </Grid>
         </Grid>
       </form>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

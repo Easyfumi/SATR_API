@@ -8,7 +8,9 @@ import {
   Link,
   Grid,
   Avatar,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { signIn } from '../services/auth';
@@ -20,6 +22,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -34,11 +37,27 @@ export default function SignIn() {
       await login(response.data.jwt);
       navigate('/profile', { replace: true });
     } catch (err) {
-      setError('Invalid email or password');
+      let errorMessage = 'An error occurred';
+      
+      // Добавляем проверку статуса ошибки
+      if (err.response) {
+        if (err.response.status === 401) {
+          errorMessage = 'Invalid email or password';
+        } else {
+          errorMessage = err.response.data?.message || errorMessage;
+        }
+      }
+      
+      setError(errorMessage);
+      setOpenSnackbar(true);
       setPassword('');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -74,11 +93,6 @@ export default function SignIn() {
           margin="normal"
           disabled={isSubmitting}
         />
-        {error && (
-          <Typography color="error" variant="body2" className="signin-error">
-            {error}
-          </Typography>
-        )}
         <Button
           type="submit"
           fullWidth
@@ -105,6 +119,22 @@ export default function SignIn() {
           </Grid>
         </Grid>
       </form>
+
+      <Snackbar
+  open={openSnackbar}
+  autoHideDuration={6000}
+  onClose={handleCloseSnackbar}
+  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+>
+  <Alert
+    onClose={handleCloseSnackbar}
+    severity="error"
+    variant="filled"
+    sx={{ width: '100%' }}
+  >
+    {error}
+  </Alert>
+</Snackbar>
     </Container>
   );
 }
