@@ -3,30 +3,31 @@ spring:
     name: API-GATEWAY-SERVICE
   cloud:
     gateway:
-        routes:
-          - id: USER-SERVICE
-            uri: lb://USER-SERVICE
-            predicates:
-              - Path=/auth/**, /users/**, /api/users/**, /
+      routes:
+        - id: TASK-SUBMISSION-SERVICE
+          uri: lb://TASK-SUBMISSION-SERVICE
+          predicates:
+            - Path=/api/submissions/**,/submissions/**
 
-          - id: TASK-SERVICE
-            uri: lb://TASK-SERVICE
-            predicates:
-              - Path=/api/tasks/**, /tasks/**
+        - id: TASK-SERVICE
+          uri: lb://TASK-SERVICE
+          predicates:
+            - Path=/api/tasks/**,/tasks/**
 
-          - id: TASK-SUBMISSION-SERVICE
-            uri: lb://TASK-SUBMISSION-SERVICE
-            predicates:
-              - Path=/api/submissions/**, /submissions/**
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/auth/**,/users/**,/api/users/**
 
-        default-filters:
-          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-        globalcors:
-            cors-configuratgion:
-              '[/**]':
-                allowedOrigins: "*"
-                allowedMethods: "*"
-                allowedHeaders: "*"
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
 
 server:
   port: 5000
