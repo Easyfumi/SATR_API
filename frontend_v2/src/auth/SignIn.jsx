@@ -35,7 +35,7 @@ export default function SignIn() {
       setError('');
       const response = await signIn({ email, password });
       await login(response.data.jwt);
-      navigate('/profile', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       let errorMessage = 'An error occurred';
 
