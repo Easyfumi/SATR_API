@@ -6,62 +6,35 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.marinin.model.enums.Role;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Table(name="users")
+@Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String password;
-
+    @Column(unique = true)
     private String email;
 
-    private String role;
+    @Column(length = 1000)
+    private String password;
 
-    private String fullName;
+    private String firstName;
 
-    public long getId() {
-        return id;
-    }
+    private String secondName;
 
-    public String getPassword() {
-        return password;
-    }
+    private String patronymic;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
 }

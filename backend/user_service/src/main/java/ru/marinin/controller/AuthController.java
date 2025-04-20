@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.marinin.config.JwtProvider;
 import ru.marinin.error.ErrorResponse;
 import ru.marinin.model.User;
+import ru.marinin.model.enums.Role;
 import ru.marinin.repository.UserRepository;
 import ru.marinin.request.LoginRequest;
 import ru.marinin.response.AuthResponse;
@@ -35,21 +36,24 @@ public class AuthController {
 
         String email = user.getEmail();
         String password = user.getPassword();
-        String fullName = user.getFullName();
-        String role = user.getRole();
+        String firstName = user.getFirstName();
+        String patronymic = user.getPatronymic();
+        String secondName = user.getSecondName();
 
         if (userRepository.existsByEmail(email)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Collections.singletonMap("message", "Email is already registered"));
         }
 
-        User createdUser = new User();
-        createdUser.setEmail(email);
-        createdUser.setFullName(fullName);
-        createdUser.setRole(role);
-        createdUser.setPassword(passwordEncoder.encode(password));
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setFirstName(firstName);
+        newUser.setPatronymic(patronymic);
+        newUser.setSecondName(secondName);
+        newUser.getRoles().add(Role.EMPTY);
+        newUser.setPassword(passwordEncoder.encode(password));
 
-        User savedUser = userRepository.save(createdUser);
+        User savedUser = userRepository.save(newUser);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
