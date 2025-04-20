@@ -71,7 +71,6 @@ export default function SignUp() {
       </div>
 
       <form className="signup-form" onSubmit={handleSubmit} >
-
         <TextField
           fullWidth
           required
@@ -82,7 +81,6 @@ export default function SignUp() {
           value={formData.secondName}
           onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
         />
-
         <TextField
           required
           fullWidth
@@ -92,19 +90,14 @@ export default function SignUp() {
           value={formData.firstName}
           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
         />
-
-
-
         <TextField
           fullWidth
           label="Отчество"
           variant="outlined"
+          margin="normal"
           value={formData.patronymic}
           onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
         />
-
-
-
         <TextField
           required
           fullWidth
@@ -115,9 +108,6 @@ export default function SignUp() {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
-
-
-
         <TextField
           required
           fullWidth
@@ -128,9 +118,7 @@ export default function SignUp() {
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
-
         {/* Кнопка регистрации */}
-
         <Button
           type="submit"
           fullWidth
@@ -139,7 +127,6 @@ export default function SignUp() {
         >
           Зарегистрироваться
         </Button>
-
         {/* Ссылка на авторизацию */}
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Link
@@ -153,9 +140,7 @@ export default function SignUp() {
           >
             Вернуться на страницу авторизации
           </Link>
-
         </div>
-
       </form>
 
 
