@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TaskService {
 
-    Task createTask(Task task, String requesterRole) throws Exception;
+    Task createTask(Task task) throws Exception;
 
     Task getTaskById(Long id) throws Exception;
 
