@@ -62,12 +62,17 @@ export default function SignIn() {
 
   return (
     <Container className="signin-container" component="main" maxWidth="xs">
-      <Avatar className="signin-avatar">
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Avatar className="signin-avatar">
         <LockOutlinedIcon />
       </Avatar>
-      <Typography component="h1" variant="h5" className="signin-title">
+      </div>
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Typography component="h1" variant="h4" className="signin-title">
         Авторизация
       </Typography>
+      </div>
+      
       <form className="signin-form" onSubmit={handleSubmit} noValidate>
         <TextField
           fullWidth
@@ -106,18 +111,16 @@ export default function SignIn() {
             'Войти'
           )}
         </Button>
-        <Grid container className="signin-links">
-          <Grid item xs>
-            {/* <Link href="#!" variant="body2">
-              Forgot password?
-            </Link> */}
-          </Grid>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+          <Grid container className="signin-links">
           <Grid item>
-            <Link href="/signup" variant="body2">
+            <Link href="/signup" variant="body3">
               Зарегестрироваться
             </Link>
           </Grid>
         </Grid>
+        </div>
+        
       </form>
 
       <Snackbar

@@ -58,12 +58,17 @@ export default function SignUp() {
 
   return (
     <Container className="signup-container" component="main" maxWidth="xs">
-      <Avatar className="signup-avatar">
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Avatar className="signup-avatar">
         <PersonAddIcon />
       </Avatar>
-      <Typography component="h1" variant="h5" className="signup-title">
+      </div>
+      <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Typography component="h1" variant="h4" className="signup-title">
         Регистрация
       </Typography>
+      </div>
+      
       <form className="signup-form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
