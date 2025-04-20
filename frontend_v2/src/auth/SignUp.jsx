@@ -7,8 +7,6 @@ import {
   Button,
   Link,
   Grid,
-  FormControlLabel,
-  Checkbox,
   Snackbar,
   Alert,
   Avatar
@@ -64,34 +62,15 @@ export default function SignUp() {
         <PersonAddIcon />
       </Avatar>
       <Typography component="h1" variant="h5" className="signup-title">
-        Sign up
+        Регистрация
       </Typography>
       <form className="signup-form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12}>
             <TextField
               required
               fullWidth
-              label="First Name"
-              value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              fullWidth
-              label="Patronymic"
-              value={formData.patronymic}
-              onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <TextField
-              required
-              fullWidth
-              label="Second Name"
+              label="Фамилия"
               value={formData.secondName}
               onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
               className="signup-input"
@@ -101,7 +80,26 @@ export default function SignUp() {
             <TextField
               required
               fullWidth
-              label="Email Address"
+              label="Имя"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              className="signup-input"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Отчество"
+              value={formData.patronymic}
+              onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
+              className="signup-input"
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              fullWidth
+              label="Email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -112,24 +110,11 @@ export default function SignUp() {
             <TextField
               required
               fullWidth
-              label="Password"
+              label="Пароль"
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={formData.agreeTerms}
-                  onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
-                />
-              }
-              label="I agree to the terms and conditions"
-              className="signup-checkbox"
             />
           </Grid>
         </Grid>
@@ -139,12 +124,12 @@ export default function SignUp() {
           variant="contained"
           className="signup-button"
         >
-          Sign Up
+          Зарегестрироваться
         </Button>
         <Grid container justifyContent="flex-end">
           <Grid item>
             <Link href="/signin" variant="body2">
-              Already have an account? Sign in
+              Вернуться на страницу авторизации
             </Link>
           </Grid>
         </Grid>

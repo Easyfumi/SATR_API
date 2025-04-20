@@ -66,13 +66,13 @@ export default function SignIn() {
         <LockOutlinedIcon />
       </Avatar>
       <Typography component="h1" variant="h5" className="signin-title">
-        Sign in
+        Авторизация
       </Typography>
       <form className="signin-form" onSubmit={handleSubmit} noValidate>
         <TextField
           fullWidth
           required
-          label="Email Address"
+          label="Email"
           autoComplete="email"
           autoFocus
           value={email}
@@ -84,7 +84,7 @@ export default function SignIn() {
         <TextField
           fullWidth
           required
-          label="Password"
+          label="Пароль"
           type="password"
           autoComplete="current-password"
           value={password}
@@ -103,18 +103,18 @@ export default function SignIn() {
           {isSubmitting ? (
             <CircularProgress size={24} color="inherit" />
           ) : (
-            'Sign In'
+            'Войти'
           )}
         </Button>
         <Grid container className="signin-links">
           <Grid item xs>
-            <Link href="#!" variant="body2">
+            {/* <Link href="#!" variant="body2">
               Forgot password?
-            </Link>
+            </Link> */}
           </Grid>
           <Grid item>
             <Link href="/signup" variant="body2">
-              Don't have an account? Sign Up
+              Зарегестрироваться
             </Link>
           </Grid>
         </Grid>
