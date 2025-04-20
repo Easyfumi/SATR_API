@@ -78,7 +78,6 @@ export default function SignIn() {
           fullWidth
           required
           label="Email"
-          autoComplete="email"
           autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -91,7 +90,6 @@ export default function SignIn() {
           required
           label="Пароль"
           type="password"
-          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="signin-input"
