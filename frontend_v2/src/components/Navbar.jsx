@@ -4,7 +4,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-// Укажите правильный путь к логотипу
+import LogoutIcon from '@mui/icons-material/Logout';
+import './Navbar.css';
 
 export default function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -12,53 +13,34 @@ export default function Navbar() {
   if (!isAuthenticated) return null;
 
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        {/* Левая часть - логотип и название*/}
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <AppBar position="static" className="navbar-container">
+      <Toolbar className="navbar-toolbar">
+        {/* Левая часть - логотип и название */}
+        <Box className="navbar-left-section">
           <img
             src="/images/logo.svg"
             alt="Логотип САТР-Фонд"
-            style={{
-              height: '70px',
-              filter: 'brightness(0) invert(1)' // Для белого логотипа
-            }}
+            className="navbar-logo"
           />
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              whiteSpace: 'nowrap'
-            }}
-          >
+          <Typography className="navbar-title">
             Межотраслевой фонд "Сертификация автотранспорта САТР" ("САТР-Фонд")
           </Typography>
         </Box>
 
-        {/* Правая часть - ФИО и кнопка выхода*/}
-
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6" component="div">
-            {`${user.secondName} ${user.firstName}${user.patronymic ? ` ${user.patronymic}` : ''}`}
+        {/* Правая часть - ФИО и кнопка выхода */}
+        <Box className="navbar-right-section">
+          <Typography className="navbar-user-name">
+            {`${user.secondName} ${user.firstName[0]}.${user.patronymic ? ` ${user.patronymic[0]}.` : ''}`}
           </Typography>
+          
           <Button
-            color="inherit"
+            className="navbar-logout-button"
+            startIcon={<LogoutIcon className="logout-icon" />}
             onClick={logout}
-            sx={{
-              border: '1px solid rgba(255, 255, 255, 0.5)',
-              borderRadius: '4px',
-              padding: '6px 16px'
-            }}
           >
-            Выйти
+            Выход
           </Button>
         </Box>
-
-
-
       </Toolbar>
     </AppBar>
   );
