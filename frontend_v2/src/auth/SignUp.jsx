@@ -19,7 +19,9 @@ import './SignUp.css';
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    patronymic: '',
+    secondName: '',
     email: '',
     password: '',
     agreeTerms: false
@@ -32,15 +34,21 @@ export default function SignUp() {
     e.preventDefault();
     try {
       setError('');
-      await signUp(formData); 
+      await signUp({
+        firstName: formData.firstName,
+        patronymic: formData.patronymic,
+        secondName: formData.secondName,
+        email: formData.email,
+        password: formData.password
+      });
       navigate('/signin');
     } catch (err) {
       let errorMessage = 'Registration failed';
-      
+
       if (err.response) {
         errorMessage = err.response.data?.message || errorMessage;
       }
-      
+
       setError(errorMessage);
       setOpenSnackbar(true);
     }
@@ -60,13 +68,32 @@ export default function SignUp() {
       </Typography>
       <form className="signup-form" onSubmit={handleSubmit}>
         <Grid container spacing={2}>
-          <Grid item xs={12}>
+          <Grid item xs={12} sm={4}>
             <TextField
               required
               fullWidth
-              label="Full Name"
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              label="First Name"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              className="signup-input"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              fullWidth
+              label="Patronymic"
+              value={formData.patronymic}
+              onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
+              className="signup-input"
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              required
+              fullWidth
+              label="Second Name"
+              value={formData.secondName}
+              onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
               className="signup-input"
             />
           </Grid>
