@@ -1,27 +1,4 @@
 /* Profile.css */
-.profile-wrapper {
-  margin-left: 260px; /* Ширина сайдбара + отступ */
-  padding: 20px 40px;
-  min-height: calc(100vh - 160px);
-}
-
-.profile-container {
-  background: white;
-  border: 2px solid var(--cold-steel);
-  border-radius: 12px;
-  padding: 30px;
-  max-width: auto; /* Ширина контейнера */
-  box-shadow: 0 4px 20px var(--glacial-shadow);
-}
-
-.profile-title {
-  color: var(--deep-frost);
-  border-bottom: 2px solid var(--silver-accent);
-  padding-bottom: 15px;
-  margin-bottom: 25px;
-  font-size: 1.8rem;
-}
-
 .info-row {
   display: flex;
   align-items: baseline;
@@ -65,15 +42,6 @@
 }
 
 @media (max-width: 768px) {
-  .profile-wrapper {
-    margin-left: 80px;
-    padding: 20px;
-  }
-
-  .profile-container {
-    padding: 20px;
-  }
-
   .info-row {
     flex-direction: column;
     gap: 5px;

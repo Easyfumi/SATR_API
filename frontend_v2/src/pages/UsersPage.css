@@ -1,0 +1,29 @@
+.users-list {
+    display: grid;
+    gap: 15px;
+  }
+  
+  .user-card {
+    background: #fff;
+    border: 1px solid var(--silver-accent);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .user-info p {
+    margin: 0;
+    color: var(--deep-frost);
+  }
+  
+  .user-email {
+    color: var(--cold-steel) !important;
+    font-size: 0.9rem !important;
+  }
+  
+  .user-roles {
+    display: flex;
+    gap: 8px;
+  }

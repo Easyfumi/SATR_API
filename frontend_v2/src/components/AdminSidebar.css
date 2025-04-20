@@ -1,0 +1,47 @@
+.admin-sidebar-container {
+    background: linear-gradient(195deg, var(--deep-frost) 0%, #1A2A3A 100%) !important;
+    box-shadow: 4px 0 20px var(--glacial-shadow) !important;
+    width: 240px;
+    height: auto;
+    position: fixed;
+    left: 20px;
+    top: 500px;
+    padding: 16px 0;
+    z-index: 1000;
+    border-radius: 16px; /* Добавлено скругление */
+  }
+  
+  .admin-sidebar-toolbar {
+    padding: 8px 0 !important; /* Уменьшаем вертикальный паддинг */
+    margin-top: 0 !important; /* Убираем отступ сверху */
+    margin-bottom: 8px !important;
+  }
+  
+  .admin-sidebar-button {
+    color: var(--ice-blue) !important;
+    padding: 12px 24px !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .admin-sidebar-button:hover {
+    background: rgba(163, 184, 204, 0.15) !important;
+  }
+  
+  .admin-sidebar-button.active {
+    background: linear-gradient(145deg, var(--ice-blue), var(--silver-accent)) !important;
+    color: var(--deep-frost) !important;
+  }
+  
+  @media (max-width: 1200px) {
+    .admin-sidebar-container {
+      left: 200px;
+      width: 200px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .admin-sidebar-container {
+      left: 60px;
+      width: 180px;
+    }
+  }

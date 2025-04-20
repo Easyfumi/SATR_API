@@ -30,9 +30,9 @@ export default function Profile() {
   }, [user, setUser]);
 
   return (
-    <div className="profile-wrapper">
-      <div className="profile-container">
-        <h2 className="profile-title">Профиль пользователя</h2>
+    <div className="page-wrapper">
+      <div className="content-container">
+        <h2 className="page-title">Профиль пользователя</h2>
         {user && (
           <div className="profile-info">
             <div className="info-row">
