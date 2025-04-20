@@ -1,6 +1,17 @@
+// Profile.js
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getProfile } from '../services/auth';
+import './Profile.css';
+
+const translateRole = (role) => {
+  const rolesMap = {
+    'ADMIN': 'Администратор',
+    'USER': 'Пользователь',
+    'EMPTY': 'Гость'
+  };
+  return rolesMap[role] || role;
+};
 
 export default function Profile() {
   const { user, setUser } = useAuth();
@@ -14,21 +25,47 @@ export default function Profile() {
         console.error('Ошибка загрузки профиля:', error);
       }
     };
-    
+
     if (!user) loadProfile();
   }, [user, setUser]);
 
   return (
-    <div className="profile-container">
-      <h2>Профиль пользователя</h2>
-      {user && (
-        <div className="profile-info">
-          <p><strong>Имя:</strong> {user.fullName}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Роль:</strong> {user.role}</p>
-          <p><strong>Дата регистрации:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
-        </div>
-      )}
+    <div className="profile-wrapper">
+      <div className="profile-container">
+        <h2 className="profile-title">Профиль пользователя</h2>
+        {user && (
+          <div className="profile-info">
+            <div className="info-row">
+              <span className="info-label">Фамилия:</span>
+              <span className="info-value">{user.secondName}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Имя:</span>
+              <span className="info-value">{user.firstName}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Отчество:</span>
+              <span className="info-value">{user.patronymic || '—'}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Email:</span>
+              <span className="info-value">{user.email}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Роли:</span>
+              <div className="roles-container">
+                {user.roles && user.roles.length > 0
+                  ? user.roles.map(role => (
+                    <span key={role} className="role-badge">
+                      {translateRole(role)}
+                    </span>
+                  ))
+                  : <span className="info-value">Не назначены</span>}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

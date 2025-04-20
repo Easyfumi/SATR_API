@@ -1,17 +1,86 @@
+/* Profile.css */
+.profile-wrapper {
+  margin-left: 260px; /* Ширина сайдбара + отступ */
+  padding: 20px 40px;
+  min-height: calc(100vh - 160px);
+}
+
 .profile-container {
-    max-width: 600px;
-    margin: 2rem auto;
-    padding: 2rem;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: white;
+  border: 2px solid var(--cold-steel);
+  border-radius: 12px;
+  padding: 30px;
+  max-width: auto; /* Ширина контейнера */
+  box-shadow: 0 4px 20px var(--glacial-shadow);
+}
+
+.profile-title {
+  color: var(--deep-frost);
+  border-bottom: 2px solid var(--silver-accent);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 18px;
+  padding: 8px 0;
+}
+
+.info-label {
+  color: var(--deep-frost);
+  font-weight: 600;
+  min-width: 120px;
+  margin-right: 25px;
+  font-size: 1rem;
+}
+
+.info-value {
+  color: #2E4A62;
+  font-size: 1rem;
+  flex-grow: 1;
+}
+
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-badge {
+  background: var(--deep-frost);
+  color: var(--ice-blue);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.role-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px var(--glacial-shadow);
+}
+
+@media (max-width: 768px) {
+  .profile-wrapper {
+    margin-left: 80px;
+    padding: 20px;
   }
-  
-  .profile-info p {
-    font-size: 1.1rem;
-    margin: 1rem 0;
+
+  .profile-container {
+    padding: 20px;
   }
-  
-  .profile-info strong {
-    display: inline-block;
-    width: 120px;
-    color: #666;
+
+  .info-row {
+    flex-direction: column;
+    gap: 5px;
   }
+
+  .info-label {
+    min-width: auto;
+    margin-right: 0;
+  }
+}

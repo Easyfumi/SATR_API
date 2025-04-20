@@ -7,6 +7,7 @@ import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import HomePage from './pages/HomePage';
 import Profile from './user/Profile';
+import Sidebar from './components/Sidebar';
 
 function App() {
   return (
@@ -18,14 +19,19 @@ function App() {
           
           <Route path="/" element={
             <ProtectedRoute>
-              <Navbar />
+              
+                <Navbar />
+              <Sidebar />
               <HomePage />
+            
+              
             </ProtectedRoute>
           } />
           
           <Route path="/profile" element={
             <ProtectedRoute>
               <Navbar />
+              <Sidebar />
               <Profile />
             </ProtectedRoute>
           } />
