@@ -1,4 +1,4 @@
-.signup-container {
+.signin-container {
   width: 100%;
   max-width: 400px;
 }
@@ -16,7 +16,7 @@
   color: #1976d2;
 }
 
-.signup-form {
+.signin-form {
   width: 100%;
 }
 

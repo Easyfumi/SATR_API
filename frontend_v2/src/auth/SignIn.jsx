@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Container,
   Typography,
   TextField,
@@ -29,7 +29,7 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    
+
     try {
       setIsSubmitting(true);
       setError('');
@@ -38,7 +38,7 @@ export default function SignIn() {
       navigate('/profile', { replace: true });
     } catch (err) {
       let errorMessage = 'An error occurred';
-      
+
       // Добавляем проверку статуса ошибки
       if (err.response) {
         if (err.response.status === 401) {
@@ -47,7 +47,7 @@ export default function SignIn() {
           errorMessage = err.response.data?.message || errorMessage;
         }
       }
-      
+
       setError(errorMessage);
       setOpenSnackbar(true);
       setPassword('');
@@ -62,17 +62,19 @@ export default function SignIn() {
 
   return (
     <Container className="signin-container" component="main" maxWidth="xs">
-      <div style={{display: 'flex', justifyContent: 'center'}}>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Avatar className="signin-avatar">
-        <LockOutlinedIcon />
-      </Avatar>
+          <LockOutlinedIcon />
+        </Avatar>
       </div>
-      <div style={{display: 'flex', justifyContent: 'center'}}>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         <Typography component="h1" variant="h4" className="signin-title">
-        Авторизация
-      </Typography>
+          Авторизация
+        </Typography>
       </div>
-      
+
       <form className="signin-form" onSubmit={handleSubmit} noValidate>
         <TextField
           fullWidth
@@ -109,33 +111,33 @@ export default function SignIn() {
             'Войти'
           )}
         </Button>
-        <div style={{display: 'flex', justifyContent: 'center'}}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Grid container className="signin-links">
-          <Grid item>
-            <Link href="/signup" variant="body3">
-              Зарегестрироваться
-            </Link>
+            <Grid item>
+              <Link href="/signup" variant="body3">
+                Зарегестрироваться
+              </Link>
+            </Grid>
           </Grid>
-        </Grid>
         </div>
-        
+
       </form>
 
       <Snackbar
-  open={openSnackbar}
-  autoHideDuration={6000}
-  onClose={handleCloseSnackbar}
-  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
->
-  <Alert
-    onClose={handleCloseSnackbar}
-    severity="error"
-    variant="filled"
-    sx={{ width: '100%' }}
-  >
-    {error}
-  </Alert>
-</Snackbar>
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

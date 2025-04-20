@@ -6,7 +6,6 @@ import {
   TextField,
   Button,
   Link,
-  Grid,
   Snackbar,
   Alert,
   Avatar
@@ -58,87 +57,107 @@ export default function SignUp() {
 
   return (
     <Container className="signup-container" component="main" maxWidth="xs">
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Avatar className="signup-avatar">
-        <PersonAddIcon />
-      </Avatar>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Avatar className="signup-avatar" sx={{ m: 1 }}>
+          <PersonAddIcon />
+        </Avatar>
       </div>
-      <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Typography component="h1" variant="h4" className="signup-title">
-        Регистрация
-      </Typography>
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
+          Регистрация
+        </Typography>
       </div>
-      
-      <form className="signup-form" onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              label="Фамилия"
-              value={formData.secondName}
-              onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              label="Имя"
-              value={formData.firstName}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Отчество"
-              value={formData.patronymic}
-              onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              label="Пароль"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="signup-input"
-            />
-          </Grid>
-        </Grid>
+
+      <form className="signup-form" onSubmit={handleSubmit} >
+
+        <TextField
+          fullWidth
+          required
+          autoFocus
+          margin="normal"
+          label="Фамилия"
+          variant="outlined"
+          value={formData.secondName}
+          onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
+        />
+
+        <TextField
+          required
+          fullWidth
+          label="Имя"
+          variant="outlined"
+          margin="normal"
+          value={formData.firstName}
+          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+        />
+
+
+
+        <TextField
+          fullWidth
+          label="Отчество"
+          variant="outlined"
+          value={formData.patronymic}
+          onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
+        />
+
+
+
+        <TextField
+          required
+          fullWidth
+          label="Email"
+          type="email"
+          variant="outlined"
+          margin="normal"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+
+
+
+        <TextField
+          required
+          fullWidth
+          label="Пароль"
+          type="password"
+          variant="outlined"
+          margin="normal"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+        />
+
+        {/* Кнопка регистрации */}
+
         <Button
           type="submit"
           fullWidth
           variant="contained"
           className="signup-button"
         >
-          Зарегестрироваться
+          Зарегистрироваться
         </Button>
-        <Grid container justifyContent="flex-end">
-          <Grid item>
-            <Link href="/signin" variant="body2">
-              Вернуться на страницу авторизации
-            </Link>
-          </Grid>
-        </Grid>
+
+        {/* Ссылка на авторизацию */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Link
+            href="/signin"
+
+            variant="body3"
+            sx={{
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
+            Вернуться на страницу авторизации
+          </Link>
+
+        </div>
+
       </form>
+
 
       <Snackbar
         open={openSnackbar}
