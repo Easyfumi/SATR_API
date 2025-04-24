@@ -50,7 +50,7 @@ public class AuthController {
         newUser.setFirstName(firstName);
         newUser.setPatronymic(patronymic);
         newUser.setSecondName(secondName);
-        newUser.getRoles().add(Role.EMPTY);
+        newUser.getRoles().add(Role.DIRECTOR);
         newUser.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(newUser);
