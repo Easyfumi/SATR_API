@@ -12,8 +12,8 @@ const AdminSidebar = () => {
       <List component="nav" className="admin-sidebar-toolbar">
         <ListItemButton
           component={Link}
-          to="/users"
-          className={`admin-sidebar-button ${location.pathname === '/users' ? 'active' : ''}`}
+          to="/all"
+          className={`admin-sidebar-button ${location.pathname === '/all' ? 'active' : ''}`}
         >
           <ListItemIcon>
             <PeopleIcon className="admin-sidebar-icon" />

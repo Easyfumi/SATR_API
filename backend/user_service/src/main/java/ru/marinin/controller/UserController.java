@@ -26,10 +26,12 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<User>> getUsers(
             @RequestHeader("Authorization") String jwt) {
         List<User> users = userService.getAllUsers();
+        System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
 }

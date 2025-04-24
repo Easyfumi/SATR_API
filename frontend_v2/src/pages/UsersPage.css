@@ -1,29 +1,66 @@
 .users-list {
-    display: grid;
-    gap: 15px;
-  }
-  
+  display: grid;
+  gap: 20px;
+}
+
+.user-card {
+  background: #fff;
+  border: 1px solid var(--silver-accent);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.info-label {
+  color: var(--deep-frost);
+  font-weight: 600;
+  min-width: 100px;
+  margin-right: 20px;
+}
+
+.info-value {
+  color: #2E4A62;
+  flex-grow: 1;
+}
+
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-badge {
+  background: var(--deep-frost);
+  color: var(--ice-blue);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
   .user-card {
-    background: #fff;
-    border: 1px solid var(--silver-accent);
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 15px;
   }
   
-  .user-info p {
-    margin: 0;
-    color: var(--deep-frost);
+  .info-row {
+    flex-direction: column;
+    gap: 5px;
   }
   
-  .user-email {
-    color: var(--cold-steel) !important;
-    font-size: 0.9rem !important;
+  .info-label {
+    min-width: auto;
+    margin-right: 0;
   }
-  
-  .user-roles {
-    display: flex;
-    gap: 8px;
-  }
+}

@@ -39,12 +39,17 @@ function App() {
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<HomePage />} />
             <Route path="/profile" element={<Profile />} />
-
+            <Route path="/all" element={<UsersPage />} />
             {/* Админские маршруты */}
             <Route element={<AdminRoute />}>
-              <Route path="/users" element={<UsersPage />} />
+              
             </Route>
+
           </Route>
+
+          {/* Fallback для несуществующих маршрутов */}
+          {/*     <Route path="*" element={<Navigate to="/" replace />} />   */}
+
         </Routes>
       </Router>
     </AuthProvider>

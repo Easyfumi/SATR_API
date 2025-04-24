@@ -1,15 +1,15 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+// import React from 'react';
+// import { Navigate } from 'react-router-dom';
+// import { useAuth } from '../context/AuthContext';
 
-const AdminRoute = ({ children }) => {
-  const { user } = useAuth();
+// const AdminRoute = ({ children }) => {
+//   const { user } = useAuth();
 
-  if (!user?.roles?.includes('DIRECTOR')) {
-    return <Navigate to="/" replace />;
-  }
+//  if (!user?.roles?.includes('DIRECTOR')) {
+//    return <Navigate to="/" replace />;
+//  }
 
-  return children;
-};
+//  return children;
+// };
 
-export default AdminRoute;
+// export default AdminRoute;

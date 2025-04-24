@@ -28,3 +28,7 @@ export const signIn = async (credentials) => {
 export const getProfile = async () => {
   return api.get('/api/users/profile');
 };
+
+export const getAllUsers = async () => {
+  return api.get('/api/users/all');
+};
