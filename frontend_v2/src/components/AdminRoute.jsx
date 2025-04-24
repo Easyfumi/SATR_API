@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
 
-  if (!user?.roles?.includes('ADMIN')) {
+  if (!user?.roles?.includes('DIRECTOR')) {
     return <Navigate to="/" replace />;
   }
 

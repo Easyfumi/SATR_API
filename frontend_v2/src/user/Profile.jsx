@@ -6,8 +6,10 @@ import './Profile.css';
 
 const translateRole = (role) => {
   const rolesMap = {
-    'ADMIN': 'Администратор',
-    'USER': 'Пользователь',
+    'EXPERT': 'Эксперт',
+    'DIRECTOR': 'Руководитель',
+    'REGISTRAR': 'Регистрация',
+    'ACCOUNTANT': 'Бухгалтерия',
     'EMPTY': 'Гость'
   };
   return rolesMap[role] || role;

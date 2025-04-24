@@ -20,7 +20,7 @@ const MainLayout = () => {
     <>
       <Navbar />
       <Sidebar />
-      {user?.roles?.includes('ADMIN') && <AdminSidebar />}
+      {user?.roles?.includes('DIRECTOR') && <AdminSidebar />}
       <Outlet /> {/* Место для отображения дочерних компонентов */}
     </>
   );
