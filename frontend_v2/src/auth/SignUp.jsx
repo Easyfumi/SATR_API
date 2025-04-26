@@ -40,7 +40,7 @@ export default function SignUp() {
       });
       navigate('/signin');
     } catch (err) {
-      let errorMessage = 'Registration failed';
+      let errorMessage = 'Не удалось выполнить регистрацию';
 
       if (err.response) {
         errorMessage = err.response.data?.message || errorMessage;

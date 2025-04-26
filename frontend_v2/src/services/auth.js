@@ -1,28 +1,11 @@
 import api from './api';
 
 export const signUp = async (userData) => {
-  try {
-    return await api.post('/auth/signup', userData);
-  } catch (error) {
-    if (error.response?.status === 409) {
-      error.response.data = { 
-        message: error.response.data?.message || 'Email is already registered'
-      };
-    }
-    throw error;
-  }
+  return api.post('/auth/signup', userData);
 };
 
 export const signIn = async (credentials) => {
-  try {
-    return await api.post('/auth/signin', credentials);
-  } catch (error) {
-    // Добавляем обработку 401 ошибки
-    if (error.response?.status === 401) {
-      error.response.data = { message: 'Invalid email or password' };
-    }
-    throw error;
-  }
+  return api.post('/auth/signin', credentials);
 };
 
 export const getProfile = async () => {
@@ -34,5 +17,5 @@ export const getAllUsers = async () => {
 };
 
 export const getUserById = async (id) => {
-  return api.get(`/users/${id}`); // Исправлены кавычки на шаблонные
+  return api.get(`/users/${id}`); 
 };

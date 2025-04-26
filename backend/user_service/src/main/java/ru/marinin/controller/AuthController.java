@@ -42,7 +42,7 @@ public class AuthController {
 
         if (userRepository.existsByEmail(email)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Collections.singletonMap("message", "Email is already registered"));
+                    .body(Collections.singletonMap("message", "Адрес электронной почты уже используется"));
         }
 
         User newUser = new User();
@@ -93,7 +93,7 @@ public class AuthController {
             return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Invalid email or password"));
+                    .body(new ErrorResponse("Неверный адрес электронной почты или пароль"));
         }
     }
 

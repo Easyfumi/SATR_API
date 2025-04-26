@@ -37,15 +37,11 @@ export default function SignIn() {
       await login(response.data.jwt);
       navigate('/', { replace: true });
     } catch (err) {
-      let errorMessage = 'An error occurred';
+      let errorMessage = 'Произошла ошибка';
 
       // Добавляем проверку статуса ошибки
       if (err.response) {
-        if (err.response.status === 401) {
-          errorMessage = 'Invalid email or password';
-        } else {
-          errorMessage = err.response.data?.message || errorMessage;
-        }
+        errorMessage = err.response.data?.message || errorMessage;
       }
 
       setError(errorMessage);
