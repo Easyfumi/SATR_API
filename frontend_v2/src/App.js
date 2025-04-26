@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import AuthLayout from './components/AuthLayout';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import AdminSidebar from './components/AdminSidebar';
+import ProtectedRoute from './services/ProtectedRoute';
+import AuthLayout from './services/AuthLayout';
+import Navbar from './navigation/Navbar';
+import Sidebar from './navigation/Sidebar';
+import AdminSidebar from './navigation/AdminSidebar';
 import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import HomePage from './pages/HomePage';
-import Profile from './user/Profile';
-import UsersPage from './pages/UsersPage';
-import UserDetailPage from './pages/UserDetailPage'; 
+import Profile from './pages/users/Profile';
+import UsersPage from './pages/users/UsersPage';
+import UserDetailPage from './pages/users/UserDetailPage'; 
 
 // Основной лейаут для авторизованных пользователей
 const MainLayout = () => {

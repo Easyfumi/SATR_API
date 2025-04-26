@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUserById } from '../services/users';
+import { getUserById } from '../../services/users';
 import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import IconButton from '@mui/material/IconButton';
