@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { getAllUsers } from '../../services/users';
 import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import './UsersPage.css';
+
 
 const translateRole = (role) => {
   const rolesMap = {
@@ -16,7 +18,10 @@ const translateRole = (role) => {
   return rolesMap[role] || role;
 };
 
+
+
 const UsersPage = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -25,11 +30,17 @@ const UsersPage = () => {
         const response = await getAllUsers();
         setUsers(response.data);
       } catch (error) {
+        if (error.response?.status === 403) {
+          navigate('/', { replace: true });
+        }
         console.error('Ошибка загрузки пользователей:', error);
       }
     };
+    
     fetchUsers();
-  }, []);
+  }, [navigate]);
+
+
 
   return (
     <div className="page-wrapper">

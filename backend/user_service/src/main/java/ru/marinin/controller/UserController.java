@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.marinin.error.ErrorResponse;
 import ru.marinin.model.User;
 import ru.marinin.model.UserInfo;
+import ru.marinin.model.enums.Role;
 import ru.marinin.service.UserService;
 
 import java.util.List;
@@ -26,8 +28,13 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<User>> getUsers(
+    public ResponseEntity<?> getUsers(
             @RequestHeader("Authorization") String jwt) {
+        User currentUser = userService.getUserProfile(jwt);
+        if (!currentUser.getRoles().contains(Role.DIRECTOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new ErrorResponse("Доступ запрещен"));
+        }
         List<User> users = userService.getAllUsers();
         System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
