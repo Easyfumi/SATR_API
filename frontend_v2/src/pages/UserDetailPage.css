@@ -1,0 +1,35 @@
+.user-detail {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .user-detail .info-row {
+    margin-bottom: 1.5rem;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+  }
+  .error-message {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .error-message .page-title {
+    color: var(--deep-frost);
+    margin-bottom: 20px;
+  }
+
+  .back-icon {
+    position: absolute !important;
+    top: 5px;
+    right: 5px;
+    color: var(--cold-steel) !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .back-icon:hover {
+    color: var(--deep-frost) !important;
+
+  }

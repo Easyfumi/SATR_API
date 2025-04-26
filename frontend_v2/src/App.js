@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext'; // Добавляем useAuth
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute'; // Добавляем импорт
 import AuthLayout from './components/AuthLayout';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
-import AdminSidebar from './components/AdminSidebar'; // Добавляем импорт
+import AdminSidebar from './components/AdminSidebar';
 import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import HomePage from './pages/HomePage';
 import Profile from './user/Profile';
-import UsersPage from './pages/UsersPage'; // Добавляем импорт
+import UsersPage from './pages/UsersPage';
+import UserDetailPage from './pages/UserDetailPage'; 
 
 // Основной лейаут для авторизованных пользователей
 const MainLayout = () => {
@@ -38,13 +38,9 @@ function App() {
           {/* Защищенные маршруты */}
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<HomePage />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/all" element={<UsersPage />} />
-            {/* Админские маршруты */}
-            <Route element={<AdminRoute />}>
-              
-            </Route>
-
+            <Route path="/users/profile" element={<Profile />} />
+            <Route path="/users/all" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserDetailPage />} />
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

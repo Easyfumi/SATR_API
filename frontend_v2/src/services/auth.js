@@ -26,9 +26,13 @@ export const signIn = async (credentials) => {
 };
 
 export const getProfile = async () => {
-  return api.get('/api/users/profile');
+  return api.get('/users/profile');
 };
 
 export const getAllUsers = async () => {
-  return api.get('/api/users/all');
+  return api.get('/users/all');
+};
+
+export const getUserById = async (id) => {
+  return api.get(`/users/${id}`); // Исправлены кавычки на шаблонные
 };

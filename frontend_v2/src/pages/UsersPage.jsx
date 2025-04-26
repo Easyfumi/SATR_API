@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAllUsers } from '../services/auth';
+import SettingsIcon from '@mui/icons-material/Settings';
+import IconButton from '@mui/material/IconButton';
 import './UsersPage.css';
 
 const translateRole = (role) => {
@@ -32,10 +35,21 @@ const UsersPage = () => {
     <div className="page-wrapper">
       <div className="content-container">
         <h2 className="page-title">Управление пользователями</h2>
-        
         <div className="users-list">
           {users.map(user => (
             <div key={user.id} className="user-card">
+              <div className="card-header">
+                <IconButton 
+                  component={Link}
+                  to={`/users/${Number(user.id)}`}
+                  className="settings-icon"
+                  aria-label="settings"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </div>
+              
               <div className="profile-info">
                 <div className="info-row">
                   <span className="info-label">ФИО:</span>

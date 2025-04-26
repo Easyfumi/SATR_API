@@ -50,7 +50,7 @@ public class AuthController {
         newUser.setFirstName(firstName);
         newUser.setPatronymic(patronymic);
         newUser.setSecondName(secondName);
-        newUser.getRoles().add(Role.DIRECTOR);
+        newUser.getRoles().add(Role.EMPTY);
         newUser.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(newUser);
@@ -97,6 +97,9 @@ public class AuthController {
         }
     }
 
+    // todo
+//    Обработать возникновение
+//    org.springframework.security.authentication.BadCredentialsException: Invalid token...
 
     private Authentication authenticate(String username, String password) {
         UserDetails userDetails = customUserServiceImplementation.loadUserByUsername(username);

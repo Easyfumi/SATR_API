@@ -7,6 +7,7 @@ import ru.marinin.model.User;
 import ru.marinin.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,4 +26,12 @@ public class UserServiceImplementation implements UserService{
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public Optional<User> getUserById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional;
+    }
+
+
 }

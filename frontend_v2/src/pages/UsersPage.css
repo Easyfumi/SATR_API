@@ -9,6 +9,8 @@
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-info {
@@ -47,6 +49,24 @@
   padding: 6px 12px;
   border-radius: 15px;
   font-size: 0.8rem;
+}
+
+.card-header {
+  position: relative;
+  height: 40px;
+}
+
+.settings-icon {
+  position: absolute !important;
+  top: 5px;
+  right: 5px;
+  color: var(--cold-steel) !important;
+  transition: all 0.2s ease !important;
+}
+
+.settings-icon:hover {
+  color: var(--deep-frost) !important;
+  transform: rotate(90deg);
 }
 
 @media (max-width: 768px) {

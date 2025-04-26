@@ -12,7 +12,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { path: "/", text: "Главная", icon: <HomeIcon className="sidebar-icon" /> },
-    { path: "/profile", text: "Профиль", icon: <PersonIcon className="sidebar-icon" /> },
+    { path: "users/profile", text: "Профиль", icon: <PersonIcon className="sidebar-icon" /> },
     { path: "/history", text: "История", icon: <HistoryIcon className="sidebar-icon" /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon className="sidebar-icon" /> },
   ];
