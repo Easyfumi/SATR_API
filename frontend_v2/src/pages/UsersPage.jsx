@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllUsers } from '../services/auth';
+import { getAllUsers } from '../services/users';
 import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import './UsersPage.css';
@@ -34,7 +34,7 @@ const UsersPage = () => {
   return (
     <div className="page-wrapper">
       <div className="content-container">
-        <h2 className="page-title">Управление пользователями</h2>
+        <h2 className="page-title">Настройка доступа пользователей</h2>
         <div className="users-list">
           {users.map(user => (
             <div key={user.id} className="user-card">

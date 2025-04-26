@@ -18,7 +18,7 @@ const AdminSidebar = () => {
           <ListItemIcon>
             <PeopleIcon className="admin-sidebar-icon" />
           </ListItemIcon>
-          <ListItemText primary="Все пользователи" />
+          <ListItemText primary="Настройка доступа" />
         </ListItemButton>
       </List>
     </div>

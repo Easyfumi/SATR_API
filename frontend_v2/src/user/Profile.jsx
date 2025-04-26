@@ -1,7 +1,7 @@
 // Profile.js
 import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getProfile } from '../services/auth';
+import { getProfile } from '../services/users';
 import './Profile.css';
 
 const translateRole = (role) => {
