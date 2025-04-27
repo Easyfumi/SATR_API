@@ -1,6 +1,7 @@
 package ru.marinin.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.marinin.config.JwtProvider;
 import ru.marinin.model.User;
@@ -19,7 +20,9 @@ public class UserServiceImplementation implements UserService{
     @Override
     public User getUserProfile(String jwt) {
         String email = JwtProvider.getEmailFromJwtToken(jwt);
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return user;
     }
 
     @Override

@@ -8,36 +8,32 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.crypto.SecretKey;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JwtProvider {
-
     static SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
     public static String generateToken(Authentication auth) {
-        Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
-        String roles = populateAuthorities(authorities);
-        String jwt = Jwts.builder()
+        List<String> authorities = auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return Jwts.builder()
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime()+86400000))
+                .setExpiration(new Date(new Date().getTime() + 86400000))
                 .claim("email", auth.getName())
-                .claim("authorities", roles)
+                .claim("authorities", authorities) // Список строк
                 .signWith(key)
                 .compact();
-        return jwt;
     }
 
     public static String getEmailFromJwtToken(String jwt) {
-        jwt = jwt.substring(7);
-        Claims claims = Jwts.parser().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-        String email= String.valueOf(claims.get("email"));
-        return email;
-    }
-
-    public static String populateAuthorities(Collection<? extends GrantedAuthority> collection) {
-        Set<String> auths = new HashSet<>();
-        for (GrantedAuthority authority:collection) {
-            auths.add(authority.getAuthority());
-        }
-        return String.join(",", auths);
+        jwt = jwt.substring(7); // Удаление "Bearer "
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
+        return (String) claims.get("email");
     }
 }

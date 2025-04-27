@@ -24,14 +24,14 @@ public class ApplicationConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.sessionManagement(
                         managment -> managment.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                ).authorizeHttpRequests(
-                        Authorize -> Authorize.requestMatchers("/api/**")
-                                .authenticated()
-                                .anyRequest()
-                                .permitAll()
-                ).addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
+                                SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/users/all").hasAuthority("DIRECTOR")
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(CorsConfigurationSource()))
                 .httpBasic(Customizer.withDefaults())

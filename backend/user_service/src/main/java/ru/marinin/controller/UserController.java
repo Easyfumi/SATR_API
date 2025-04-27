@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -31,10 +31,10 @@ public class UserController {
     public ResponseEntity<?> getUsers(
             @RequestHeader("Authorization") String jwt) {
         User currentUser = userService.getUserProfile(jwt);
-        if (!currentUser.getRoles().contains(Role.DIRECTOR)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse("Доступ запрещен"));
-        }
+//        if (!currentUser.getRoles().contains(Role.DIRECTOR)) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body(new ErrorResponse("Доступ запрещен"));
+//        }
         List<User> users = userService.getAllUsers();
         System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
