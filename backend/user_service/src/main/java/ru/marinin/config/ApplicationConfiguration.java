@@ -27,7 +27,10 @@ public class ApplicationConfiguration {
                                 SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/users/all").hasAuthority("DIRECTOR")
+                        .requestMatchers("/api/users/profile").authenticated()
+                        .requestMatchers(
+                                "/api/users/all",
+                                "/api/users/{id}").hasAuthority("DIRECTOR")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )

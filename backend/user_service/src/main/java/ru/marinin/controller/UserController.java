@@ -30,13 +30,7 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<?> getUsers(
             @RequestHeader("Authorization") String jwt) {
-        User currentUser = userService.getUserProfile(jwt);
-//        if (!currentUser.getRoles().contains(Role.DIRECTOR)) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(new ErrorResponse("Доступ запрещен"));
-//        }
         List<User> users = userService.getAllUsers();
-        System.out.println(users);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

@@ -22,7 +22,7 @@
 .info-row {
   display: flex;
   align-items: baseline;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .info-label {
@@ -53,7 +53,7 @@
 
 .card-header {
   position: relative;
-  height: 40px;
+  height: 10px;
 }
 
 .settings-icon {

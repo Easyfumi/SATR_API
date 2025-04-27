@@ -33,6 +33,7 @@ const UsersPage = () => {
         if (error.response?.status === 403) {
           navigate('/', { replace: true });
         }
+        // убрать потом
         console.error('Ошибка загрузки пользователей:', error);
       }
     };
@@ -45,7 +46,7 @@ const UsersPage = () => {
   return (
     <div className="page-wrapper">
       <div className="content-container">
-        <h2 className="page-title">Настройка доступа пользователей</h2>
+        <h2 className="page-title">Список пользователей</h2>
         <div className="users-list">
           {users.map(user => (
             <div key={user.id} className="user-card">

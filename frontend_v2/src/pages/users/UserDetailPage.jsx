@@ -5,6 +5,7 @@ import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import IconButton from '@mui/material/IconButton';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const translateRole = (role) => {
     const rolesMap = {
@@ -18,6 +19,7 @@ const translateRole = (role) => {
 };
 
 const UserDetailPage = () => {
+    const navigate = useNavigate();
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -28,6 +30,10 @@ const UserDetailPage = () => {
                 const response = await getUserById(id);
                 setUser(response.data);
             } catch (error) {
+                if (error.response?.status === 403) {
+                  navigate('/', { replace: true });
+                }
+                // убрать потом
                 console.error('Ошибка загрузки пользователя:', error);
             } finally {
                 setLoading(false);
@@ -35,7 +41,7 @@ const UserDetailPage = () => {
         };
 
         fetchUser();
-    }, [id]);
+    }, [id,navigate]);
 
     if (loading) return <div>Загрузка...</div>;
     if (!user) return <div>
