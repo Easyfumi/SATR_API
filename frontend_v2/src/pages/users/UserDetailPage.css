@@ -1,37 +1,107 @@
-.user-detail {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  }
-  
-  .user-detail .info-row {
-    margin-bottom: 1.5rem;
-    padding: 0.8rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-  }
-  .error-message {
-    text-align: center;
-    padding: 40px 20px;
-  }
-  
-  .error-message .page-title {
-    color: var(--deep-frost);
-    margin-bottom: 20px;
-  }
+/* UserDetailPage.css */
+.roles-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 
-  .back-icon {
-    position: absolute !important;
-    top: 5px;
-    right: 5px;
-    color: var(--cold-steel) !important;
-    transition: all 0.2s ease !important;
+.roles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.role-chip {
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 16px;
+  padding: 0.25rem 0.75rem;
+  margin: 0.25rem;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.role-chip .MuiChip-deleteIcon {
+  color: rgba(255, 255, 255, 0.7);
+  &:hover {
+    color: white;
   }
-  
-  .back-icon:hover {
+}
+
+.dialog-title {
+  background-color: var(--deep-frost);
+  color: white !important;
+  padding: 1rem !important;
+}
+
+.dialog-content {
+  padding: 2rem !important;
+  min-width: 400px;
+}
+
+.roles-editor {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.add-role-btn {
+  background-color: #3498db;
+  color: white !important;
+  margin-left: 1rem;
+  &:hover {
+    background-color: #2980b9;
+  }
+}
+.role-menu-item {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  &:hover {
+    background-color: #3498db;
+    color: white;
+  }
+}
+
+.dialog-actions {
+  padding: 1rem 2rem;
+  border-top: 1px solid #eee;
+}
+
+.save-btn {
+  background-color: #27ae60 !important;
+  color: white !important;
+}
+.custom-alert {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.back-icon {
+  position: absolute !important;
+  top: 5px;
+  right: 5px;
+  color: var(--cold-steel) !important;
+  transition: all 0.2s ease !important;
+  &:hover {
     color: var(--deep-frost) !important;
-
   }
+}
 
-  
+.edit-controls {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  border-color: #e74c3c !important;
+  color: #e74c3c !important;
+}

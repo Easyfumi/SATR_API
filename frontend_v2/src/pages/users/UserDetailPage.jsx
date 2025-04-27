@@ -4,19 +4,18 @@ import { getUserById, updateUserRoles } from '../../services/users';
 import { useAuth } from '../../context/AuthContext';
 import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
-  Checkbox,
-  FormControlLabel,
   Snackbar,
-  Alert
+  Alert,
+  Menu,
+  MenuItem,
+  Chip
 } from '@mui/material';
 
 const translateRole = (role) => {
@@ -31,14 +30,16 @@ const translateRole = (role) => {
 };
 
 const UserDetailPage = () => {
-    const { user: currentUser } = useAuth(); 
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedRoles, setEditedRoles] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
 
   const allRoles = ['EXPERT', 'DIRECTOR', 'REGISTRAR', 'ACCOUNTANT', 'EMPTY'];
 
@@ -47,6 +48,7 @@ const UserDetailPage = () => {
       try {
         const response = await getUserById(id);
         setUser(response.data);
+        setEditedRoles(response.data.roles);
       } catch (error) {
         if (error.response?.status === 403) {
           navigate('/', { replace: true });
@@ -60,26 +62,26 @@ const UserDetailPage = () => {
     fetchUser();
   }, [id, navigate]);
 
-  const handleEditRoles = () => {
-    setSelectedRoles([...user.roles]);
-    setEditModalOpen(true);
+  useEffect(() => {
+    setAvailableRoles(allRoles.filter(role => !editedRoles.includes(role)));
+  }, [editedRoles]);
+
+  const handleAddRole = (role) => {
+    setEditedRoles(prev => [...prev, role]);
+    setAnchorEl(null);
   };
 
-  const handleRoleChange = (role) => {
-    setSelectedRoles(prev => 
-      prev.includes(role) 
-        ? prev.filter(r => r !== role) 
-        : [...prev, role]
-    );
+  const handleRemoveRole = (roleToRemove) => {
+    setEditedRoles(prev => prev.filter(role => role !== roleToRemove));
   };
 
-  const handleSaveRoles = async () => {
+  const handleSave = async () => {
     try {
-      await updateUserRoles(id, selectedRoles);
+      await updateUserRoles(id, editedRoles);
       const updatedUser = await getUserById(id);
       setUser(updatedUser.data);
       setSnackbar({ open: true, message: 'Роли успешно обновлены!', severity: 'success' });
-      setEditModalOpen(false);
+      setIsEditing(false);
     } catch (error) {
       setSnackbar({ 
         open: true, 
@@ -87,6 +89,11 @@ const UserDetailPage = () => {
         severity: 'error' 
       });
     }
+  };
+
+  const handleCancel = () => {
+    setEditedRoles(user.roles);
+    setIsEditing(false);
   };
 
   if (loading) return <div>Загрузка...</div>;
@@ -131,57 +138,85 @@ const UserDetailPage = () => {
             <div className="roles-header">
               <span className="info-label">Роли:</span>
               {currentUser?.roles?.includes('DIRECTOR') && (
-                <Button 
-                  variant="outlined" 
-                  size="small"
-                  onClick={handleEditRoles}
-                >
-                  Изменить роли
-                </Button>
+                <>
+                  {isEditing ? (
+                    <Button 
+                      variant="contained" 
+                      size="small"
+                      startIcon={<AddIcon />}
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
+                      className="add-role-btn"
+                    >
+                      Добавить роль
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="outlined" 
+                      size="small"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      Редактировать
+                    </Button>
+                  )}
+                </>
               )}
             </div>
             <div className="roles-container">
-              {user.roles.map(role => (
-                <span key={role} className="role-badge">
-                  {translateRole(role)}
-                </span>
+              {(isEditing ? editedRoles : user.roles).map(role => (
+                <Chip
+                  key={role}
+                  label={translateRole(role)}
+                  className="role-chip"
+                  onDelete={isEditing ? () => handleRemoveRole(role) : null}
+                  deleteIcon={<CloseIcon />}
+                />
               ))}
             </div>
+            {isEditing && (
+              <div className="edit-controls">
+                <Button 
+                  variant="contained" 
+                  color="primary"
+                  onClick={handleSave}
+                  className="save-btn"
+                >
+                  Сохранить
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  onClick={handleCancel}
+                  className="cancel-btn"
+                >
+                  Отмена
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Модальное окно редактирования ролей */}
-      <Dialog open={editModalOpen} onClose={() => setEditModalOpen(false)}>
-        <DialogTitle>Редактирование ролей</DialogTitle>
-        <DialogContent>
-          {allRoles.map(role => (
-            <FormControlLabel
-              key={role}
-              control={
-                <Checkbox
-                  checked={selectedRoles.includes(role)}
-                  onChange={() => handleRoleChange(role)}
-                  color="primary"
-                />
-              }
-              label={translateRole(role)}
-            />
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditModalOpen(false)}>Отмена</Button>
-          <Button onClick={handleSaveRoles} color="primary">Сохранить</Button>
-        </DialogActions>
-      </Dialog>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        {availableRoles.map(role => (
+          <MenuItem
+            key={role}
+            onClick={() => handleAddRole(role)}
+            className="role-menu-item"
+          >
+            {translateRole(role)}
+          </MenuItem>
+        ))}
+      </Menu>
 
-      {/* Уведомления */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
       >
-        <Alert severity={snackbar.severity}>
+        <Alert severity={snackbar.severity} className="custom-alert">
           {snackbar.message}
         </Alert>
       </Snackbar>
