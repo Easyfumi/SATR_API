@@ -28,9 +28,8 @@ public class ApplicationConfiguration {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/users/profile").authenticated()
-                        .requestMatchers(
-                                "/api/users/all",
-                                "/api/users/{id}").hasAuthority("DIRECTOR")
+                        .requestMatchers("/api/users/all","/api/users/{id}",
+                                "/api/users/{id}/roles").hasAuthority("DIRECTOR")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
