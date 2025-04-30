@@ -150,7 +150,6 @@ const UserDetailPage = () => {
           <div className="info-row ">
             <span className="info-label">Роли:</span>
             <div className="roles-container-wrapper">
-
               <div className="roles-container">
                 {(isEditing ? editedRoles : user.roles).map(role => (
                   <div key={role} className="role-badge">
@@ -161,16 +160,14 @@ const UserDetailPage = () => {
                     />
                   </div>
                 ))}
-
+              </div>
+              <div>
                 <IconButton
                   className="add-role-icon"
                   onClick={(e) => handleEdit(e)}
-                  
-            
                 >
                   <AddBoxIcon fontSize="large" color="primary" />
                 </IconButton>
-
               </div>
             </div>
           </div>
@@ -202,12 +199,27 @@ const UserDetailPage = () => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          }
+        }}
       >
         {availableRoles.map(role => (
           <MenuItem
             key={role}
             onClick={() => handleAddRole(role)}
             className="role-menu-item"
+            sx={{
+              padding: '8px 16px',
+              margin: '4px',
+              borderRadius: '20px',
+              '&:hover': {
+                backgroundColor: 'var(--deep-frost)',
+                color: 'var(--ice-blue)'
+              }
+            }}
           >
             {translateRole(role)}
           </MenuItem>

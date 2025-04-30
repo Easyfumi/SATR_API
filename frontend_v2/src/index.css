@@ -26,3 +26,9 @@ html, body, #root {
   transition: transform 0.3s ease;
   transform-origin: top left;
 }
+
+:root {
+  --deep-frost: #2c3e50;
+  --ice-blue: #ecf0f1;
+  --glacial-shadow: rgba(44,62,80,0.1);
+}
