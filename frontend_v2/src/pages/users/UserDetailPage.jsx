@@ -5,7 +5,6 @@ import { useAuth } from '../../context/AuthContext';
 import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import CloseIcon from '@mui/icons-material/Close';
-import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +35,7 @@ const UserDetailPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [editedRoles, setEditedRoles] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [anchorEl, setAnchorEl] = useState(null);
@@ -74,6 +73,7 @@ const UserDetailPage = () => {
 
   const handleRemoveRole = (roleToRemove) => {
     setEditedRoles(prev => prev.filter(role => role !== roleToRemove));
+    setIsEditing(true);
   };
 
   const handleSave = async () => {
@@ -83,6 +83,10 @@ const UserDetailPage = () => {
       setUser(updatedUser.data);
       setSnackbar({ open: true, message: 'Роли успешно обновлены!', severity: 'success' });
       setIsEditing(false);
+      setTimeout(() => {
+        window.location.reload(); // Полная перезагрузка страницы
+      }, 100);
+
     } catch (error) {
       setSnackbar({
         open: true,
@@ -92,9 +96,14 @@ const UserDetailPage = () => {
     }
   };
 
+  const handleEdit = (e) => {
+    setAnchorEl(e.currentTarget);
+    setIsEditing(true);
+  }
+
   const handleCancel = () => {
     setEditedRoles(user.roles);
-    setIsEditing(true);
+    setIsEditing(false);
   };
 
   if (loading) return <div>Загрузка...</div>;
@@ -155,7 +164,9 @@ const UserDetailPage = () => {
 
                 <IconButton
                   className="add-role-icon"
-                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                  onClick={(e) => handleEdit(e)}
+                  
+            
                 >
                   <AddBoxIcon fontSize="large" color="primary" />
                 </IconButton>
@@ -164,7 +175,7 @@ const UserDetailPage = () => {
             </div>
           </div>
 
-          
+          {isEditing && (
             <div className="edit-controls">
               <Button
                 variant="contained"
@@ -182,7 +193,7 @@ const UserDetailPage = () => {
                 Отмена
               </Button>
             </div>
-          
+          )}
 
         </div>
       </div>
