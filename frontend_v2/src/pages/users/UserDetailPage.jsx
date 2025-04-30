@@ -17,6 +17,7 @@ import {
   MenuItem,
   Chip
 } from '@mui/material';
+import AddBoxIcon from '@mui/icons-material/AddBox';
 
 const translateRole = (role) => {
   const rolesMap = {
@@ -35,7 +36,7 @@ const UserDetailPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [editedRoles, setEditedRoles] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [anchorEl, setAnchorEl] = useState(null);
@@ -83,21 +84,21 @@ const UserDetailPage = () => {
       setSnackbar({ open: true, message: 'Роли успешно обновлены!', severity: 'success' });
       setIsEditing(false);
     } catch (error) {
-      setSnackbar({ 
-        open: true, 
-        message: error.response?.data?.message || 'Ошибка обновления ролей', 
-        severity: 'error' 
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Ошибка обновления ролей',
+        severity: 'error'
       });
     }
   };
 
   const handleCancel = () => {
     setEditedRoles(user.roles);
-    setIsEditing(false);
+    setIsEditing(true);
   };
 
   if (loading) return <div>Загрузка...</div>;
-  
+
   if (!user) return (
     <div className="page-wrapper">
       <div className="content-container">
@@ -124,74 +125,65 @@ const UserDetailPage = () => {
       <div className="content-container">
         <h2 className="page-title">Профиль пользователя</h2>
         <div className="user-detail">
+
           <div className="info-row">
             <span className="info-label">ФИО:</span>
             <span className="info-value">
               {user.secondName} {user.firstName} {user.patronymic}
             </span>
           </div>
+
           <div className="info-row">
             <span className="info-label">Email:</span>
             <span className="info-value">{user.email}</span>
           </div>
-          <div className="info-row">
-            <div className="roles-header">
-              <span className="info-label">Роли:</span>
-              {currentUser?.roles?.includes('DIRECTOR') && (
-                <>
-                  {isEditing ? (
-                    <Button 
-                      variant="contained" 
-                      size="small"
-                      startIcon={<AddIcon />}
-                      onClick={(e) => setAnchorEl(e.currentTarget)}
-                      className="add-role-btn"
-                    >
-                      Добавить роль
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outlined" 
-                      size="small"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      Редактировать
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-            <div className="roles-container">
-              {(isEditing ? editedRoles : user.roles).map(role => (
-                <Chip
-                  key={role}
-                  label={translateRole(role)}
-                  className="role-chip"
-                  onDelete={isEditing ? () => handleRemoveRole(role) : null}
-                  deleteIcon={<CloseIcon />}
-                />
-              ))}
-            </div>
-            {isEditing && (
-              <div className="edit-controls">
-                <Button 
-                  variant="contained" 
-                  color="primary"
-                  onClick={handleSave}
-                  className="save-btn"
+
+          <div className="info-row ">
+            <span className="info-label">Роли:</span>
+            <div className="roles-container-wrapper">
+
+              <div className="roles-container">
+                {(isEditing ? editedRoles : user.roles).map(role => (
+                  <div key={role} className="role-badge">
+                    {translateRole(role)}
+                    <CloseIcon
+                      className="role-remove-icon"
+                      onClick={() => handleRemoveRole(role)}
+                    />
+                  </div>
+                ))}
+
+                <IconButton
+                  className="add-role-icon"
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
                 >
-                  Сохранить
-                </Button>
-                <Button 
-                  variant="outlined" 
-                  onClick={handleCancel}
-                  className="cancel-btn"
-                >
-                  Отмена
-                </Button>
+                  <AddBoxIcon fontSize="large" color="primary" />
+                </IconButton>
+
               </div>
-            )}
+            </div>
           </div>
+
+          
+            <div className="edit-controls">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSave}
+                className="save-btn"
+              >
+                Сохранить
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={handleCancel}
+                className="cancel-btn"
+              >
+                Отмена
+              </Button>
+            </div>
+          
+
         </div>
       </div>
 

@@ -9,7 +9,11 @@
 .roles-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+  padding-right: 40px;
+  min-height: 40px;
 }
 
 .role-chip {
@@ -47,21 +51,28 @@
   align-items: center;
 }
 
-.add-role-btn {
-  background-color: #3498db;
-  color: white !important;
-  margin-left: 1rem;
-  &:hover {
-    background-color: #2980b9;
-  }
+.add-role-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  padding: 10px !important;
 }
+
+
 .role-menu-item {
   padding: 0.75rem 1.5rem;
   font-size: 0.9rem;
   &:hover {
     background-color: #3498db;
-    color: white;
+    color: rgb(0, 0, 0);
   }
+}
+
+.role-remove-icon {
+  cursor: pointer;
+  font-size: 16px !important;
+  margin-left: 4px;
+  color: var(--ice-blue) !important;
 }
 
 .dialog-actions {
@@ -95,13 +106,38 @@
 }
 
 .edit-controls {
-  margin-top: 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 12px;
   justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .cancel-btn {
   border-color: #e74c3c !important;
   color: #e74c3c !important;
 }
+
+.info-row.roles-row {
+  align-items: flex-start;
+}
+
+.roles-container-wrapper {
+  flex-grow: 1;
+}
+
+
+.role-badge {
+  background: var(--deep-frost);
+  color: var(--ice-blue);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+
