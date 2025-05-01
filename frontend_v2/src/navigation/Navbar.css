@@ -42,7 +42,7 @@
     font-weight: 500 !important;
     font-size: 1.1rem !important;
     letter-spacing: 0.5px;
-    white-space: nowrap;
+
     transition: opacity 0.3s ease;
   }
   
@@ -84,40 +84,3 @@
     margin-right: 8px !important;
   }
   
-  @media (max-width: 1200px) {
-    .navbar-title {
-      display: none !important;
-    }
-    
-    .navbar-toolbar {
-      padding: 0 16px !important;
-    }
-    
-    .navbar-user-name {
-      font-size: 0.85rem !important;
-      padding: 4px 8px;
-    }
-    
-    .navbar-logout-button {
-      padding: 6px 16px !important;
-      font-size: 0.9rem !important;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .navbar-logo {
-      height: 40px;
-    }
-    
-    .navbar-user-name {
-      display: none !important;
-    }
-    
-    .navbar-logout-button span {
-      display: none;
-    }
-    
-    .logout-icon {
-      margin-right: 0 !important;
-    }
-  }

@@ -130,7 +130,7 @@ const UserDetailPage = () => {
   );
 
   return (
-    <div className="page-wrapper">
+    <div>
       <div className="content-container">
         <h2 className="page-title">Профиль пользователя</h2>
         <div className="user-detail">

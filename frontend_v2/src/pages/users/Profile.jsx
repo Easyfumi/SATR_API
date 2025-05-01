@@ -32,7 +32,7 @@ export default function Profile() {
   }, [user, setUser]);
 
   return (
-    <div className="page-wrapper">
+
       <div className="content-container">
         <h2 className="page-title">Профиль пользователя</h2>
         {user && (
@@ -68,6 +68,6 @@ export default function Profile() {
           </div>
         )}
       </div>
-    </div>
+
   );
 }

@@ -44,7 +44,7 @@ const UsersPage = () => {
 
 
   return (
-    <div className="page-wrapper">
+
       <div className="content-container">
         <h2 className="page-title">Список пользователей</h2>
         <div className="users-list">
@@ -88,7 +88,7 @@ const UsersPage = () => {
           ))}
         </div>
       </div>
-    </div>
+ 
   );
 };
 
