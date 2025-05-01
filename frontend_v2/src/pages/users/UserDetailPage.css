@@ -81,15 +81,14 @@
 
 .add-role-icon {
   right: 10px;
-  top: 24px;
+
   padding: 8px !important;
 }
 
 .edit-controls {
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
+  justify-content:start;
 }
 
 .save-btn {

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getUserById, updateUserRoles } from '../../services/users';
-import { useAuth } from '../../context/AuthContext';
 import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,8 +12,7 @@ import {
   Snackbar,
   Alert,
   Menu,
-  MenuItem,
-  Chip
+  MenuItem
 } from '@mui/material';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 
@@ -30,7 +28,6 @@ const translateRole = (role) => {
 };
 
 const UserDetailPage = () => {
-  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState(null);
@@ -41,7 +38,10 @@ const UserDetailPage = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [availableRoles, setAvailableRoles] = useState([]);
 
-  const allRoles = ['EXPERT', 'DIRECTOR', 'REGISTRAR', 'ACCOUNTANT', 'EMPTY'];
+  const allRoles = React.useMemo(
+    () => ['EXPERT', 'DIRECTOR', 'REGISTRAR', 'ACCOUNTANT', 'EMPTY'],
+    []
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -64,7 +64,7 @@ const UserDetailPage = () => {
 
   useEffect(() => {
     setAvailableRoles(allRoles.filter(role => !editedRoles.includes(role)));
-  }, [editedRoles]);
+  }, [editedRoles, allRoles]);
 
   const handleAddRole = (role) => {
     setEditedRoles(prev => [...prev, role]);
@@ -132,7 +132,7 @@ const UserDetailPage = () => {
   return (
     <div>
       <div className="content-container">
-        <h2 className="page-title">Профиль пользователя</h2>
+        <h2 className="page-title">Профиль пользователя</h2>        
         <div className="user-detail">
 
           <div className="info-row">
@@ -149,7 +149,10 @@ const UserDetailPage = () => {
 
           <div className="info-row ">
             <span className="info-label">Роли:</span>
+
+            
             <div className="roles-container-wrapper">
+        
               <div className="roles-container">
                 {(isEditing ? editedRoles : user.roles).map(role => (
                   <div key={role} className="role-badge">
@@ -160,37 +163,43 @@ const UserDetailPage = () => {
                     />
                   </div>
                 ))}
-              </div>
-              <div>
                 <IconButton
-                  className="add-role-icon"
-                  onClick={(e) => handleEdit(e)}
-                >
-                  <AddBoxIcon fontSize="large" color="primary" />
-                </IconButton>
+                className="add-role-icon"
+                onClick={(e) => handleEdit(e)}
+              >
+                <AddBoxIcon fontSize="large" color="primary" />
+              </IconButton>
               </div>
+
+              
+
             </div>
           </div>
 
-          {isEditing && (
-            <div className="edit-controls">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSave}
-                className="save-btn"
-              >
-                Сохранить
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleCancel}
-                className="cancel-btn"
-              >
-                Отмена
-              </Button>
-            </div>
-          )}
+  
+            {isEditing && (
+                <div className="edit-controls">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSave}
+                    className="save-btn"
+                  >
+                    Сохранить
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={handleCancel}
+                    className="cancel-btn"
+                  >
+                    Отмена
+                  </Button>
+                </div>
+              )}
+    
+
+
+
 
         </div>
       </div>
