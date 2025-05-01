@@ -1,15 +1,13 @@
 package ru.marinin.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.marinin.model.Task;
-import ru.marinin.model.TaskStatus;
+import ru.marinin.model.enums.TaskStatus;
 import ru.marinin.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 

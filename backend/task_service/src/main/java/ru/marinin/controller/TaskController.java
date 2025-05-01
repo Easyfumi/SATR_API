@@ -1,15 +1,13 @@
 package ru.marinin.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.marinin.model.Task;
-import ru.marinin.model.TaskStatus;
+import ru.marinin.model.enums.TaskStatus;
 import ru.marinin.model.UserDto;
 import ru.marinin.service.TaskService;
-import ru.marinin.service.TaskServiceImplementation;
 import ru.marinin.service.UserService;
 
 import java.util.List;

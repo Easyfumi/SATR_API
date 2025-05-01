@@ -1,7 +1,7 @@
 package ru.marinin.service;
 
 import ru.marinin.model.Task;
-import ru.marinin.model.TaskStatus;
+import ru.marinin.model.enums.TaskStatus;
 
 import java.util.List;
 

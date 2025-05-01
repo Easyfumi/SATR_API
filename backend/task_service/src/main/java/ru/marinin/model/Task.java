@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.marinin.model.enums.TaskStatus;
+import ru.marinin.model.enums.VehicleCategories;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +32,7 @@ public class Task {
 
     private String manufacturer;   // изготовитель
 
-    private List<String> categories;   // категории
+    private List<VehicleCategories> categories;   // категории
 
     private String mark;  // марка
 

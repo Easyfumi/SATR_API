@@ -1,4 +1,4 @@
-package ru.marinin.model;
+package ru.marinin.model.enums;
 
 public enum TaskStatus {
     RECEIVED("RECEIVED"),    // заявка получена - 1 статус при создании
