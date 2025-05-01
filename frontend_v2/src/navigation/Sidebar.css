@@ -4,7 +4,7 @@
     box-shadow: 4px 0 20px var(--glacial-shadow) !important;
     width: 240px;
     height: auto;
-    position: fixed;
+    position: absolute;
     left: 20px;
     top: 100px;
     padding: 16px 0;
@@ -43,10 +43,15 @@
   }
   
   .sidebar-icon {
-    color: inherit !important;
-    margin-right: 12px !important; /* Меньше отступ */
-    min-width: 22px; /* Компактные иконки */
+    color: white;
+    margin-right: 12px !important;
+    min-width: 22px;
     font-size: 1.1rem !important;
+    transition: color 0.25s ease !important; /* Добавляем анимацию */
+  }
+
+  .sidebar-icon.active {
+    color: var(--deep-frost) !important;
   }
   
   @media (max-width: 768px) {
@@ -55,7 +60,11 @@
         padding: 16px 4px;
         border-radius: 12px; /* Меньшее скругление для мобильной версии */
         left: 10px; /* Лучше смотрится с уменьшенным отступом */
-        top: 80px; /* Более компактное позиционирование */
+        top: 100px; /* Более компактное позиционирование */
+    }
+
+    .sidebar-button .MuiListItemText-root {
+      display: none !important;
     }
     
     .sidebar-button {
@@ -65,5 +74,7 @@
     
     .sidebar-icon {
       font-size: 1rem !important;
+      margin-left: -9px;
+      font-size: 1.4rem !important;
     }
   }

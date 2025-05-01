@@ -11,26 +11,34 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/", text: "Главная", icon: <HomeIcon className="sidebar-icon" /> },
-    { path: "users/profile", text: "Профиль", icon: <PersonIcon className="sidebar-icon" /> },
-    { path: "/history", text: "История", icon: <HistoryIcon className="sidebar-icon" /> },
-    { path: "/settings", text: "Настройки", icon: <SettingsIcon className="sidebar-icon" /> },
+    { path: "/", text: "Главная", icon: <HomeIcon /> },
+    { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
+    { path: "/history", text: "История", icon: <HistoryIcon /> },
+    { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },
   ];
 
   return (
     <div className="sidebar-container">
       <List component="nav" className="sidebar-toolbar">
-        {menuItems.map((item) => (
-          <ListItemButton
-            key={item.path}
-            component={Link}
-            to={item.path}
-            className={`sidebar-button ${location.pathname === item.path ? 'active' : ''}`}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
+
+      {menuItems.map((item) => {
+  const isActive = location.pathname === item.path;
+  return (
+    <ListItemButton
+      key={item.path}
+      component={Link}
+      to={item.path}
+      className={`sidebar-button ${isActive ? 'active' : ''}`}
+    >
+      <ListItemIcon>
+        {React.cloneElement(item.icon, {
+          className: `sidebar-icon ${isActive ? 'active' : ''}`
+        })}
+      </ListItemIcon>
+      <ListItemText primary={item.text} />
+    </ListItemButton>
+  );
+})}
       </List>
     </div>
   );
