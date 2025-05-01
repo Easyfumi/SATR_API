@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -16,18 +18,36 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String number;   //  номер заявки, присваивается при регистрации
 
-    private String description;
+    private String type;   // ОТТС/ОТШ
 
-    private String image;
+    private String applicant;   // заявитель
 
-    private Long assignedUserId;
+    private String manufacturer;   // изготовитель
 
-    private TaskStatus status;
+    private List<String> categories;   // категории
 
-    private LocalDateTime createdAt;
+    private String mark;  // марка
+
+    private String typeName;  // наименование типа
+
+    private String procedure;  // процедура
+
+    private String manufacturersRepresentative;  // представитель изготовителя
+
+    private Long createdBy;   // кем создана
+
+    private Long assignedUserId;   // назначен для работы по заявке
+
+    private TaskStatus status;   // статус
+
+    private LocalDateTime createdAt;   // дата время создания заявки
+
+    private LocalDate decisionAt;   // дата решения по заявке
+
+    private Boolean paymentStatus;  // статус оплаты
 }
