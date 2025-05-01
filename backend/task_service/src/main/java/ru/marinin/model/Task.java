@@ -1,9 +1,6 @@
 package ru.marinin.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,9 +25,11 @@ public class Task {
 
     private String type;   // ОТТС/ОТШ
 
-    private String applicant;   // заявитель
+    @ManyToOne
+    private Applicant applicant;   // заявитель
 
-    private String manufacturer;   // изготовитель
+    @ManyToOne
+    private Manufacturer manufacturer;   // изготовитель
 
     private List<VehicleCategories> categories;   // категории
 
@@ -40,7 +39,8 @@ public class Task {
 
     private String procedure;  // процедура
 
-    private String manufacturersRepresentative;  // представитель изготовителя
+    @ManyToOne
+    private Representative manufacturersRepresentative;  // представитель изготовителя
 
     private Long createdBy;   // кем создана
 
@@ -52,5 +52,5 @@ public class Task {
 
     private LocalDate decisionAt;   // дата решения по заявке
 
-    private Boolean paymentStatus;  // статус оплаты
+    private Boolean paymentStatus=false;  // статус оплаты
 }
