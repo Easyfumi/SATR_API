@@ -78,46 +78,37 @@ const TaskListPage = () => {
                 <div className="error-message">{error}</div>
             ) : (
                 <div className="tasks-list">
-                    {tasks.length > 0 ? (
-                        tasks.map(task => (
-                            <div key={task.id} className="task-card">
+                    {tasks.map(task => (
+                        <div key={task.id} className="task-card">
+                            <div className="approval-type">{task.docType}</div>
 
-                                <div className="task-info">
-                                    <div className="info-row">
-                                        <span className="info-label">Тип:</span>
-                                        <span className="info-value">{task.docType}</span>
-                                    </div>
+                            <div className="card-content">
+                                <div className="info-group">
+                                    <span className="info-label">Марка</span>
+                                    <span className="info-value">{task.mark}</span>
+                                </div>
 
-                                    <div className="info-row">
-                                        <span className="info-label">Заявитель:</span>
-                                        <span className="info-value">{task.applicant}</span>
-                                    </div>
+                                <div className="info-group">
+                                    <span className="info-label">Тип</span>
+                                    <span className="info-value">{task.typeName}</span>
+                                </div>
 
-                                    <div className="info-row">
-                                        <span className="info-label">Изготовитель:</span>
-                                        <span className="info-value">{task.manufacturer}</span>
-                                    </div>
-
-                                    <div className="info-row">
-                                        <span className="info-label">Марка:</span>
-                                        <span className="info-value">{task.mark}</span>
-                                    </div>
-
-                                    <div className="info-row">
-                                        <span className="info-label">Тип:</span>
-                                        <span className="info-value">{task.typeName}</span>
-                                    </div>
-
-                                    <div className="info-row">
-                                        <span className="info-label">Процесс:</span>
-                                        <span className="info-value">{task.processType}</span>
+                                <div className="info-group">
+                                    <span className="info-label">Категории</span>
+                                    <div className="categories-list">
+                                        {task.categories.map(cat => (
+                                            <span key={cat} className="category-tag">{cat}</span>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <div className="no-tasks">Нет доступных заявок</div>
-                    )}
+
+                            <div className="applicant-info">
+                                <span className="applicant-label">Заявитель:</span>
+                                <span className="applicant-name">{task.applicant}</span>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
