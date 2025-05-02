@@ -60,7 +60,7 @@ const TaskListPage = () => {
                     ))}
                 </div>
 
-                <h2 className="page-title">Раздел Одобрений типа транспортного средства / шасси</h2>
+                <h2 className="page-title">Раздел Одобрения типа транспортного средства / шасси</h2>
 
                 <Link
                     to="/tasks/create"
