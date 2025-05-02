@@ -83,11 +83,11 @@ const CreateTaskPage = () => {
     return (
         <div className="content-container">
             <div className="create-task-form">
-                <h2 className="form-title">Создание новой заявки</h2>
+                <h2 className="page-title">Создание новой заявки</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
 
-                    <div className="info-row">
-                        <label className="info-label">Тип заявки:</label>
+                    <div className="form-row">
+                        <label className="form-label">Тип одобрения:</label>
                         <select
                             value={formData.docType}
                             onChange={(e) => setFormData({ ...formData, docType: e.target.value })}
@@ -98,8 +98,30 @@ const CreateTaskPage = () => {
                         </select>
                     </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Заявитель:</label>
+                    <div className="form-row">
+                        <label className="form-label">Марка:</label>
+                        <input
+                            type="text"
+                            value={formData.mark}
+                            onChange={(e) => setFormData({ ...formData, mark: e.target.value })}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <label className="form-label">Тип:</label>
+                        <input
+                            type="text"
+                            value={formData.typeName}
+                            onChange={(e) => setFormData({ ...formData, typeName: e.target.value })}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+                    
+                    <div className="form-row">
+                        <label className="form-label">Заявитель:</label>
                         <input
                             type="text"
                             value={formData.applicantName}
@@ -109,8 +131,8 @@ const CreateTaskPage = () => {
                         />
                     </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Изготовитель:</label>
+                    <div className="form-row">
+                        <label className="form-label">Изготовитель:</label>
                         <input
                             type="text"
                             value={formData.manufacturerName}
@@ -120,8 +142,19 @@ const CreateTaskPage = () => {
                         />
                     </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Категория:</label>
+                    <div className="form-row form-row-multiline">
+                        <label className="form-label">Представитель изготовителя:</label>
+                        <input
+                            type="text"
+                            value={formData.representativeName}
+                            onChange={(e) => setFormData({ ...formData, representativeName: e.target.value })}
+                            className="form-input"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <label className="form-label">Категория:</label>
                         <FormControl fullWidth>
                             <Select
                                 multiple
@@ -159,30 +192,12 @@ const CreateTaskPage = () => {
                         </FormControl>
                     </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Марка:</label>
-                        <input
-                            type="text"
-                            value={formData.mark}
-                            onChange={(e) => setFormData({ ...formData, mark: e.target.value })}
-                            className="form-input"
-                            required
-                        />
-                    </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Тип:</label>
-                        <input
-                            type="text"
-                            value={formData.typeName}
-                            onChange={(e) => setFormData({ ...formData, typeName: e.target.value })}
-                            className="form-input"
-                            required
-                        />
-                    </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Процедура:</label>
+
+
+                    <div className="form-row">
+                        <label className="form-label">Процедура:</label>
                         <input
                             type="text"
                             value={formData.processType}
@@ -192,16 +207,7 @@ const CreateTaskPage = () => {
                         />
                     </div>
 
-                    <div className="info-row">
-                        <label className="info-label">Представитель:</label>
-                        <input
-                            type="text"
-                            value={formData.representativeName}
-                            onChange={(e) => setFormData({ ...formData, representativeName: e.target.value })}
-                            className="form-input"
-                            required
-                        />
-                    </div>
+
 
                     <div className="form-actions">
                         <Button
