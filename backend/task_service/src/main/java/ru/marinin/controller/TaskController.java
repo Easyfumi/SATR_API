@@ -9,6 +9,8 @@ import ru.marinin.model.dto.TaskRequest;
 import ru.marinin.model.dto.TaskResponse;
 import ru.marinin.service.TaskService;
 
+import ru.marinin.service.UserService;
+
 import java.util.List;
 
 
@@ -16,14 +18,17 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
-
     private final TaskService taskService;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
 
-    @PostMapping
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest request) {
-        TaskResponse response = taskService.createTask(request);
+    @PostMapping("/create")
+    public ResponseEntity<TaskResponse> createTask(
+            @RequestBody TaskRequest request,
+            @RequestHeader("Authorization") String jwt) {
+
+        TaskResponse response = taskService.createTask(request, jwt);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

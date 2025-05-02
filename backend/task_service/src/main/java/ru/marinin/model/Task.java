@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "tasks")
 public class Task {
 
     @Id
@@ -23,7 +24,7 @@ public class Task {
 
     private String number;   //  номер заявки, присваивается при регистрации
 
-    private String type;   // ОТТС/ОТШ
+    private String docType;   // ОТТС/ОТШ
 
     @ManyToOne
     private Applicant applicant;   // заявитель
@@ -37,7 +38,7 @@ public class Task {
 
     private String typeName;  // наименование типа
 
-    private String procedure;  // процедура
+    private String processType;  // процедура
 
     @ManyToOne
     private Representative manufacturersRepresentative;  // представитель изготовителя

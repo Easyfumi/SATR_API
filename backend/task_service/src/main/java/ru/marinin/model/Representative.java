@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "representatives")
 public class Representative {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
