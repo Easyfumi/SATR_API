@@ -2,10 +2,10 @@
     background: linear-gradient(195deg, var(--deep-frost) 0%, #1A2A3A 100%) !important;
     box-shadow: 4px 0 20px var(--glacial-shadow) !important;
     width: 240px;
-    height: auto;
+    height: auto !important;
     position: absolute;
     left: 20px;
-    top: 410px;
+    top: 450px !important;
     padding: 16px 0;
     z-index: 1000;
     border-radius: 16px; /* Добавлено скругление */

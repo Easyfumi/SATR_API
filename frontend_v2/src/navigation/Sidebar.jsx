@@ -11,34 +11,47 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/tasks", text: "Главная", icon: <HomeIcon /> },
+    { 
+      path: "/tasks",
+      text: "Главная", 
+      icon: <HomeIcon />,
+      activePaths: ["/tasks", "/decl", "/serts"]
+    },
     { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },
   ];
 
+    const isActive = (item) => {
+    if (item.activePaths) {
+      return item.activePaths.some(path => 
+        location.pathname.startsWith(path)
+      );
+    }
+    return location.pathname === item.path;
+  };
+
   return (
     <div className="sidebar-container">
       <List component="nav" className="sidebar-toolbar">
-
-      {menuItems.map((item) => {
-  const isActive = location.pathname === item.path;
-  return (
-    <ListItemButton
-      key={item.path}
-      component={Link}
-      to={item.path}
-      className={`sidebar-button ${isActive ? 'active' : ''}`}
-    >
-      <ListItemIcon>
-        {React.cloneElement(item.icon, {
-          className: `sidebar-icon ${isActive ? 'active' : ''}`
+        {menuItems.map((item) => {
+          const active = isActive(item);
+          return (
+            <ListItemButton
+              key={item.path}
+              component={Link}
+              to={item.path}
+              className={`sidebar-button ${active ? 'active' : ''}`}
+            >
+              <ListItemIcon>
+                {React.cloneElement(item.icon, {
+                  className: `sidebar-icon ${active ? 'active' : ''}`
+                })}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          );
         })}
-      </ListItemIcon>
-      <ListItemText primary={item.text} />
-    </ListItemButton>
-  );
-})}
       </List>
     </div>
   );

@@ -1,83 +1,134 @@
+.nav-buttons-container {
+    display: flex;
+    gap: 2px;
+    background: linear-gradient(195deg, var(--deep-frost) 0%, #1A2A3A 100%);
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 4px 4px 15px var(--glacial-shadow);
+}
+
+.nav-button {
+    color: var(--ice-blue);
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    position: relative;
+    font-size: 0.95rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-button:hover {
+    background: rgba(163, 184, 204, 0.15);
+    transform: translateY(-1px);
+}
+
+.nav-button.active {
+    background: linear-gradient(145deg, var(--ice-blue), var(--silver-accent));
+    color: var(--deep-frost);
+    box-shadow: 0 2px 8px var(--glacial-shadow);
+}
+
 .tasks-list {
     display: grid;
     gap: 20px;
-  }
-  
-  .task-card {
+}
+
+.task-card {
     background: #fff;
     border: 1px solid var(--silver-accent);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
-  }
-  
-  .task-header {
+}
+
+.task-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-  }
-  
-  .task-number {
+}
+
+.task-number {
     color: var(--deep-frost);
     font-weight: 600;
     font-size: 1.1rem;
-  }
-  
-  .status-badge {
+}
+
+.status-badge {
     background: var(--ice-blue);
     color: #fff;
     padding: 6px 12px;
     border-radius: 15px;
     font-size: 0.8rem;
     text-transform: uppercase;
-  }
-  
-  .task-info {
+}
+
+.task-info {
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
-  
-  .payment-status {
+}
+
+.payment-status {
     display: inline-block;
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 0.8rem;
-  }
-  
-  .payment-paid {
+}
+
+.payment-paid {
     background: #e6f4ea;
     color: #137333;
-  }
-  
-  .payment-unpaid {
+}
+
+.payment-unpaid {
     background: #fce8e6;
     color: #c5221f;
-  }
-  
-  .create-btn {
+}
+
+.create-btn {
     background: var(--deep-frost) !important;
     color: white !important;
     padding: 10px 20px !important;
     border-radius: 8px !important;
     text-transform: none !important;
-  }
-  
-  .create-btn:hover {
+}
+
+.create-btn:hover {
     background: var(--cold-steel) !important;
-  }
-  
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
     .task-card {
-      padding: 15px;
+        padding: 15px;
     }
-    
+
     .task-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
-  }
+
+    .nav-buttons-container {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .nav-button {
+        flex: 1 1 auto;
+        padding: 12px 15px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+
+    .create-btn {
+        width: 100%;
+        margin-top: 15px;
+    }
+}
