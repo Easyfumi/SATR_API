@@ -32,8 +32,7 @@
 }
 
 .tasks-list {
-    display: grid;
-    gap: 20px;
+    display: grid
 }
 
 .task-card {
@@ -44,6 +43,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .task-header {
@@ -91,16 +91,45 @@
     color: #c5221f;
 }
 
-.create-btn {
-    background: var(--deep-frost) !important;
-    color: white !important;
-    padding: 10px 20px !important;
-    border-radius: 8px !important;
-    text-transform: none !important;
+.create-task-button {
+    display: flex;
+    align-items: center;
+    max-width: 250px;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--deep-frost);
+    padding: 12px 20px;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 1px solid var(--silver-accent);
 }
 
-.create-btn:hover {
-    background: var(--cold-steel) !important;
+.create-task-button:hover {
+    background: rgba(163, 184, 204, 0.15) !important;
+    transform: translateX(3px);
+}
+
+.create-task-button:hover .create-task-icon,
+.create-task-button:hover .create-task-text {
+    color: var(--deep-frost);
+}
+
+.create-task-icon {
+    font-size: 40px !important;
+    color: inherit;
+    transition: inherit;
+}
+
+.create-task-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: inherit;
+    transition: inherit;
+    font-weight: 500;
 }
 
 @media (max-width: 768px) {

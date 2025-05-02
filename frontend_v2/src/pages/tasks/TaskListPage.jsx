@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskListPage.css';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 
 const statusLabels = {
     RECEIVED: 'Получена',
@@ -26,44 +27,50 @@ const TaskListPage = () => {
 
     useEffect(() => {
         const fetchTasks = async () => {
-          try {
-            const response = await api.get('/api/tasks');
-            const data = Array.isArray(response.data) ? response.data : [];
-            setTasks(data);
-            setError(null);
-          } catch (error) {
-            console.error('Error fetching tasks:', error);
-            setError('Ошибка загрузки данных');
-            setTasks([]);
-          } finally {
-            setLoading(false);
-          }
+            try {
+                const response = await api.get('/api/tasks');
+                const data = Array.isArray(response.data) ? response.data : [];
+                setTasks(data);
+                setError(null);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+                setError('Ошибка загрузки данных');
+                setTasks([]);
+            } finally {
+                setLoading(false);
+            }
         };
-        
-        fetchTasks();
-      }, []);
 
-      return (
+        fetchTasks();
+    }, []);
+
+    return (
         <div className="content-container">
-          <div className="tasks-header">
-            <div className="nav-buttons-container">
-              {navItems.map((item) => (
+            <div className="tasks-header">
+                <div className="nav-buttons-container">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`nav-button ${location.pathname === item.path ? 'active' : ''
+                                }`}
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
+                </div>
+
+                <h2 className="page-title">Раздел Одобрений типа транспортного средства / шасси</h2>
+
                 <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`nav-button ${
-                    location.pathname === item.path ? 'active' : ''
-                  }`}
+                    to="/tasks/create"
+                    className="create-task-button"
                 >
-                  {item.label}
+                    <LibraryAddIcon className="create-task-icon" />
+                    <h1 className="create-task-text">Новая заявка</h1>
                 </Link>
-              ))}
+
             </div>
-            
-            <Link to="/tasks/create" className="create-btn">
-              + Новая заявка
-            </Link>
-          </div>
 
             {loading ? (
                 <div className="loading">Загрузка...</div>
@@ -74,13 +81,6 @@ const TaskListPage = () => {
                     {tasks.length > 0 ? (
                         tasks.map(task => (
                             <div key={task.id} className="task-card">
-
-                                {/* <div className="task-header">
-                <div className="task-number">#{task.number}</div>
-                <span className={`status-badge ${task.status.toLowerCase()}`}>
-                  {statusLabels[task.status]}
-                </span>
-              </div> */}
 
                                 <div className="task-info">
                                     <div className="info-row">
