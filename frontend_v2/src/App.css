@@ -1,3 +1,5 @@
+
+
 .content-container {
   background: white;
   border: 2px solid var(--cold-steel);
@@ -21,6 +23,24 @@
   font-size: 1.8rem;
   font-weight: 600;
 }
+
+/* .primary-btn {
+  background: var(--deep-frost);
+  color: white;
+  padding: 10px 25px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: #f0f2f5;
+  color: var(--deep-frost);
+  padding: 10px 25px;
+  border-radius: 6px;
+  border: 1px solid var(--silver-accent);
+  cursor: pointer;
+} */
 
 /* Адаптивность */
 @media (max-width: 768px) {

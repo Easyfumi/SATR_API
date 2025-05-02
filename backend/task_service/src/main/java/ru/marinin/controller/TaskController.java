@@ -1,12 +1,17 @@
 package ru.marinin.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.marinin.model.Applicant;
+import ru.marinin.model.Manufacturer;
+import ru.marinin.model.Representative;
 import ru.marinin.model.dto.TaskRequest;
 import ru.marinin.model.dto.TaskResponse;
+import ru.marinin.repository.ApplicantRepository;
+import ru.marinin.repository.ManufacturerRepository;
+import ru.marinin.repository.RepresentativeRepository;
 import ru.marinin.service.TaskService;
 
 import ru.marinin.service.UserService;
@@ -19,16 +24,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    private final ModelMapper modelMapper;
     private final UserService userService;
-
 
     @PostMapping("/create")
     public ResponseEntity<TaskResponse> createTask(
             @RequestBody TaskRequest request,
             @RequestHeader("Authorization") String jwt) {
 
+        System.out.println(request);
+
+
         TaskResponse response = taskService.createTask(request, jwt);
+
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -36,6 +44,8 @@ public class TaskController {
     public ResponseEntity<List<TaskResponse>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
+
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {

@@ -11,6 +11,8 @@ import HomePage from './pages/HomePage';
 import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
 import UserDetailPage from './pages/users/UserDetailPage'; 
+import TaskListPage from './pages/tasks/TaskListPage';
+import CreateTaskPage from './pages/tasks/CreateTaskPage'; 
 
 // Основной лейаут для авторизованных пользователей
 const MainLayout = () => {
@@ -41,6 +43,8 @@ function App() {
             <Route path="/users/profile" element={<Profile />} />
             <Route path="/users/all" element={<UsersPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
+            <Route path="/tasks" element={<TaskListPage />} />
+            <Route path="/tasks/create" element={<CreateTaskPage />} />
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

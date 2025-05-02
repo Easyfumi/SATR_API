@@ -7,17 +7,12 @@ import java.util.List;
 
 @Data
 public class TaskRequest {
-    private String type;
-    private Long applicantId;
-    private Long manufacturerId;
+    private String docType;
+    private String applicantName;
+    private String manufacturerName;
     private List<String> categories;
     private String mark;
     private String typeName;
-    private String procedure;
-    private Long representativeId;
-    private Long createdBy;
-    private Long assignedUserId;
-    private String status;
-    private LocalDate decisionAt;
-    private Boolean paymentStatus;
+    private String processType;
+    private String representativeName;
 }

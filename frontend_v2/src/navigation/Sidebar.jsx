@@ -11,7 +11,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/", text: "Главная", icon: <HomeIcon /> },
+    { path: "/tasks", text: "Главная", icon: <HomeIcon /> },
     { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },

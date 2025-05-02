@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.marinin.model.dto.TaskRequest;
 import ru.marinin.model.enums.TaskStatus;
 import ru.marinin.model.enums.VehicleCategories;
 
@@ -32,7 +33,7 @@ public class Task {
     @ManyToOne
     private Manufacturer manufacturer;   // изготовитель
 
-    private List<VehicleCategories> categories;   // категории
+    private List<String> categories;   // категории
 
     private String mark;  // марка
 
@@ -41,7 +42,7 @@ public class Task {
     private String processType;  // процедура
 
     @ManyToOne
-    private Representative manufacturersRepresentative;  // представитель изготовителя
+    private Representative Representative;  // представитель изготовителя
 
     private Long createdBy;   // кем создана
 
@@ -54,4 +55,5 @@ public class Task {
     private LocalDate decisionAt;   // дата решения по заявке
 
     private Boolean paymentStatus=false;  // статус оплаты
+
 }

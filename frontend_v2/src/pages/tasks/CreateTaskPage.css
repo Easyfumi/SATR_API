@@ -1,0 +1,75 @@
+.create-task-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .form-title {
+    color: var(--deep-frost);
+    margin-bottom: 25px;
+    text-align: center;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+  }
+  
+  .form-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    background: #fff;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+  }
+
+  .categories-select {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  
+  .category-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .category-checkbox:hover {
+    background: #f5f7fa;
+  }
+  
+  .category-checkbox input {
+    margin: 0;
+  }
+  
+  .category-label {
+    font-size: 0.9rem;
+    color: var(--deep-frost);
+  }
+  
+  @media (max-width: 768px) {
+    .create-task-form {
+      padding: 15px;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+  }
