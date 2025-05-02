@@ -3,6 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './CreateTaskPage.css';
 import { VehicleCategories } from '../../constants/vehicleCategories';
+import {
+    FormControl,
+    Select,
+    MenuItem,
+    Checkbox,
+    ListItemText,
+    Chip,
+    Button
+} from '@mui/material';
 
 const CreateTaskPage = () => {
     const navigate = useNavigate();
@@ -20,29 +29,29 @@ const CreateTaskPage = () => {
 
     const getCategoryLabel = (category) => {
         const labels = {
-            M1: "Легковые (M1)",
-            M1G: "Внедорожные (M1G)",
-            M2: "Автобусы малые (M2)",
-            M2G: "Внедорожные автобусы (M2G)",
-            M3: "Автобусы крупные (M3)",
-            M3G: "Внедорожные автобусы (M3G)",
-            N1: "Грузовые малые (N1)",
-            N1G: "Внедорожные грузовые (N1G)",
-            N2: "Грузовые средние (N2)",
+            M1: "M1 (Легковые)",
+            M1G: "M1G (Внедорожные)",
+            M2: "M2 (Автобусы малые)",
+            M2G: "M2G (Внедорожные автобусы)",
+            M3: "M3 (Автобусы крупные)",
+            M3G: "M3G (Внедорожные автобусы)",
+            N1: "N1 (Грузовые малые)",
+            N1G: "N1G (Внедорожные грузовые)",
+            N2: "N2 (Грузовые средние)",
             N2G: "Внедорожные грузовые (N2G)",
-            N3: "Грузовые крупные (N3)",
-            N3G: "Внедорожные грузовые (N3G)",
-            O1: "Прицепы легкие (O1)",
-            O2: "Прицепы средние (O2)",
-            O3: "Прицепы тяжелые (O3)",
-            O4: "Прицепы сверхтяжелые (O4)",
-            L1: "Мопеды (L1)",
-            L2: "Мотовелосипеды (L2)",
-            L3: "Мотоциклы (L3)",
-            L4: "Мотоциклы с коляской (L4)",
-            L5: "Трициклы (L5)",
-            L6: "Квадрициклы легкие (L6)",
-            L7: "Квадрициклы тяжелые (L7)"
+            N3: "N2G (Грузовые крупные)",
+            N3G: "N3G (Внедорожные грузовые)",
+            O1: "O1 (Прицепы легкие)",
+            O2: "O2 (Прицепы средние)",
+            O3: "O3 (Прицепы тяжелые)",
+            O4: "O4 (Прицепы сверхтяжелые)",
+            L1: "L1 (Мопеды)",
+            L2: "L2 (Мотовелосипеды)",
+            L3: "L3 (Мотоциклы)",
+            L4: "L4 (Мотоциклы с коляской)",
+            L5: "L5 (Трициклы)",
+            L6: "L6 (Квадрициклы легкие)",
+            L7: "L7 (Квадрициклы тяжелые)"
         };
         return labels[category] || category;
     };
@@ -112,24 +121,42 @@ const CreateTaskPage = () => {
                     </div>
 
                     <div className="info-row">
-                        <label className="info-label">Категории ТС:</label>
-                        <div className="categories-select">
-                            {Object.values(VehicleCategories).map(category => (
-                                <label key={category} className="category-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.categories.includes(category)}
-                                        onChange={(e) => {
-                                            const newCategories = e.target.checked
-                                                ? [...formData.categories, category]
-                                                : formData.categories.filter(c => c !== category);
-                                            setFormData({ ...formData, categories: newCategories });
-                                        }}
-                                    />
-                                    <span className="category-label">{getCategoryLabel(category)}</span>
-                                </label>
-                            ))}
-                        </div>
+                        <label className="info-label">Категория:</label>
+                        <FormControl fullWidth>
+                            <Select
+                                multiple
+                                value={formData.categories}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    categories: e.target.value
+                                })}
+                                renderValue={(selected) => (
+                                    <div className="selected-categories">
+                                        {selected.map((value) => (
+                                            <Chip
+                                                key={value}
+                                                label={getCategoryLabel(value)}
+                                                className="category-chip"
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            maxHeight: 300,
+                                        },
+                                    }
+                                }}
+                            >
+                                {Object.values(VehicleCategories).map((category) => (
+                                    <MenuItem key={category} value={category}>
+                                        <Checkbox checked={formData.categories.includes(category)} />
+                                        <ListItemText primary={getCategoryLabel(category)} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </div>
 
                     <div className="info-row">
@@ -144,7 +171,7 @@ const CreateTaskPage = () => {
                     </div>
 
                     <div className="info-row">
-                        <label className="info-label">Наименование типа:</label>
+                        <label className="info-label">Тип:</label>
                         <input
                             type="text"
                             value={formData.typeName}
@@ -176,22 +203,22 @@ const CreateTaskPage = () => {
                         />
                     </div>
 
-
-
                     <div className="form-actions">
-                        <button
+                        <Button
+                            variant="outlined"
                             type="button"
                             onClick={() => navigate('/tasks')}
-                            className="secondary-btn"
+                            className="cancel-btn"
                         >
                             Отмена
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant="contained"
                             type="submit"
-                            className="primary-btn"
+                            className="save-btn"
                         >
                             Создать заявку
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </div>

@@ -1,10 +1,9 @@
 .create-task-form {
-    max-width: 600px;
+    max-width: auto;
     margin: 0 auto;
     background: #fff;
     padding: 25px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
   
   .form-title {
@@ -35,33 +34,47 @@
     border-radius: 6px;
   }
 
-  .categories-select {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-  }
-  
-  .category-checkbox {
+  /* Стили для выпадающего списка категорий */
+.selected-categories {
     display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .category-chip {
+    background-color: var(--ice-blue) !important;
+    color: var(--deep-frost) !important;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+  }
+  
+  .MuiSelect-select {
+    min-height: 30px !important;
+    display: flex !important;
     align-items: center;
-    gap: 8px;
-    padding: 8px;
-    border: 1px solid var(--silver-accent);
-    border-radius: 6px;
-    cursor: pointer;
   }
   
-  .category-checkbox:hover {
-    background: #f5f7fa;
+  .MuiMenuItem-root {
+    padding: 2px 8px !important;
   }
   
-  .category-checkbox input {
-    margin: 0;
+  .MuiCheckbox-root {
+    padding: 4px !important;
+  }
+
+  .save-btn {
+    background-color: var(--deep-frost) !important;
+    color: white !important;
+    text-transform: none !important;
+    padding: 8px 24px !important;
   }
   
-  .category-label {
-    font-size: 0.9rem;
-    color: var(--deep-frost);
+  .cancel-btn {
+    border-color: var(--deep-frost) !important;
+    color: var(--deep-frost) !important;
+    text-transform: none !important;
+    padding: 8px 24px !important;
   }
   
   @media (max-width: 768px) {
