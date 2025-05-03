@@ -19,7 +19,7 @@ public class TaskResponse {
     private String processType;
     private String representative;
     private String createdBy;
-    private Long assignedUserId;
+    private UserInfo assignedUser;
     private String status;
     private LocalDateTime createdAt;
     private LocalDate decisionAt;

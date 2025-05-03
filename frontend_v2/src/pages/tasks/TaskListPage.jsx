@@ -79,13 +79,20 @@ const TaskListPage = () => {
                             className="task-card"
                             onClick={() => navigate(`/tasks/${task.id}`)}
                         >
-                            <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
-                                {task.number || 'Не зарегистрирована'}
+                            <div className="approval-info-container">
+                                <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
+                                    {task.number || 'Не зарегистрирована'}
+                                </div>
+                                <div className={`expert-info ${!task.assignedUser ? 'not-assigned' : ''}`}>
+                                    Эксперт: {task.assignedUser
+                                        ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
+                                        : 'не назначен'}
+                                </div>
                             </div>
 
                             <div className="approval-type">{task.docType}</div>
 
-                            {/* Добавляем статус оплаты */}
+                    
                             <div className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
                                 {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
                             </div>

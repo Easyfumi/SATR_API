@@ -84,11 +84,39 @@
     font-size: 0.82rem;
     font-weight: 600;
     text-transform: uppercase;
-    margin: 35px 0 14px; /* Добавляем отступ сверху */
+    margin: 5px 0 14px;
+    /* Добавляем отступ сверху */
     display: inline-block;
     position: relative;
     z-index: 1;
     width: max-content;
+}
+
+.approval-info-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 0 0 14px;
+    flex-wrap: wrap;
+}
+
+/* Стили для блока с экспертом */
+.expert-info {
+    background: var(--deep-frost);
+    color: var(--ice-blue);
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    order: 2; /* Изменяем порядок элементов */
+}
+
+.expert-info.not-assigned {
+    background: #ffebee;
+    color: #c62828;
+    text-transform: none;
 }
 
 .card-content {
@@ -206,9 +234,6 @@
 
 /* Стили для статуса регистрации */
 .registration-status {
-    position: absolute;
-    top: 18px;
-    left: 18px;
     padding: 5px 12px;
     border-radius: 16px;
     font-size: 0.82rem;
@@ -218,6 +243,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    order: 1; /* Изменяем порядок элементов */
 }
 
 .registration-status.registered {
@@ -229,6 +255,7 @@
     background: #ffebee;
     color: #c62828;
 }
+
 /* 
 @media (max-width: 768px) {
     .task-card {
@@ -273,4 +300,32 @@
     .approval-type {
         margin-left: 40px;
     }
-} */
+
+    .approval-info-container {
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    
+    .registration-status,
+    .expert-info {
+        font-size: 0.78rem;
+        padding: 4px 12px;
+    }
+} 
+    
+@media (max-width: 480px) {
+    .approval-info-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .registration-status,
+    .expert-info {
+        width: 100%;
+        max-width: none;
+        text-align: center;
+    }
+}
+
+
+*/

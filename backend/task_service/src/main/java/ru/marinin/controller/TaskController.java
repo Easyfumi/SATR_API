@@ -40,8 +40,9 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskResponse>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+    public ResponseEntity<List<TaskResponse>> getAllTasks(
+            @RequestHeader("Authorization") String jwt) {
+        return ResponseEntity.ok(taskService.getAllTasks(jwt));
     }
 
     @GetMapping("/{id}")
@@ -53,7 +54,6 @@ public class TaskController {
     public ResponseEntity<?> setTaskNumber(
             @PathVariable Long id,
             @Valid @RequestBody TaskNumberRequest request) {
-
         try {
             TaskResponse response = taskService.setTaskNumber(id, request.getNumber());
             return ResponseEntity.ok(response);
@@ -64,40 +64,43 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
+}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TaskResponse> updateTask(
-            @PathVariable Long id,
-            @RequestBody TaskRequest request) {
-        return ResponseEntity.ok(taskService.updateTask(id, request));
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
-        return ResponseEntity.noContent().build();
-    }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<TaskResponse> changeStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
-        return ResponseEntity.ok(taskService.changeStatus(id, status));
-    }
 
-    @PatchMapping("/{id}/assign")
-    public ResponseEntity<TaskResponse> assignUser(
-            @PathVariable Long id,
-            @RequestParam Long userId) {
-        return ResponseEntity.ok(taskService.assignUser(id, userId));
-    }
-
-    @GetMapping("/filter")
-    public ResponseEntity<List<TaskResponse>> filterTasks(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) List<String> categories) {
-        return ResponseEntity.ok(taskService.filterTasks(status, categories));
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<TaskResponse> updateTask(
+//            @PathVariable Long id,
+//            @RequestBody TaskRequest request) {
+//        return ResponseEntity.ok(taskService.updateTask(id, request));
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+//        taskService.deleteTask(id);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @PatchMapping("/{id}/status")
+//    public ResponseEntity<TaskResponse> changeStatus(
+//            @PathVariable Long id,
+//            @RequestParam String status) {
+//        return ResponseEntity.ok(taskService.changeStatus(id, status));
+//    }
+//
+//    @PatchMapping("/{id}/assign")
+//    public ResponseEntity<TaskResponse> assignUser(
+//            @PathVariable Long id,
+//            @RequestParam Long userId) {
+//        return ResponseEntity.ok(taskService.assignUser(id, userId));
+//    }
+//
+//    @GetMapping("/filter")
+//    public ResponseEntity<List<TaskResponse>> filterTasks(
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) List<String> categories) {
+//        return ResponseEntity.ok(taskService.filterTasks(status, categories));
 
 //    @Autowired
 //    private TaskService taskService;
@@ -195,5 +198,3 @@ public class TaskController {
 //        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 //    }
 
-
-}
