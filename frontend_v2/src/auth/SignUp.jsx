@@ -78,6 +78,7 @@ export default function SignUp() {
           margin="normal"
           label="Фамилия"
           variant="outlined"
+          className="signup-input"
           value={formData.secondName}
           onChange={(e) => setFormData({ ...formData, secondName: e.target.value })}
         />
@@ -87,6 +88,7 @@ export default function SignUp() {
           label="Имя"
           variant="outlined"
           margin="normal"
+          className="signup-input"
           value={formData.firstName}
           onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
         />
@@ -95,6 +97,7 @@ export default function SignUp() {
           label="Отчество"
           variant="outlined"
           margin="normal"
+          className="signup-input"
           value={formData.patronymic}
           onChange={(e) => setFormData({ ...formData, patronymic: e.target.value })}
         />
@@ -105,6 +108,7 @@ export default function SignUp() {
           type="email"
           variant="outlined"
           margin="normal"
+          className="signup-input"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
@@ -115,6 +119,7 @@ export default function SignUp() {
           type="password"
           variant="outlined"
           margin="normal"
+          className="signup-input"
           value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />

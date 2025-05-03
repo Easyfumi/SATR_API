@@ -7,7 +7,6 @@ import Sidebar from './navigation/Sidebar';
 import AdminSidebar from './navigation/AdminSidebar';
 import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
-import HomePage from './pages/HomePage';
 import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
 import UserDetailPage from './pages/users/UserDetailPage'; 
@@ -43,7 +42,6 @@ function App() {
 
           {/* Защищенные маршруты */}
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route path="/" element={<HomePage />} />
             <Route path="/users/profile" element={<Profile />} />
             <Route path="/users/all" element={<UsersPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
