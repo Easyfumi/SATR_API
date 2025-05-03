@@ -4,6 +4,8 @@ package ru.marinin.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.marinin.exceptions.DuplicateNumberException;
+import ru.marinin.exceptions.TaskNotFoundException;
 import ru.marinin.model.Applicant;
 import ru.marinin.model.Manufacturer;
 import ru.marinin.model.Representative;
@@ -34,19 +36,14 @@ public class TaskServiceImplementation implements TaskService {
     private final RepresentativeRepository representativeRepository;
     private final UserService userService;
 
+
     public TaskResponse createTask(TaskRequest request, String jwt) {
-
         UserInfo userInfo = userService.getUserProfile(jwt);
-
         Task task = mapRequestToEntity(request);
-
         task.setCreatedBy(userInfo.getId());
         task.setCreatedAt(LocalDateTime.now());
         task.setStatus(TaskStatus.RECEIVED);    // Default status
-
-
         Task savedTask = taskRepository.save(task);
-
         return mapEntityToResponse(savedTask);
     }
 
@@ -59,6 +56,29 @@ public class TaskServiceImplementation implements TaskService {
     public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+        return mapEntityToResponse(task);
+    }
+
+
+
+
+
+    public TaskResponse setTaskNumber(Long taskId, String number) {
+        // Проверка существования номера
+        if (taskRepository.existsByNumber(number)) {
+            throw new DuplicateNumberException("Номер " + number + " уже существует");
+        }
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
+
+        // Проверка что номер еще не установлен
+        if (task.getNumber() != null) {
+            throw new IllegalStateException("Номер уже назначен");
+        }
+
+        task.setNumber(number);
+        task = taskRepository.save(task);
         return mapEntityToResponse(task);
     }
 
@@ -166,6 +186,7 @@ public class TaskServiceImplementation implements TaskService {
 //         Boolean paymentStatus;
 
         response.setId(task.getId());
+        response.setNumber(task.getNumber());
         response.setDocType(task.getDocType());
         response.setApplicant(task.getApplicant().getName());
         response.setManufacturer(task.getManufacturer().getName());

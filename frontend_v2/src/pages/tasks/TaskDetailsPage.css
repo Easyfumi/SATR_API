@@ -105,6 +105,17 @@
     font-size: 0.85rem;
     font-weight: 500;
   }
+
+  /* Стили для контейнера с полем ввода */
+.number-input-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.number-input-container .MuiTextField-root {
+  flex-grow: 1;
+}
   
   @media (max-width: 768px) {
     .task-details-container {
@@ -124,9 +135,21 @@
       font-size: 0.9rem;
       padding: 8px 12px;
     }
-  }
   
-  @media (max-width: 480px) {
+    .number-input-container {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .number-input-container .MuiTextField-root {
+      width: 100%;
+    }
+    
+    .number-input-container button {
+      width: 100%;
+      margin-left: 0 !important;
+    }
+ 
     .task-row {
       flex-direction: column;
       gap: 5px;

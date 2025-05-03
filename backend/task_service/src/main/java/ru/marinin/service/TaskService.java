@@ -15,4 +15,5 @@ public interface TaskService {
     TaskResponse changeStatus(Long id, String status);
     TaskResponse assignUser(Long id, Long userId);
     List<TaskResponse> filterTasks(String status, List<String> categories);
+    TaskResponse setTaskNumber(Long taskId, String number);
 }

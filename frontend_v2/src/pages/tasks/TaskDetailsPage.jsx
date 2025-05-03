@@ -4,12 +4,15 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskDetailsPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { TextField, Button, CircularProgress } from '@mui/material';
 
 const TaskDetailsPage = () => {
   const { id } = useParams();
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [newNumber, setNewNumber] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -41,6 +44,23 @@ const TaskDetailsPage = () => {
     fetchTask();
   }, [id]);
 
+  const handleAssignNumber = async () => {
+    if (!newNumber.trim()) return;
+    
+    setIsUpdating(true);
+    try {
+      const response = await api.put(`/api/tasks/${id}/number`, { number: newNumber });
+      setTask({ ...task, number: newNumber });
+      setNewNumber('');
+      alert('Номер успешно присвоен');
+    } catch (error) {
+      console.error('Ошибка присвоения номера:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('ru-RU');
   };
@@ -65,7 +85,32 @@ const TaskDetailsPage = () => {
         <div className="card-content">
           <div className="task-row">
             <span className="task-label">Номер заявки</span>
-            <span className="task-value">{task.number}</span>
+            {task.number ? (
+              <span className="task-value">{task.number}</span>
+            ) : (
+              <div className="number-input-container">
+                <TextField
+                  size="small"
+                  value={newNumber}
+                  onChange={(e) => setNewNumber(e.target.value)}
+                  placeholder="Введите номер"
+                  variant="outlined"
+                  disabled={isUpdating}
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleAssignNumber}
+                  disabled={!newNumber || isUpdating}
+                  style={{ marginLeft: '10px' }}
+                >
+                  {isUpdating ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    'Присвоить номер'
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="task-row">

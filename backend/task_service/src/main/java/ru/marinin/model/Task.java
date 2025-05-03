@@ -23,6 +23,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String number;   //  номер заявки, присваивается при регистрации
 
     private String docType;   // ОТТС/ОТШ

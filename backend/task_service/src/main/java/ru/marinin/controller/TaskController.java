@@ -1,12 +1,16 @@
 package ru.marinin.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.marinin.exceptions.DuplicateNumberException;
+import ru.marinin.exceptions.TaskNotFoundException;
 import ru.marinin.model.Applicant;
 import ru.marinin.model.Manufacturer;
 import ru.marinin.model.Representative;
+import ru.marinin.model.dto.TaskNumberRequest;
 import ru.marinin.model.dto.TaskRequest;
 import ru.marinin.model.dto.TaskResponse;
 import ru.marinin.repository.ApplicantRepository;
@@ -17,6 +21,7 @@ import ru.marinin.service.TaskService;
 import ru.marinin.service.UserService;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -30,13 +35,7 @@ public class TaskController {
     public ResponseEntity<TaskResponse> createTask(
             @RequestBody TaskRequest request,
             @RequestHeader("Authorization") String jwt) {
-
-        System.out.println(request);
-
-
         TaskResponse response = taskService.createTask(request, jwt);
-
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -45,11 +44,25 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-
-
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
         return ResponseEntity.ok(taskService.getTaskById(id));
+    }
+
+    @PutMapping("/{id}/number")
+    public ResponseEntity<?> setTaskNumber(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskNumberRequest request) {
+
+        try {
+            TaskResponse response = taskService.setTaskNumber(id, request.getNumber());
+            return ResponseEntity.ok(response);
+        } catch (DuplicateNumberException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -181,11 +194,6 @@ public class TaskController {
 //
 //        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 //    }
-
-
-
-
-
 
 
 }
