@@ -83,29 +83,29 @@ const TaskListPage = () => {
                             <div className="approval-type">{task.docType}</div>
 
                             <div className="card-content">
-                                <div className="info-group">
-                                    <span className="info-label">Марка</span>
-                                    <span className="info-value">{task.mark}</span>
+                                <div className="task-row">
+                                    <span className="task-label">Марка</span>
+                                    <span className="task-value">{task.mark}</span>
                                 </div>
 
-                                <div className="info-group">
-                                    <span className="info-label">Тип</span>
-                                    <span className="info-value">{task.typeName}</span>
+                                <div className="task-row">
+                                    <span className="task-label">Тип</span>
+                                    <span className="task-value">{task.typeName}</span>
                                 </div>
 
-                                <div className="info-group">
-                                    <span className="info-label">Категории</span>
+                                <div className="task-row">
+                                    <span className="task-label">Категории</span>
                                     <div className="categories-list">
                                         {task.categories.map(cat => (
                                             <span key={cat} className="category-tag">{cat}</span>
                                         ))}
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="applicant-info">
-                                <span className="applicant-label">Заявитель:</span>
-                                <span className="applicant-name">{task.applicant}</span>
+                                <div className="task-row applicant-info">
+                                    <span className="task-label">Заявитель</span>
+                                    <span className="task-value">{task.applicant}</span>
+                                </div>
                             </div>
                         </div>
                     ))}
