@@ -148,20 +148,20 @@ public class TaskServiceImplementation implements TaskService {
     private TaskResponse mapEntityToResponse(Task task) {
         TaskResponse response = new TaskResponse();
 
-//         Long id;
+//         Long id; +
 //         String number;
-//         String docType;
-//         String applicant;
-//         String manufacturer;
-//         List<String> categories;
-//         String mark;
-//         String typeName;
+//         String docType; +
+//         String applicant; +
+//         String manufacturer; +
+//         List<String> categories; +
+//         String mark; +
+//         String typeName; +
 //         String processType;
-//         String representative;
+//         String representative; +
 //         Long createdBy;
 //         Long assignedUserId;
-//         String status;
-//         LocalDateTime createdAt;
+//         String status; +
+//         LocalDateTime createdAt; +
 //         LocalDate decisionAt;
 //         Boolean paymentStatus;
 

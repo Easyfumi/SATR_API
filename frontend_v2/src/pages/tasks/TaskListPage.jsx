@@ -1,5 +1,7 @@
+// TaskListPage.jsx
+
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskListPage.css';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
@@ -13,6 +15,7 @@ const statusLabels = {
 };
 
 const TaskListPage = () => {
+    const navigate = useNavigate();
     const location = useLocation();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,7 +82,11 @@ const TaskListPage = () => {
             ) : (
                 <div className="tasks-list">
                     {tasks.map(task => (
-                        <div key={task.id} className="task-card">
+                        <div
+                            key={task.id}
+                            className="task-card"
+                            onClick={() => navigate(`/tasks/${task.id}`)}
+                        >
                             <div className="approval-type">{task.docType}</div>
 
                             <div className="card-content">

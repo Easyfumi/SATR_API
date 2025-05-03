@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class TaskResponse {
     private Long id;
-//    private String number;
+    private String number;
     private String docType;
     private String applicant;
     private String manufacturer;
@@ -18,12 +18,12 @@ public class TaskResponse {
     private String typeName;
     private String processType;
     private String representative;
-//    private String createdBy;
-//    private Long assignedUserId;
+    private String createdBy;
+    private Long assignedUserId;
     private String status;
     private LocalDateTime createdAt;
-//    private LocalDate decisionAt;
-//    private Boolean paymentStatus;
+    private LocalDate decisionAt;
+    private Boolean paymentStatus;
 }
 
 

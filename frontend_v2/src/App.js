@@ -15,6 +15,7 @@ import TaskListPage from './pages/tasks/TaskListPage';
 import CreateTaskPage from './pages/tasks/CreateTaskPage'; 
 import DeclarationPage from './pages/declaration/DeclarationPage'; 
 import CertificatesPage from './pages/certificates/CertificatesPage'; 
+import TaskDetailsPage from './pages/tasks/TaskDetailsPage'; 
 
 
 // Основной лейаут для авторизованных пользователей
@@ -48,6 +49,7 @@ function App() {
             <Route path="/users/:id" element={<UserDetailPage />} />
             <Route path="/tasks" element={<TaskListPage />} />
             <Route path="/tasks/create" element={<CreateTaskPage />} />
+            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
             <Route path="/decl" element={<DeclarationPage />} /> 
             <Route path="/serts" element={<CertificatesPage />} /> 
           </Route>
