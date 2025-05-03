@@ -78,6 +78,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("/experts")
+    public ResponseEntity<List<UserInfo>> getExperts(
+            @RequestHeader("Authorization") String jwt) {
+        List<User> experts = userService.getUsersByRole(Role.EXPERT);
+        List<UserInfo> expertInfos = experts.stream()
+                .map(UserInfo::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(expertInfos);
+    }
+
     // DTO для запроса
 
     public static class RoleUpdateRequest {

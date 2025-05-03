@@ -105,7 +105,9 @@
 }
 
 .MuiMenuItem-root {
+  white-space: normal !important;
   padding: 8px 16px !important;
+  line-height: 1.4 !important;
 }
 
 .MuiCheckbox-root {
@@ -113,8 +115,9 @@
 }
 
 .MuiSelect-selectMenu {
-  white-space: normal !important;
-  line-height: 1.4 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .MuiOutlinedInput-notchedOutline {

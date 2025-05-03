@@ -15,4 +15,5 @@ public class TaskRequest {
     private String typeName;
     private String processType;
     private String representativeName;
+    private Long assignedUserId;
 }

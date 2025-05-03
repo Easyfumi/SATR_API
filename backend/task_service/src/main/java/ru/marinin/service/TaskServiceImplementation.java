@@ -162,6 +162,9 @@ public class TaskServiceImplementation implements TaskService {
                 new Representative(
                         request.getRepresentativeName())));
 
+        task.setAssignedUserId(request.getAssignedUserId());
+        System.out.println(request.getAssignedUserId());
+
         return task;
     }
 

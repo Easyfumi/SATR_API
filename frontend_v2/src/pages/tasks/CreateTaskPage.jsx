@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './CreateTaskPage.css';
@@ -15,6 +15,29 @@ import {
 
 const CreateTaskPage = () => {
     const navigate = useNavigate();
+
+    const [experts, setExperts] = useState([]);
+    useEffect(() => {
+        const fetchExperts = async () => {
+            try {
+                const response = await api.get('/api/users/experts');
+                setExperts(response.data);
+            } catch (error) {
+                console.error('Error fetching experts:', error);
+            }
+        };
+        fetchExperts();
+    }, []);
+
+
+    // Функция для форматирования ФИО
+    const formatExpertName = (expert) => {
+        const initials = expert.patronymic
+            ? `${expert.secondName} ${expert.firstName[0]}.${expert.patronymic[0]}.`
+            : `${expert.secondName} ${expert.firstName[0]}.`;
+        return initials;
+    };
+
     const [formData, setFormData] = useState({
         docType: '',
         applicantName: '',
@@ -23,7 +46,8 @@ const CreateTaskPage = () => {
         mark: '',
         typeName: '',
         processType: '',
-        representativeName: ''
+        representativeName: '',
+        assignedUserId: null
     });
 
     const processOptions = [
@@ -43,7 +67,7 @@ const CreateTaskPage = () => {
             N1: "N1 (Грузовые малые)",
             N1G: "N1G (Внедорожные грузовые)",
             N2: "N2 (Грузовые средние)",
-            N2G: "Внедорожные грузовые (N2G)",
+            N2G: "N2G (Внедорожные грузовые)",
             N3: "N2G (Грузовые крупные)",
             N3G: "N3G (Внедорожные грузовые)",
             O1: "O1 (Прицепы легкие)",
@@ -72,7 +96,8 @@ const CreateTaskPage = () => {
                 mark: formData.mark,
                 typeName: formData.typeName,
                 processType: formData.processType,
-                representativeName: formData.representativeName
+                representativeName: formData.representativeName,
+                assignedUserId: formData.assignedUserId
             };
 
             await api.post('/api/tasks/create', request);
@@ -263,6 +288,33 @@ const CreateTaskPage = () => {
                             </Select>
                         </FormControl>
                     </div>
+                    <div className="form-row">
+                        <label className="form-label">Эксперт:</label>
+                        <FormControl fullWidth>
+                            <Select
+                                value={formData.assignedUserId || ''}
+                                onChange={(e) => setFormData({ ...formData, assignedUserId: e.target.value })}
+                                displayEmpty
+                                renderValue={(selected) => {
+                                    if (!selected) {
+                                        return <span className="placeholder-text">Выберите эксперта</span>;
+                                    }
+                                    const selectedExpert = experts.find(e => e.id === selected);
+                                    return formatExpertName(selectedExpert);
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>Не назначен</em>
+                                </MenuItem>
+                                {experts.map((expert) => (
+                                    <MenuItem key={expert.id} value={expert.id}>
+                                        {formatExpertName(expert)}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
+
                     <div className="form-actions">
                         <Button
                             variant="outlined"

@@ -12,4 +12,5 @@ public interface UserService {
     List<User> getAllUsers();
     Optional<User> getUserById(Long id);
     User updateUserRoles(Long id, Set<Role> roles);
+    List<User> getUsersByRole(Role role);
 }

@@ -47,6 +47,9 @@ public class UserServiceImplementation implements UserService{
         user.setRoles(roles);
         return userRepository.save(user);
     }
-
+    @Override
+    public List<User> getUsersByRole(Role role) {
+        return userRepository.findByRole(role);
+    }
 
 }
