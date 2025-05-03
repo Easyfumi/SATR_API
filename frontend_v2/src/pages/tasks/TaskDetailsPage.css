@@ -75,15 +75,15 @@
   .status-badge.decision_done { background: #e8f5e9; color: #2e7d32; }
   .status-badge.completed { background: #f5f5f5; color: #616161; }
   
-  .payment-status {
+  .details-payment-status {
     padding: 6px 12px;
     border-radius: 16px;
     font-weight: 600;
     font-size: 0.9rem;
   }
   
-  .payment-status.paid { background: #e8f5e9; color: #2e7d32; }
-  .payment-status.unpaid { background: #ffebee; color: #c62828; }
+  .details-payment-status.paid { background: #e8f5e9; color: #2e7d32; }
+  .details-payment-status.unpaid { background: #ffebee; color: #c62828; }
   
   .categories-list {
     display: flex;

@@ -103,7 +103,7 @@ const TaskDetailsPage = () => {
 
           <div className="task-row">
             <span className="task-label">Статус оплаты</span>
-            <span className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
+            <span className={`details-payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
               {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
             </span>
           </div>

@@ -179,7 +179,27 @@
     font-size: 1rem;
     font-weight: 500;
 }
-
+/* Стили для статуса оплаты */
+.payment-status {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    z-index: 1;
+  }
+  
+  .payment-status.paid { 
+    background: #e8f5e9; 
+    color: #2e7d32; 
+  }
+  
+  .payment-status.unpaid { 
+    background: #ffebee; 
+    color: #c62828; 
+  }
 @media (max-width: 768px) {
     .task-card {
         padding: 14px;
@@ -207,4 +227,10 @@
     .nav-button {
         padding: 12px 15px;
     }
+    .payment-status {
+        top: 14px;
+        right: 14px;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+      }
 }

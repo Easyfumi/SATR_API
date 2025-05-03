@@ -89,6 +89,11 @@ const TaskListPage = () => {
                         >
                             <div className="approval-type">{task.docType}</div>
 
+                            {/* Добавляем статус оплаты */}
+                            <div className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
+                                {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
+                            </div>
+
                             <div className="card-content">
                                 <div className="task-row">
                                     <span className="task-label">Марка</span>
