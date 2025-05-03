@@ -1,10 +1,7 @@
 .create-task-form {
   max-width: auto; /* Добавим ограничение ширины */
-  margin: 0 auto;
   background: #fff;
   padding: 25px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Добавим тень как в карточках */
 }
 
 .form-title {

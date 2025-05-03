@@ -40,7 +40,7 @@ const TaskDetailsPage = () => {
   if (error) return <div className="error-message">{error}</div>;
 
   return (
-    <div className="task-details-container">
+    <div className="content-container">
       <Link to="/tasks" className="back-button">
         <ArrowBackIcon />
         К списку задач

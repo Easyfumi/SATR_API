@@ -109,12 +109,14 @@
 }
 
 .task-label {
-    color: #6b7c93;
+    color: #2E4A62 !important;
     font-size: 0.9rem;
     font-weight: 500;
     min-width: 100px;
     margin-right: 20px;
 }
+
+
 
 .task-value {
     color: var(--deep-frost);
