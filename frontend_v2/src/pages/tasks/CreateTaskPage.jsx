@@ -26,6 +26,11 @@ const CreateTaskPage = () => {
         representativeName: ''
     });
 
+    const processOptions = [
+        'со сроком действия до 3-х лет',
+        'со сроком действия до 1-ого года в соответствии с п. 35 ТР о безопасности колесных транспортных средств',
+        'на малую партию транспортных средств (шасси) в соответствии с п. 35 технического регламента о безопасности колесных транспортных средств'
+    ];
 
     const getCategoryLabel = (category) => {
         const labels = {
@@ -56,8 +61,6 @@ const CreateTaskPage = () => {
         return labels[category] || category;
     };
 
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -79,7 +82,6 @@ const CreateTaskPage = () => {
         }
     };
 
-
     return (
         <div className="content-container">
             <div className="create-task-form">
@@ -97,7 +99,6 @@ const CreateTaskPage = () => {
                             <option value="ОТШ">ОТШ</option>
                         </select>
                     </div>
-
                     <div className="form-row">
                         <label className="form-label">Марка:</label>
                         <input
@@ -108,7 +109,6 @@ const CreateTaskPage = () => {
                             required
                         />
                     </div>
-
                     <div className="form-row">
                         <label className="form-label">Тип:</label>
                         <input
@@ -119,7 +119,6 @@ const CreateTaskPage = () => {
                             required
                         />
                     </div>
-                    
                     <div className="form-row">
                         <label className="form-label">Заявитель:</label>
                         <input
@@ -130,7 +129,6 @@ const CreateTaskPage = () => {
                             required
                         />
                     </div>
-
                     <div className="form-row">
                         <label className="form-label">Изготовитель:</label>
                         <input
@@ -141,7 +139,6 @@ const CreateTaskPage = () => {
                             required
                         />
                     </div>
-
                     <div className="form-row form-row-multiline">
                         <label className="form-label">Представитель изготовителя:</label>
                         <input
@@ -152,7 +149,6 @@ const CreateTaskPage = () => {
                             required
                         />
                     </div>
-
                     <div className="form-row">
                         <label className="form-label">Категория:</label>
                         <FormControl fullWidth>
@@ -163,15 +159,19 @@ const CreateTaskPage = () => {
                                     ...formData,
                                     categories: e.target.value
                                 })}
+                                displayEmpty
                                 renderValue={(selected) => (
                                     <div className="selected-categories">
-                                        {selected.map((value) => (
-                                            <Chip
-                                                key={value}
-                                                label={getCategoryLabel(value)}
-                                                className="category-chip"
-                                            />
-                                        ))}
+                                        {selected.length === 0
+                                            ? <span className="placeholder-text">Выберите категорию</span>
+                                            : selected.map((value) => (
+                                                <Chip
+                                                    key={value}
+                                                    label={getCategoryLabel(value)}
+                                                    className="category-chip"
+                                                />
+                                            ))
+                                        }
                                     </div>
                                 )}
                                 MenuProps={{
@@ -191,24 +191,46 @@ const CreateTaskPage = () => {
                             </Select>
                         </FormControl>
                     </div>
-
-
-
-
-
                     <div className="form-row">
                         <label className="form-label">Процедура:</label>
-                        <input
-                            type="text"
-                            value={formData.processType}
-                            onChange={(e) => setFormData({ ...formData, processType: e.target.value })}
-                            className="form-input"
-                            required
-                        />
+                        <FormControl fullWidth>
+                            <Select
+                                value={formData.processType}
+                                onChange={(e) => setFormData({ ...formData, processType: e.target.value })}
+                                displayEmpty
+                                renderValue={(selected) => (
+                                    <div className="selected-process">
+                                        {selected || <span className="placeholder-text">Выберите процедуру</span>}
+                                    </div>
+                                )}
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            width: '100%',
+                                            maxWidth: 'none',
+                                            maxHeight: 300
+                                        }
+                                    }
+                                }}
+                            >
+                                {processOptions.map((option) => (
+                                    <MenuItem
+                                        key={option}
+                                        value={option}
+                                        style={{ whiteSpace: 'normal' }}
+                                    >
+                                        <div className="process-option">
+                                            <Checkbox
+                                                checked={formData.processType === option}
+                                                style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                            />
+                                            <span>{option}</span>
+                                        </div>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </div>
-
-
-
                     <div className="form-actions">
                         <Button
                             variant="outlined"

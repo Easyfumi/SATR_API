@@ -49,6 +49,42 @@
 
 
 
+
+.selected-process {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  padding: 8px 0;
+  width: 100%;
+}
+
+/* Стили для выпадающего меню */
+.MuiPaper-root.MuiPopover-paper {
+  width: calc(100% - 32px) !important;
+  max-width: 600px !important;
+  margin: 4px 16px !important;
+}
+
+
+
+
+/* Чекбоксы */
+.process-option .MuiCheckbox-root {
+  padding: 0;
+  margin-right: 8px;
+  color: var(--deep-frost);
+}
+
+
+
+.placeholder-text {
+  color: #6b7c93;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+
+
 /* Стили для выпадающего списка категорий */
 .selected-categories {
   display: flex;
@@ -69,6 +105,8 @@
   display: flex !important;
   align-items: center;
 }
+
+
 
 .MuiMenuItem-root {
   padding: 8px 16px !important;
@@ -127,4 +165,16 @@
   .cancel-btn {
     width: 100%;
   } */
+  .MuiPaper-root.MuiPopover-paper {
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
+  }
+  
+  .process-option {
+    padding: 6px 0;
+  }
+  
+  .process-option span {
+    font-size: 0.9rem;
+  }
 }
