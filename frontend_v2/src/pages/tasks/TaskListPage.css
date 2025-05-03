@@ -1,5 +1,5 @@
- /* TaskListPage.css */
- .nav-buttons-container {
+/* TaskListPage.css */
+.nav-buttons-container {
     display: flex;
     gap: 2px;
     background: linear-gradient(195deg, var(--deep-frost) 0%, #1A2A3A 100%);
@@ -14,7 +14,6 @@
     border-radius: 8px;
     text-decoration: none;
     transition: all 0.25s ease;
-    position: relative;
     font-size: 0.95rem;
     background: none;
     border: none;
@@ -32,12 +31,6 @@
     box-shadow: 0 2px 8px var(--glacial-shadow);
 }
 
-.task-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
 .tasks-list {
     display: flex;
     flex-direction: column;
@@ -47,14 +40,13 @@
 
 .task-card {
     background: #fff;
-    border: 1px solid #dde4ec;
+    border: 1px solid var(--silver-accent);
     border-radius: 10px;
     padding: 18px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    position: relative;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-origin: center;
+    position: relative;
     overflow: hidden;
 }
 
@@ -71,12 +63,12 @@
 
 .task-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border-color: #b2c3d3;
+    box-shadow: 0 8px 20px var(--glacial-shadow);
+    border-color: var(--cold-steel);
 }
 
 .task-card:hover::before {
-    background: rgba(42, 74, 104, 0.03);
+    background: rgba(var(--deep-frost-rgb), 0.03);
 }
 
 .task-card:active {
@@ -85,8 +77,8 @@
 }
 
 .approval-type {
-    background: #2a4a68;
-    color: #f0f7ff;
+    background: var(--deep-frost);
+    color: var(--ice-blue);
     padding: 5px 14px;
     border-radius: 16px;
     font-size: 0.82rem;
@@ -125,7 +117,7 @@
 }
 
 .task-value {
-    color: #1a2a3a;
+    color: var(--deep-frost);
     font-size: 0.95rem;
     font-weight: 500;
     flex-grow: 1;
@@ -140,7 +132,7 @@
 
 .category-tag {
     background: #f0f4f8;
-    color: #2a4a68;
+    color: var(--deep-frost);
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 0.82rem;
@@ -151,13 +143,12 @@
 
 .category-tag:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px var(--glacial-shadow);
 }
-
 
 .applicant-info .task-value {
     font-weight: 600;
-    color: #1a2a3a;
+    color: var(--deep-frost);
 }
 
 .create-task-button {
@@ -190,16 +181,8 @@
 @media (max-width: 768px) {
     .task-card {
         padding: 14px;
-        transition: none;
-    }
-    .task-card:hover {
-        transform: none;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     
-    .task-card:active {
-        background: #f8fafc;
-    }
     .task-label {
         min-width: 80px;
         margin-right: 15px;
@@ -217,5 +200,9 @@
     .approval-type {
         font-size: 0.78rem;
         padding: 4px 12px;
+    }
+    
+    .nav-button {
+        padding: 12px 15px;
     }
 }
