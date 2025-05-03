@@ -94,13 +94,13 @@
 .card-content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px !important;
 }
 
 .task-row {
     display: flex;
     align-items: baseline;
-    padding: 8px 0;
+    padding: 6px 0 !important;
     border-bottom: 1px solid #f0f4f8;
 }
 
@@ -111,17 +111,17 @@
 
 .task-label {
     color: #2E4A62 !important;
-    font-size: 0.9rem;
+    font-size: 0.95rem !important;
     font-weight: 500;
-    min-width: 100px;
-    margin-right: 20px;
+    min-width: 120px !important;
+    margin-right: 20px !important;
 }
 
 
 
 .task-value {
     color: var(--deep-frost);
-    font-size: 0.95rem;
+    font-size: 1rem !important;
     font-weight: 500;
     flex-grow: 1;
 }
