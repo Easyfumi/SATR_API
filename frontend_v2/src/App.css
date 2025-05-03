@@ -4,6 +4,8 @@
   --glacial-shadow: rgba(46, 74, 98, 0.2);
   --silver-accent: #C0C9D1;
   --cold-steel: #A3B8CC;
+  --deep-frost-rgb: 46, 74, 98;
+  --cold-steel-rgb: 163, 184, 204;
 }
 
 .content-container {
