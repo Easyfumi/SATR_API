@@ -79,6 +79,10 @@ const TaskListPage = () => {
                             className="task-card"
                             onClick={() => navigate(`/tasks/${task.id}`)}
                         >
+                            <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
+                                {task.number || 'Не зарегистрирована'}
+                            </div>
+
                             <div className="approval-type">{task.docType}</div>
 
                             {/* Добавляем статус оплаты */}
