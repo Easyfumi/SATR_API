@@ -6,14 +6,6 @@ import api from '../../services/api';
 import './TaskListPage.css';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 
-const statusLabels = {
-    RECEIVED: 'Получена',
-    REGISTERED: 'Зарегистрирована',
-    DECISION_DONE: 'Решение готово',
-    COMPLETED: 'Завершена',
-    // ... остальные статусы
-};
-
 const TaskListPage = () => {
     const navigate = useNavigate();
     const location = useLocation();

@@ -11,6 +11,19 @@ const TaskDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const statusLabels = {
+    RECEIVED: 'Заявка получена',
+    REGISTERED: 'Заявка зарегистрирована',
+    DECISION_DONE: 'Решение по заявке готово',
+    DOCUMENTS_WAITING: 'Ожидание документов',
+    REJECTION: 'Отказ в проведении работ',
+    CANCELLED: 'Аннулирована',
+    PROJECT: 'Переведено в проект',
+    SIGNED: 'Подписано',
+    FOR_REVISION: 'Возвращено на доработку',
+    COMPLETED: 'Заявка выполнена'
+  };
+
   useEffect(() => {
     const fetchTask = async () => {
       try {
@@ -43,12 +56,12 @@ const TaskDetailsPage = () => {
     <div className="content-container">
       <Link to="/tasks" className="back-button">
         <ArrowBackIcon />
-        К списку задач
+        К списку заявок
       </Link>
 
       <div className="task-details-card">
         <div className="approval-type">{task.docType}</div>
-        
+
         <div className="card-content">
           <div className="task-row">
             <span className="task-label">Номер заявки</span>
@@ -58,7 +71,7 @@ const TaskDetailsPage = () => {
           <div className="task-row">
             <span className="task-label">Статус</span>
             <span className={`status-badge ${task.status.toLowerCase()}`}>
-              {task.status}
+              {statusLabels[task.status] || task.status}
             </span>
           </div>
 
