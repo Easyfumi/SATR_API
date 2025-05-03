@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserInfo> getTaskById(
+    public ResponseEntity<UserInfo> getUserById(
             @PathVariable("id") Long id,
             @RequestHeader("Authorization") String jwt) throws Exception {
 
