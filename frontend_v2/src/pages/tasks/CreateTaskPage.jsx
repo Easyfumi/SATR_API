@@ -16,7 +16,7 @@ import {
 const CreateTaskPage = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        docType: 'ОТТС',
+        docType: '',
         applicantName: '',
         manufacturerName: '',
         categories: [],
@@ -90,14 +90,46 @@ const CreateTaskPage = () => {
 
                     <div className="form-row">
                         <label className="form-label">Тип одобрения:</label>
-                        <select
-                            value={formData.docType}
-                            onChange={(e) => setFormData({ ...formData, docType: e.target.value })}
-                            className="form-select"
-                        >
-                            <option value="ОТТС">ОТТС</option>
-                            <option value="ОТШ">ОТШ</option>
-                        </select>
+                        <FormControl fullWidth>
+                            <Select
+                                value={formData.docType}
+                                onChange={(e) => setFormData({ ...formData, docType: e.target.value })}
+                                displayEmpty
+                                renderValue={(selected) => (
+                                    <div className="selected-process">
+                                        {selected || <span className="placeholder-text">Выберите тип одобрения</span>}
+                                    </div>
+                                )}
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            width: '100%',
+                                            maxWidth: 'none',
+                                            maxHeight: 300
+                                        }
+                                    }
+                                }}
+                            >
+                                <MenuItem value="ОТТС" style={{ whiteSpace: 'normal' }}>
+                                    <div className="process-option">
+                                        <Checkbox
+                                            checked={formData.docType === 'ОТТС'}
+                                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                        />
+                                        <span>ОТТС (Одобрение типа транспортного средства)</span>
+                                    </div>
+                                </MenuItem>
+                                <MenuItem value="ОТШ" style={{ whiteSpace: 'normal' }}>
+                                    <div className="process-option">
+                                        <Checkbox
+                                            checked={formData.docType === 'ОТШ'}
+                                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                        />
+                                        <span>ОТШ (Одобрение типа шасси)</span>
+                                    </div>
+                                </MenuItem>
+                            </Select>
+                        </FormControl>
                     </div>
                     <div className="form-row">
                         <label className="form-label">Марка:</label>

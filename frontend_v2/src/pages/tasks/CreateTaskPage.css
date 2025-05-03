@@ -1,5 +1,6 @@
 .create-task-form {
-  max-width: auto; /* Добавим ограничение ширины */
+  max-width: auto;
+  /* Добавим ограничение ширины */
   background: #fff;
   padding: 25px;
 }
@@ -13,13 +14,16 @@
 
 .form-row {
   display: flex;
-  align-items: center; /* Изменено с flex-start на center */
+  align-items: center;
+  /* Изменено с flex-start на center */
   margin-bottom: 1rem;
   gap: 15px;
 }
+
 /* Специальный класс для многострочных лейблов */
 .form-row-multiline {
-  align-items: center; /* Выравнивание по вертикали */
+  align-items: center;
+  /* Выравнивание по вертикали */
 }
 
 .form-label {
@@ -29,11 +33,13 @@
   /* min-width: 200px; */
   font-size: 1rem;
   flex-shrink: 0;
-  white-space: normal; /* Разрешаем перенос текста */
-  line-height: 1.4; /* Межстрочный интервал */
-  padding: 8px 0; /* Вертикальные отступы */
+  white-space: normal;
+  /* Разрешаем перенос текста */
+  line-height: 1.4;
+  /* Межстрочный интервал */
+  padding: 8px 0;
+  /* Вертикальные отступы */
 }
-
 
 .form-input,
 .form-select {
@@ -42,13 +48,9 @@
   border: 1px solid var(--silver-accent);
   border-radius: 6px;
   font-size: 1rem;
-  height: 40px; 
+  height: 40px;
   box-sizing: border-box;
 }
-
-
-
-
 
 .selected-process {
   white-space: normal;
@@ -65,9 +67,6 @@
   margin: 4px 16px !important;
 }
 
-
-
-
 /* Чекбоксы */
 .process-option .MuiCheckbox-root {
   padding: 0;
@@ -75,15 +74,11 @@
   color: var(--deep-frost);
 }
 
-
-
 .placeholder-text {
   color: #6b7c93;
   font-style: italic;
   font-size: 0.95rem;
 }
-
-
 
 /* Стили для выпадающего списка категорий */
 .selected-categories {
@@ -101,12 +96,13 @@
 }
 
 .MuiSelect-select {
-  min-height: 40px !important; /* Высота как у обычных инпутов */
+  min-height: 40px !important;
   display: flex !important;
   align-items: center;
+  padding: 8px 12px !important;
+  border: 1px solid var(--silver-accent) !important;
+  border-radius: 6px !important;
 }
-
-
 
 .MuiMenuItem-root {
   padding: 8px 16px !important;
@@ -114,6 +110,29 @@
 
 .MuiCheckbox-root {
   padding: 4px !important;
+}
+
+.MuiSelect-selectMenu {
+  white-space: normal !important;
+  line-height: 1.4 !important;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border: none !important;
+}
+
+.approval-type-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+}
+
+.approval-type-option span {
+  flex-grow: 1;
+  padding-left: 12px;
+  font-size: 0.95rem;
+  color: var(--deep-frost);
 }
 
 .form-actions {
@@ -139,28 +158,24 @@
   font-weight: 600 !important;
 }
 
-
 /* Для мобильной версии */
 @media (max-width: 768px) {
+
   /* .create-task-form {
     padding: 15px;
   }
-
   .form-row {
     flex-direction: column;
     gap: 8px;
   }
-
   .form-label {
     width: 100%;
     min-width: auto;
     padding: 0;
   }
-
   .form-actions {
     flex-direction: column;
   }
-
   .save-btn,
   .cancel-btn {
     width: 100%;
@@ -169,11 +184,11 @@
     width: calc(100% - 20px) !important;
     max-width: none !important;
   }
-  
+
   .process-option {
     padding: 6px 0;
   }
-  
+
   .process-option span {
     font-size: 0.9rem;
   }
