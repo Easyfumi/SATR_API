@@ -51,7 +51,7 @@ const UserDetailPage = () => {
         setEditedRoles(response.data.roles);
       } catch (error) {
         if (error.response?.status === 403) {
-          navigate('/', { replace: true });
+          navigate('/tasks', { replace: true });
         }
         console.error('Ошибка загрузки пользователя:', error);
       } finally {

@@ -31,7 +31,7 @@ const UsersPage = () => {
         setUsers(response.data);
       } catch (error) {
         if (error.response?.status === 403) {
-          navigate('/', { replace: true });
+          navigate('/tasks', { replace: true });
         }
         // убрать потом
         console.error('Ошибка загрузки пользователей:', error);

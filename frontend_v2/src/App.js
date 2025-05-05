@@ -15,6 +15,7 @@ import CreateTaskPage from './pages/tasks/CreateTaskPage';
 import DeclarationPage from './pages/declaration/DeclarationPage'; 
 import CertificatesPage from './pages/certificates/CertificatesPage'; 
 import TaskDetailsPage from './pages/tasks/TaskDetailsPage'; 
+import HomePage from './pages/HomePage';
 
 
 // Основной лейаут для авторизованных пользователей
@@ -42,6 +43,7 @@ function App() {
 
           {/* Защищенные маршруты */}
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+          <Route path="/" element={<HomePage />} />
             <Route path="/users/profile" element={<Profile />} />
             <Route path="/users/all" element={<UsersPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
