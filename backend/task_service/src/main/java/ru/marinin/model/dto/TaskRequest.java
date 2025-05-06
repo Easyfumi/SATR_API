@@ -14,6 +14,7 @@ public class TaskRequest {
     private String mark;
     private String typeName;
     private String processType;
+    private String previousNumber;
     private String representativeName;
     private Long assignedUserId;
 }

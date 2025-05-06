@@ -98,12 +98,12 @@ public class TaskServiceImplementation implements TaskService {
         task.setCategories(request.getCategories());
         task.setMark(request.getMark());
         task.setTypeName(request.getTypeName());
+        task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
         task.setRepresentative(representativeRepository.save(
                 new Representative(
                         request.getRepresentativeName())));
         task.setAssignedUserId(request.getAssignedUserId());
-        System.out.println(request.getAssignedUserId());
         return task;
     }
 

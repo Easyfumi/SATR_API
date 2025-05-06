@@ -10,7 +10,8 @@ import {
     Checkbox,
     ListItemText,
     Chip,
-    Button
+    Button,
+    TextField
 } from '@mui/material';
 
 const CreateTaskPage = () => {
@@ -46,6 +47,8 @@ const CreateTaskPage = () => {
         mark: '',
         typeName: '',
         processType: '',
+        procedureType: '', // Новое поле
+        previousNumber: '', // Новое поле
         representativeName: '',
         assignedUserId: null
     });
@@ -97,7 +100,10 @@ const CreateTaskPage = () => {
                 typeName: formData.typeName,
                 processType: formData.processType,
                 representativeName: formData.representativeName,
-                assignedUserId: formData.assignedUserId
+                assignedUserId: formData.assignedUserId,
+                previousNumber: formData.procedureType === 'оформление нового'
+                    ? 'оформление нового'
+                    : formData.previousNumber
             };
 
             await api.post('/api/tasks/create', request);
@@ -105,6 +111,25 @@ const CreateTaskPage = () => {
         } catch (error) {
             console.error('Error creating task:', error);
         }
+    };
+
+    const [showPreviousNumber, setShowPreviousNumber] = useState(false);
+
+    // Варианты для процедуры
+    const procedureOptions = [
+        'оформление нового',
+        'распространение',
+        'продление'
+    ];
+
+    // Обработчик изменения типа процедуры
+    const handleProcedureChange = (value) => {
+        setFormData({
+            ...formData,
+            procedureType: value,
+            previousNumber: value === 'оформление нового' ? value : ''
+        });
+        setShowPreviousNumber(value !== 'оформление нового');
     };
 
     return (
@@ -288,6 +313,40 @@ const CreateTaskPage = () => {
                             </Select>
                         </FormControl>
                     </div>
+
+                    {/* Поле выбора процедуры */}
+                    <div className="form-row">
+                        <label className="form-label">Тип процедуры:</label>
+                        <FormControl fullWidth className="procedure-select">
+                            <Select
+                                value={formData.procedureType}
+                                onChange={(e) => handleProcedureChange(e.target.value)}
+                                displayEmpty
+                                required
+                            >
+                                {procedureOptions.map((option) => (
+                                    <MenuItem key={option} value={option}>
+                                        {option}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </div>
+
+                    {/* Поле ввода номера */}
+                    {showPreviousNumber && (
+                        <div className="form-row">
+                            <label className="form-label">Номер предыдущего одобрения:</label>
+                            <TextField
+                                fullWidth
+                                className="previous-number-input"
+                                value={formData.previousNumber}
+                                onChange={(e) => setFormData({ ...formData, previousNumber: e.target.value })}
+                                required={showPreviousNumber}
+                                variant="outlined"
+                            />
+                        </div>
+                    )}
                     <div className="form-row">
                         <label className="form-label">Эксперт:</label>
                         <FormControl fullWidth>
