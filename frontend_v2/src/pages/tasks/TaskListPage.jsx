@@ -79,47 +79,50 @@ const TaskListPage = () => {
                             className="task-card"
                             onClick={() => navigate(`/tasks/${task.id}`)}
                         >
-                            <div className="approval-info-container">
+                            {/* Верхняя строка с номером и статусом оплаты */}
+                            <div className="status-container">
                                 <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
                                     {task.number || 'Не зарегистрирована'}
                                 </div>
-                                <div className={`expert-info ${!task.assignedUser ? 'not-assigned' : ''}`}>
-                                    Эксперт: {task.assignedUser
-                                        ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
-                                        : 'не назначен'}
+                                <div className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
+                                    {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
                                 </div>
                             </div>
 
-                            <div className="approval-type">{task.docType}</div>
-
-                    
-                            <div className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
-                                {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
-                            </div>
-
-                            <div className="card-content">
-                                <div className="task-row">
-                                    <span className="task-label">Марка</span>
-                                    <span className="task-value">{task.mark}</span>
+                            {/* Строка с данными в grid-контейнере */}
+                            <div className="info-grid">
+                                <div className="grid-item">
+                                    <div className="grid-label"></div>
+                                    <div className="grid-value">{task.docType}</div>
                                 </div>
-
-                                <div className="task-row">
-                                    <span className="task-label">Тип</span>
-                                    <span className="task-value">{task.typeName}</span>
+                                <div className="grid-item">
+                                    <div className="grid-label">Марка</div>
+                                    <div className="grid-value">{task.mark}</div>
                                 </div>
-
-                                <div className="task-row">
-                                    <span className="task-label">Категории</span>
-                                    <div className="categories-list">
-                                        {task.categories.map(cat => (
-                                            <span key={cat} className="category-tag">{cat}</span>
-                                        ))}
+                                <div className="grid-item">
+                                    <div className="grid-label">Тип</div>
+                                    <div className="grid-value">{task.typeName}</div>
+                                </div>
+                                <div className="grid-item">
+                                    <div className="grid-label">Категории</div>
+                                    <div className="grid-value">
+                                        {task.categories.join(', ')}
                                     </div>
                                 </div>
+                                <div className="grid-item">
+                                    <div className="grid-label">Заявитель</div>
+                                    <div className="grid-value">{task.applicant}</div>
+                                </div>
 
-                                <div className="task-row applicant-info">
-                                    <span className="task-label">Заявитель</span>
-                                    <span className="task-value">{task.applicant}</span>
+                            </div>
+                            <div className="applicant-expert-container">
+                                <div className={`info-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
+                                    <span className="info-label">Эксперт:</span>
+                                    <span className="info-value">
+                                        {task.assignedUser
+                                            ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
+                                            : 'не назначен'}
+                                    </span>
                                 </div>
                             </div>
                         </div>

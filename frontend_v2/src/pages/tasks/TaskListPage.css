@@ -6,9 +6,9 @@
     padding: 8px;
     border-radius: 12px;
     box-shadow: 4px 4px 15px var(--glacial-shadow);
-}
-
-.nav-button {
+  }
+  
+  .nav-button {
     color: var(--ice-blue);
     padding: 12px 30px;
     border-radius: 8px;
@@ -18,27 +18,27 @@
     background: none;
     border: none;
     cursor: pointer;
-}
-
-.nav-button:hover {
+  }
+  
+  .nav-button:hover {
     background: rgba(163, 184, 204, 0.15);
     transform: translateY(-1px);
-}
-
-.nav-button.active {
+  }
+  
+  .nav-button.active {
     background: linear-gradient(145deg, var(--ice-blue), var(--silver-accent));
     color: var(--deep-frost);
     box-shadow: 0 2px 8px var(--glacial-shadow);
-}
-
-.tasks-list {
+  }
+  
+  .tasks-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-top: 20px;
-}
-
-.task-card {
+  }
+  
+  .task-card {
     background: #fff;
     border: 1px solid var(--silver-accent);
     border-radius: 10px;
@@ -46,143 +46,104 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-}
-
-.task-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(42, 74, 104, 0);
-    transition: background 0.3s ease;
-}
-
-.task-card:hover {
+  }
+  
+  .task-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 20px var(--glacial-shadow);
     border-color: var(--cold-steel);
-}
-
-.task-card:hover::before {
-    background: rgba(var(--deep-frost-rgb), 0.03);
-}
-
-.task-card:active {
-    transform: translateY(-1px);
-    transition-duration: 0.1s;
-}
-
-.approval-type {
-    background: var(--deep-frost);
-    color: var(--ice-blue);
-    padding: 5px 14px;
-    border-radius: 16px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin: 5px 0 14px;
-    /* Добавляем отступ сверху */
-    display: inline-block;
-    position: relative;
-    z-index: 1;
-    width: max-content;
-}
-
-.approval-info-container {
+  }
+  
+  .status-container {
     display: flex;
     gap: 10px;
-    align-items: center;
-    margin: 0 0 5px;
-    flex-wrap: wrap;
-}
-
-/* Стили для блока с экспертом */
-.expert-info {
-    background: var(--deep-frost);
-    color: var(--ice-blue);
-    padding: 5px 14px;
+    margin-bottom: 15px;
+  }
+  
+  .registration-status,
+  .payment-status {
+    padding: 6px 14px;
     border-radius: 16px;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    text-transform: uppercase;
-    display: inline-block;
-    order: 2; /* Изменяем порядок элементов */
-}
-
-.expert-info.not-assigned {
+  }
+  
+  .registration-status.registered {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .registration-status.unregistered {
     background: #ffebee;
     color: #c62828;
-    text-transform: none;
-}
-
-.card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px !important;
-}
-
-.task-row {
-    display: flex;
-    align-items: baseline;
-    padding: 6px 0 !important;
-    border-bottom: 1px solid #f0f4f8;
-}
-
-.task-row:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
-.task-label {
-    color: #2E4A62 !important;
-    font-size: 0.95rem !important;
+  }
+  
+  .payment-status.paid {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .payment-status.unpaid {
+    background: #ffebee;
+    color: #c62828;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 80px) minmax(0, 250px) minmax(0, 200px) minmax(0, 100px) minmax(0, 400px);
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .grid-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 80px;
+  }
+  
+  .grid-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+  
+  .grid-value {
+    font-size: 0.95rem;
+    color: #1e293b;
     font-weight: 500;
-    min-width: 120px !important;
-    margin-right: 20px !important;
-}
-
-
-
-.task-value {
-    color: var(--deep-frost);
-    font-size: 1rem !important;
-    font-weight: 500;
-    flex-grow: 1;
-}
-
-.categories-list {
+    word-break: break-word;
+    text-align: center;
+  }
+  
+  .applicant-expert-container {
+    border-top: 1px solid #f0f4f8;
+    padding-top: 12px;
+  }
+  
+  .info-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: -2px 0;
-}
-
-.category-tag {
-    background: #f0f4f8;
-    color: var(--deep-frost);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.82rem;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .info-label {
+    color: #475569;
+    font-size: 0.9rem;
+    min-width: 80px;
+  }
+  
+  .info-value {
+    color: #1e293b;
     font-weight: 500;
-    line-height: 1.3;
-    transition: all 0.2s ease;
-}
-
-.category-tag:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px var(--glacial-shadow);
-}
-
-.applicant-info .task-value {
-    font-weight: 600;
-    color: var(--deep-frost);
-}
-
-.create-task-button {
+  }
+  
+  .not-assigned .info-value {
+    color: #c62828;
+  }
+  
+  .create-task-button {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -193,139 +154,34 @@
     border: 1px solid var(--silver-accent);
     transition: all 0.25s ease;
     margin-top: 25px;
-}
-
-.create-task-button:hover {
+  }
+  
+  .create-task-button:hover {
     background: rgba(163, 184, 204, 0.15);
     transform: translateX(3px);
-}
-
-.create-task-icon {
-    font-size: 40px !important;
-}
-
-.create-task-text {
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-/* Стили для статуса оплаты */
-.payment-status {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    padding: 5px 12px;
-    border-radius: 16px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    z-index: 1;
-}
-
-.payment-status.paid {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.payment-status.unpaid {
-    background: #ffebee;
-    color: #c62828;
-}
-
-
-/* Стили для статуса регистрации */
-.registration-status {
-    padding: 5px 12px;
-    border-radius: 16px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    z-index: 1;
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    order: 1; /* Изменяем порядок элементов */
-}
-
-.registration-status.registered {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.registration-status.unregistered {
-    background: #ffebee;
-    color: #c62828;
-}
-
-/* 
-@media (max-width: 768px) {
+  }
+  
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
     .task-card {
-        padding: 14px;
+      padding: 14px;
     }
-
-    .task-label {
-        min-width: 80px;
-        margin-right: 15px;
-        font-size: 0.85rem;
+  }
+  
+  @media (max-width: 480px) {
+    .info-grid {
+      grid-template-columns: 1fr;
     }
-
-    .task-value {
-        font-size: 0.9rem;
+    
+    .status-container {
+      flex-direction: column;
     }
-
-    .category-tag {
-        font-size: 0.78rem;
-    }
-
-    .approval-type {
-        margin: 26px 0 12px;
-        font-size: 0.78rem;
-    }
+    
     .nav-button {
-        padding: 12px 15px;
+      padding: 12px 15px;
+      font-size: 0.85rem;
     }
-
-    .payment-status {
-        top: 14px;
-        right: 14px;
-        font-size: 0.75rem;
-    }
-
-    .registration-status {
-        top: 14px;
-        left: 14px;
-        max-width: 120px;
-        font-size: 0.75rem;
-    }
-    
-    .approval-type {
-        margin-left: 40px;
-    }
-
-    .approval-info-container {
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-    
-    .registration-status,
-    .expert-info {
-        font-size: 0.78rem;
-        padding: 4px 12px;
-    }
-} 
-    
-@media (max-width: 480px) {
-    .approval-info-container {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .registration-status,
-    .expert-info {
-        width: 100%;
-        max-width: none;
-        text-align: center;
-    }
-}
-
-
-*/
+  }
