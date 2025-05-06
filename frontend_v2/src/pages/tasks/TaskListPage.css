@@ -154,12 +154,21 @@
     border: 1px solid var(--silver-accent);
     transition: all 0.25s ease;
     margin-top: 25px;
-  }
-  
-  .create-task-button:hover {
+}
+
+.create-task-button:hover {
     background: rgba(163, 184, 204, 0.15);
     transform: translateX(3px);
-  }
+}
+
+.create-task-icon {
+    font-size: 40px !important;
+}
+
+.create-task-text {
+    font-size: 1rem;
+    font-weight: 500;
+}
   
   @media (max-width: 768px) {
     .info-grid {
