@@ -317,16 +317,35 @@ const CreateTaskPage = () => {
                     {/* Поле выбора процедуры */}
                     <div className="form-row">
                         <label className="form-label">Тип процедуры:</label>
-                        <FormControl fullWidth className="procedure-select">
+                        <FormControl fullWidth>
                             <Select
                                 value={formData.procedureType}
                                 onChange={(e) => handleProcedureChange(e.target.value)}
                                 displayEmpty
-                                required
+                                renderValue={(selected) => (
+                                    <div className="selected-process">
+                                        {selected || <span className="placeholder-text">Выберите тип процедуры</span>}
+                                    </div>
+                                )}
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            width: '100%',
+                                            maxWidth: 'none',
+                                            maxHeight: 300
+                                        }
+                                    }
+                                }}
                             >
                                 {procedureOptions.map((option) => (
-                                    <MenuItem key={option} value={option}>
-                                        {option}
+                                    <MenuItem key={option} value={option} style={{ whiteSpace: 'normal' }}>
+                                        <div className="process-option">
+                                            <Checkbox
+                                                checked={formData.processType === option}
+                                                style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                            />
+                                            <span>{option}</span>
+                                        </div>
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -347,6 +366,7 @@ const CreateTaskPage = () => {
                             />
                         </div>
                     )}
+
                     <div className="form-row">
                         <label className="form-label">Эксперт:</label>
                         <FormControl fullWidth>
@@ -356,18 +376,52 @@ const CreateTaskPage = () => {
                                 displayEmpty
                                 renderValue={(selected) => {
                                     if (!selected) {
-                                        return <span className="placeholder-text">Выберите эксперта</span>;
+                                        return (
+                                            <div className="selected-process">
+                                                <span className="placeholder-text">Выберите эксперта</span>
+                                            </div>
+                                        );
                                     }
                                     const selectedExpert = experts.find(e => e.id === selected);
-                                    return formatExpertName(selectedExpert);
+                                    return (
+                                        <div className="selected-process">
+                                            {formatExpertName(selectedExpert)}
+                                        </div>
+                                    );
+                                }}
+                                MenuProps={{
+                                    PaperProps: {
+                                        style: {
+                                            width: '100%',
+                                            maxWidth: 'none',
+                                            maxHeight: 300
+                                        }
+                                    }
                                 }}
                             >
-                                <MenuItem value="">
-                                    <em>Не назначен</em>
+                                <MenuItem value="" style={{ whiteSpace: 'normal' }}>
+                                    <div className="process-option">
+                                        <Checkbox
+                                            checked={false}
+                                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                            disabled
+                                        />
+                                        <span style={{ fontStyle: 'italic' }}>Не назначен</span>
+                                    </div>
                                 </MenuItem>
                                 {experts.map((expert) => (
-                                    <MenuItem key={expert.id} value={expert.id}>
-                                        {formatExpertName(expert)}
+                                    <MenuItem
+                                        key={expert.id}
+                                        value={expert.id}
+                                        style={{ whiteSpace: 'normal' }}
+                                    >
+                                        <div className="process-option">
+                                            <Checkbox
+                                                checked={formData.assignedUserId === expert.id}
+                                                style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                            />
+                                            <span>{formatExpertName(expert)}</span>
+                                        </div>
                                     </MenuItem>
                                 ))}
                             </Select>
