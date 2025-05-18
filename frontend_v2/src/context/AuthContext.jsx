@@ -28,7 +28,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = useCallback(async (token) => {
     localStorage.setItem('token', token);
-    await checkAuth();
+    await checkAuth(); // Добавляем await
+    return true; // Возвращаем промис
   }, [checkAuth]);
 
   useEffect(() => {

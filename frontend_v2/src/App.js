@@ -44,14 +44,14 @@ function App() {
           {/* Защищенные маршруты */}
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
           <Route path="/" element={<HomePage />} />
-            <Route path="/users/profile" element={<Profile />} />
-            <Route path="/users/all" element={<UsersPage />} />
-            <Route path="/users/:id" element={<UserDetailPage />} />
-            <Route path="/tasks" element={<TaskListPage />} />
-            <Route path="/tasks/create" element={<CreateTaskPage />} />
-            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
-            <Route path="/decl" element={<DeclarationPage />} /> 
-            <Route path="/serts" element={<CertificatesPage />} /> 
+          <Route path="/users/profile" element={<Profile />} />
+          <Route path="/users/all" element={<UsersPage />} />
+          <Route path="/users/:id" element={<UserDetailPage />} />
+          <Route path="/tasks" element={<TaskListPage />} />
+          <Route path="/tasks/create" element={<CreateTaskPage />} />
+          <Route path="/tasks/:id" element={<TaskDetailsPage />} />
+          <Route path="/decl" element={<DeclarationPage />} /> 
+          <Route path="/serts" element={<CertificatesPage />} /> 
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

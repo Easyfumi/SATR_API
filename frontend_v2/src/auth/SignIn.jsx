@@ -34,8 +34,13 @@ export default function SignIn() {
       setIsSubmitting(true);
       setError('');
       const response = await signIn({ email, password });
-      await login(response.data.jwt);
-      navigate('/tasks', { replace: true });
+
+      const loginSuccess = await login(response.data.jwt);
+    
+      if (loginSuccess) {
+        navigate('/tasks', { replace: true });
+      }
+
     } catch (err) {
       let errorMessage = 'Произошла ошибка';
 
