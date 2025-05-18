@@ -101,9 +101,12 @@ const CreateTaskPage = () => {
                 processType: formData.processType,
                 representativeName: formData.representativeName,
                 assignedUserId: formData.assignedUserId,
-                previousNumber: formData.procedureType === 'оформление нового'
-                    ? 'оформление нового'
-                    : formData.previousNumber
+                previousProcessType: formData.procedureType !== 'оформление нового' 
+                    ? formData.procedureType 
+                    : null,
+                previousNumber: formData.procedureType !== 'оформление нового' 
+                    ? formData.previousNumber 
+                    : null
             };
 
             await api.post('/api/tasks/create', request);
@@ -341,7 +344,7 @@ const CreateTaskPage = () => {
                                     <MenuItem key={option} value={option} style={{ whiteSpace: 'normal' }}>
                                         <div className="process-option">
                                             <Checkbox
-                                                checked={formData.processType === option}
+                                                checked={formData.procedureType === option}
                                                 style={{ padding: '0 10px 0 0', flexShrink: 0 }}
                                             />
                                             <span>{option}</span>
@@ -352,7 +355,7 @@ const CreateTaskPage = () => {
                         </FormControl>
                     </div>
 
-                    {/* Поле ввода номера */}
+                    {/* Поле ввода номера предыдущего одобрения */}
                     {showPreviousNumber && (
                         <div className="form-row">
                             <label className="form-label">Номер предыдущего одобрения:</label>
@@ -360,7 +363,10 @@ const CreateTaskPage = () => {
                                 fullWidth
                                 className="previous-number-input"
                                 value={formData.previousNumber}
-                                onChange={(e) => setFormData({ ...formData, previousNumber: e.target.value })}
+                                onChange={(e) => setFormData({ 
+                                    ...formData, 
+                                    previousNumber: e.target.value 
+                                })}
                                 required={showPreviousNumber}
                                 variant="outlined"
                             />

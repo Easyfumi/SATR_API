@@ -44,6 +44,8 @@ public class Task {
 
     private String previousNumber; // номер предыдущего / процедура
 
+    private String previousProcessType;  // процедура распространения?
+
     @ManyToOne
     private Representative Representative;  // представитель изготовителя
 
