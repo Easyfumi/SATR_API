@@ -18,6 +18,7 @@ const CreateTaskPage = () => {
     const navigate = useNavigate();
 
     const [experts, setExperts] = useState([]);
+
     useEffect(() => {
         const fetchExperts = async () => {
             try {
@@ -127,13 +128,50 @@ const CreateTaskPage = () => {
 
     // Обработчик изменения типа процедуры
     const handleProcedureChange = (value) => {
+        let newPreviousNumber = formData.previousNumber;
+        
+        if (value !== 'оформление нового') {
+            if (formData.previousNumber === '' || formData.previousNumber === 'оформление нового') {
+                newPreviousNumber = generateDefaultNumber(formData.docType);
+            }
+        } else {
+            newPreviousNumber = '';
+        }
+
         setFormData({
             ...formData,
             procedureType: value,
-            previousNumber: value === 'оформление нового' ? value : ''
+            previousNumber: newPreviousNumber
         });
         setShowPreviousNumber(value !== 'оформление нового');
     };
+
+    const generateDefaultNumber = (docType) => {
+        if (docType === 'ОТТС') {
+            return 'ТС RU E-XX.МТ02.00XXX.Р1И1П1';
+        } else if (docType === 'ОТШ') {
+            return 'ТС RU K-XX.МТ02.00XXX.Р1И1П1';
+        }
+        return '';
+    };
+
+    const handleDocTypeChange = (newDocType) => {
+        let newPreviousNumber = formData.previousNumber;
+        
+        if (formData.procedureType !== 'оформление нового') {
+            const currentDefault = generateDefaultNumber(formData.docType);
+            if (formData.previousNumber === currentDefault || formData.previousNumber === '') {
+                newPreviousNumber = generateDefaultNumber(newDocType);
+            }
+        }
+
+        setFormData({
+            ...formData,
+            docType: newDocType,
+            previousNumber: newPreviousNumber
+        });
+    };
+
 
     return (
         <div className="content-container">
@@ -146,7 +184,7 @@ const CreateTaskPage = () => {
                         <FormControl fullWidth>
                             <Select
                                 value={formData.docType}
-                                onChange={(e) => setFormData({ ...formData, docType: e.target.value })}
+                                onChange={(e) => handleDocTypeChange(e.target.value)}
                                 displayEmpty
                                 renderValue={(selected) => (
                                     <div className="selected-process">
