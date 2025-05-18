@@ -92,7 +92,7 @@ const TaskListPage = () => {
                             {/* Строка с данными в grid-контейнере */}
                             <div className="info-grid">
                                 <div className="grid-item">
-                                    <div className="grid-label"></div>
+                                    <div className="grid-label-invisible">Тип</div>
                                     <div className="grid-value">{task.docType}</div>
                                 </div>
                                 <div className="grid-item">

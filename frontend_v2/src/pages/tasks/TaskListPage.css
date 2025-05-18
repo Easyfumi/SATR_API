@@ -108,6 +108,12 @@
     color: #64748b;
     margin-bottom: 6px;
   }
+
+  .grid-label-invisible {
+    font-size: 0.75rem;
+    color: #f8fafc;
+    margin-bottom: 6px;
+  }
   
   .grid-value {
     font-size: 0.95rem;
