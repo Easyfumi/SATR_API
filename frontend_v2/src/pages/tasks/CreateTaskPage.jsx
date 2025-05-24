@@ -33,6 +33,8 @@ const CreateTaskPage = () => {
     }, []);
 
 
+
+
     // Функция для форматирования ФИО
     const formatExpertName = (expert) => {
         const initials = expert.patronymic
@@ -216,6 +218,52 @@ const CreateTaskPage = () => {
         }
     }, 300);
 
+    // Добавляем состояния для чекбоксов
+    const [manufacturerSameAsApplicant, setManufacturerSameAsApplicant] = useState(false);
+    const [representativeSameAsApplicant, setRepresentativeSameAsApplicant] = useState(false);
+
+    // Эффект для синхронизации полей при изменении чекбоксов
+    useEffect(() => {
+        if (manufacturerSameAsApplicant) {
+            setFormData(prev => ({ ...prev, manufacturerName: prev.applicantName }));
+        }
+    }, [manufacturerSameAsApplicant, formData.applicantName]);
+
+    useEffect(() => {
+        if (representativeSameAsApplicant) {
+            setFormData(prev => ({ ...prev, representativeName: prev.applicantName }));
+        }
+    }, [representativeSameAsApplicant, formData.applicantName]);
+
+    // Обработчики изменений полей
+    const handleManufacturerChange = (value) => {
+        if (manufacturerSameAsApplicant && value !== formData.applicantName) {
+            setManufacturerSameAsApplicant(false);
+        }
+        setFormData({ ...formData, manufacturerName: value });
+    };
+
+    const handleRepresentativeChange = (value) => {
+        if (representativeSameAsApplicant && value !== formData.applicantName) {
+            setRepresentativeSameAsApplicant(false);
+        }
+        setFormData({ ...formData, representativeName: value });
+    };
+
+
+    // Эффект для сброса представителя при совпадении изготовителя
+    useEffect(() => {
+        if (manufacturerSameAsApplicant) {
+            setFormData(prev => ({
+                ...prev,
+                representativeName: '',
+                manufacturerName: prev.applicantName
+            }));
+            setRepresentativeSameAsApplicant(false);
+        }
+    }, [manufacturerSameAsApplicant, formData.applicantName]);
+
+
     return (
         <div className="content-container">
             <div className="create-task-form">
@@ -313,18 +361,27 @@ const CreateTaskPage = () => {
                             />
                         </FormControl>
                     </div>
+
                     <div className="form-row">
                         <label className="form-label">Изготовитель:</label>
                         <FormControl fullWidth>
+                            <div className="checkbox-container">
+                                <Checkbox
+                                    checked={manufacturerSameAsApplicant}
+                                    onChange={(e) => setManufacturerSameAsApplicant(e.target.checked)}
+                                />
+                                <span>Совпадает с заявителем</span>
+                            </div>
                             <Autocomplete
                                 freeSolo
                                 options={manufacturers}
                                 getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
                                 onInputChange={(_, value) => {
                                     searchManufacturers(value);
-                                    setFormData({ ...formData, manufacturerName: value });
+                                    handleManufacturerChange(value);
                                 }}
                                 value={formData.manufacturerName}
+                                disabled={manufacturerSameAsApplicant}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
@@ -341,34 +398,46 @@ const CreateTaskPage = () => {
                             />
                         </FormControl>
                     </div>
-                    <div className="form-row form-row-multiline">
-                        <label className="form-label">Представитель изготовителя:</label>
-                        <FormControl fullWidth>
-                            <Autocomplete
-                                freeSolo
-                                options={representatives}
-                                getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
-                                onInputChange={(_, value) => {
-                                    searchRepresentatives(value);
-                                    setFormData({ ...formData, representativeName: value });
-                                }}
-                                value={formData.representativeName}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        InputProps={{
-                                            ...params.InputProps,
-                                            className: 'form-input',
-                                            startAdornment: !formData.representativeName && (
-                                                <span className="placeholder-text">Выберите или введите представителя</span>
-                                            )
-                                        }}
-                                        required
+
+                    {!manufacturerSameAsApplicant && (
+                        <div className="form-row form-row-multiline">
+                            <label className="form-label">Представитель изготовителя:</label>
+                            <FormControl fullWidth>
+                                <div className="checkbox-container">
+                                    <Checkbox
+                                        checked={representativeSameAsApplicant}
+                                        onChange={(e) => setRepresentativeSameAsApplicant(e.target.checked)}
                                     />
-                                )}
-                            />
-                        </FormControl>
-                    </div>
+                                    <span>Совпадает с заявителем</span>
+                                </div>
+                                <Autocomplete
+                                    freeSolo
+                                    options={representatives}
+                                    getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                                    onInputChange={(_, value) => {
+                                        searchRepresentatives(value);
+                                        handleRepresentativeChange(value);
+                                    }}
+                                    value={formData.representativeName}
+                                    disabled={representativeSameAsApplicant}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            InputProps={{
+                                                ...params.InputProps,
+                                                className: 'form-input',
+                                                startAdornment: !formData.representativeName && (
+                                                    <span className="placeholder-text">Выберите или введите представителя</span>
+                                                )
+                                            }}
+                                            required={!manufacturerSameAsApplicant}
+                                        />
+                                    )}
+                                />
+                            </FormControl>
+                        </div>
+                    )}
+
                     <div className="form-row">
                         <label className="form-label">Категория:</label>
                         <FormControl fullWidth>
