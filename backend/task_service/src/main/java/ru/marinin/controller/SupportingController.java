@@ -26,17 +26,26 @@ public class SupportingController {
 
 
     @GetMapping("/applicants/search")
-    public List<Applicant> searchApplicants(@RequestParam String name) {
-        return applicantRepository.findByNameContainingIgnoreCase(name);
+    public List<Applicant> searchApplicants(@RequestParam(required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return applicantRepository.findByNameContainingIgnoreCase(search);
+        }
+        return applicantRepository.findAll();
     }
 
     @GetMapping("/manufacturers/search")
-    public List<Manufacturer> searchManufacturers(@RequestParam String name) {
-        return manufacturerRepository.findByNameContainingIgnoreCase(name);
+    public List<Manufacturer> searchManufacturers(@RequestParam(required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return manufacturerRepository.findByNameContainingIgnoreCase(search);
+        }
+        return manufacturerRepository.findAll();
     }
 
     @GetMapping("/representatives/search")
-    public List<Representative> searchRepresentatives(@RequestParam String name) {
-        return representativeRepository.findByNameContainingIgnoreCase(name);
+    public List<Representative> searchRepresentatives(@RequestParam(required = false) String search) {
+        if (search != null && !search.isEmpty()) {
+            return representativeRepository.findByNameContainingIgnoreCase(search);
+        }
+        return representativeRepository.findAll();
     }
 }

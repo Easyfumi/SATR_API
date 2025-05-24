@@ -12,7 +12,7 @@ spring:
         - id: TASK-SERVICE
           uri: lb://TASK-SERVICE
           predicates:
-            - Path=/api/tasks/**,/tasks/**, /applicants/**
+            - Path=/api/tasks/**,/tasks/**, /api/applicants/**, /api/manufacturers/**, /api/representatives/**
 
         - id: USER-SERVICE
           uri: lb://USER-SERVICE

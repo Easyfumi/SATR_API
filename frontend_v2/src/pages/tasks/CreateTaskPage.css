@@ -203,6 +203,22 @@
   padding: 4px 0;
 }
 
+/* Добавим стили для плейсхолдеров в Autocomplete */
+.MuiAutocomplete-root .placeholder-text {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7c93;
+  font-style: italic;
+  pointer-events: none;
+}
+
+/* Скорректируем отступы при наличии плейсхолдера */
+.MuiAutocomplete-root .MuiInputBase-input {
+  padding-left: 0 !important;
+}
+
 /* Для мобильной версии */
 @media (max-width: 768px) {
 

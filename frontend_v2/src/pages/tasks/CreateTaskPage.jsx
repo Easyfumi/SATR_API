@@ -11,7 +11,8 @@ import {
     ListItemText,
     Chip,
     Button,
-    TextField
+    TextField,
+    Autocomplete
 } from '@mui/material';
 
 const CreateTaskPage = () => {
@@ -102,11 +103,11 @@ const CreateTaskPage = () => {
                 processType: formData.processType,
                 representativeName: formData.representativeName,
                 assignedUserId: formData.assignedUserId,
-                previousProcessType: formData.procedureType !== 'оформление нового' 
-                    ? formData.procedureType 
+                previousProcessType: formData.procedureType !== 'оформление нового'
+                    ? formData.procedureType
                     : null,
-                previousNumber: formData.procedureType !== 'оформление нового' 
-                    ? formData.previousNumber 
+                previousNumber: formData.procedureType !== 'оформление нового'
+                    ? formData.previousNumber
                     : null
             };
 
@@ -129,7 +130,7 @@ const CreateTaskPage = () => {
     // Обработчик изменения типа процедуры
     const handleProcedureChange = (value) => {
         let newPreviousNumber = formData.previousNumber;
-        
+
         if (value !== 'оформление нового') {
             if (formData.previousNumber === '' || formData.previousNumber === 'оформление нового') {
                 newPreviousNumber = generateDefaultNumber(formData.docType);
@@ -157,7 +158,7 @@ const CreateTaskPage = () => {
 
     const handleDocTypeChange = (newDocType) => {
         let newPreviousNumber = formData.previousNumber;
-        
+
         if (formData.procedureType !== 'оформление нового') {
             const currentDefault = generateDefaultNumber(formData.docType);
             if (formData.previousNumber === currentDefault || formData.previousNumber === '') {
@@ -172,6 +173,48 @@ const CreateTaskPage = () => {
         });
     };
 
+
+    // Добавим состояния для хранения вариантов
+    const [applicants, setApplicants] = useState([]);
+    const [manufacturers, setManufacturers] = useState([]);
+    const [representatives, setRepresentatives] = useState([]);
+
+    // Функция для поиска с задержкой
+    const debounce = (func, delay) => {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    };
+
+    // Обработчики поиска
+    const searchApplicants = debounce(async (searchText) => {
+        try {
+            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            setApplicants(response.data);
+        } catch (error) {
+            console.error('Error searching applicants:', error);
+        }
+    }, 300);
+
+    const searchManufacturers = debounce(async (searchText) => {
+        try {
+            const response = await api.get(`/api/manufacturers/search?search=${encodeURIComponent(searchText)}`);
+            setManufacturers(response.data);
+        } catch (error) {
+            console.error('Error searching manufacturers:', error);
+        }
+    }, 300);
+
+    const searchRepresentatives = debounce(async (searchText) => {
+        try {
+            const response = await api.get(`/api/representatives/search?search=${encodeURIComponent(searchText)}`);
+            setRepresentatives(response.data);
+        } catch (error) {
+            console.error('Error searching representatives:', error);
+        }
+    }, 300);
 
     return (
         <div className="content-container">
@@ -244,33 +287,87 @@ const CreateTaskPage = () => {
                     </div>
                     <div className="form-row">
                         <label className="form-label">Заявитель:</label>
-                        <input
-                            type="text"
-                            value={formData.applicantName}
-                            onChange={(e) => setFormData({ ...formData, applicantName: e.target.value })}
-                            className="form-input"
-                            required
-                        />
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                freeSolo
+                                options={applicants}
+                                getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                                onInputChange={(_, value) => {
+                                    searchApplicants(value);
+                                    setFormData({ ...formData, applicantName: value });
+                                }}
+                                value={formData.applicantName}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            className: 'form-input',
+                                            startAdornment: !formData.applicantName && (
+                                                <span className="placeholder-text">Выберите или введите заявителя</span>
+                                            )
+                                        }}
+                                        required
+                                    />
+                                )}
+                            />
+                        </FormControl>
                     </div>
                     <div className="form-row">
                         <label className="form-label">Изготовитель:</label>
-                        <input
-                            type="text"
-                            value={formData.manufacturerName}
-                            onChange={(e) => setFormData({ ...formData, manufacturerName: e.target.value })}
-                            className="form-input"
-                            required
-                        />
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                freeSolo
+                                options={manufacturers}
+                                getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                                onInputChange={(_, value) => {
+                                    searchManufacturers(value);
+                                    setFormData({ ...formData, manufacturerName: value });
+                                }}
+                                value={formData.manufacturerName}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            className: 'form-input',
+                                            startAdornment: !formData.manufacturerName && (
+                                                <span className="placeholder-text">Выберите или введите изготовителя</span>
+                                            )
+                                        }}
+                                        required
+                                    />
+                                )}
+                            />
+                        </FormControl>
                     </div>
                     <div className="form-row form-row-multiline">
                         <label className="form-label">Представитель изготовителя:</label>
-                        <input
-                            type="text"
-                            value={formData.representativeName}
-                            onChange={(e) => setFormData({ ...formData, representativeName: e.target.value })}
-                            className="form-input"
-                            required
-                        />
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                freeSolo
+                                options={representatives}
+                                getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                                onInputChange={(_, value) => {
+                                    searchRepresentatives(value);
+                                    setFormData({ ...formData, representativeName: value });
+                                }}
+                                value={formData.representativeName}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            className: 'form-input',
+                                            startAdornment: !formData.representativeName && (
+                                                <span className="placeholder-text">Выберите или введите представителя</span>
+                                            )
+                                        }}
+                                        required
+                                    />
+                                )}
+                            />
+                        </FormControl>
                     </div>
                     <div className="form-row">
                         <label className="form-label">Категория:</label>
@@ -401,9 +498,9 @@ const CreateTaskPage = () => {
                                 fullWidth
                                 className="previous-number-input"
                                 value={formData.previousNumber}
-                                onChange={(e) => setFormData({ 
-                                    ...formData, 
-                                    previousNumber: e.target.value 
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    previousNumber: e.target.value
                                 })}
                                 required={showPreviousNumber}
                                 variant="outlined"
