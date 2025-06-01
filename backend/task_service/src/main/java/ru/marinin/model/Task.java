@@ -47,7 +47,7 @@ public class Task {
     private String previousProcessType;  // процедура распространения?
 
     @ManyToOne
-    private Representative Representative;  // представитель изготовителя
+    private Representative representative;  // представитель изготовителя
 
     private Long createdBy;   // кем создана
 

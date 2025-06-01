@@ -89,23 +89,27 @@ public class TaskServiceImplementation implements TaskService {
     private Task mapRequestToEntity(TaskRequest request) {
         Task task = new Task();
         task.setDocType(request.getDocType());
-        task.setApplicant(applicantRepository.save(
-                new Applicant(
-                        request.getApplicantName())));
-        task.setManufacturer(manufacturerRepository.save(
-                new Manufacturer(
-                        request.getManufacturerName())));
+
+        // Обработка Applicant: найти или создать
+        task.setApplicant(getOrCreateApplicant(request.getApplicantName()));
+
+        // Обработка Manufacturer: найти или создать
+        task.setManufacturer(getOrCreateManufacturer(request.getManufacturerName()));
+
         task.setCategories(request.getCategories());
         task.setMark(request.getMark());
         task.setTypeName(request.getTypeName());
         task.setPreviousProcessType(request.getPreviousProcessType());
-        if (request.getPreviousNumber()!=null) {
+
+        if (request.getPreviousNumber() != null) {
             task.setPreviousNumber(request.getPreviousNumber());
         }
+
         task.setProcessType(request.getProcessType());
-        task.setRepresentative(representativeRepository.save(
-                new Representative(
-                        request.getRepresentativeName())));
+
+        // Обработка Representative: найти или создать
+        task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
+
         task.setAssignedUserId(request.getAssignedUserId());
         return task;
     }
@@ -124,6 +128,25 @@ public class TaskServiceImplementation implements TaskService {
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus().name());
         return response;
+    }
+
+
+    // Для Applicant
+    private Applicant getOrCreateApplicant(String name) {
+        return applicantRepository.findByName(name)
+                .orElseGet(() -> applicantRepository.save(new Applicant(name)));
+    }
+
+    // Для Manufacturer (аналогично)
+    private Manufacturer getOrCreateManufacturer(String name) {
+        return manufacturerRepository.findByName(name)
+                .orElseGet(() -> manufacturerRepository.save(new Manufacturer(name)));
+    }
+
+    // Для Representative (аналогично)
+    private Representative getOrCreateRepresentative(String name) {
+        return representativeRepository.findByName(name)
+                .orElseGet(() -> representativeRepository.save(new Representative(name)));
     }
 
 }

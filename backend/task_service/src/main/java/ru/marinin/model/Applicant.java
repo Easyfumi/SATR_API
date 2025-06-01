@@ -15,7 +15,7 @@ public class Applicant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(unique = true) // Запрет дубликатов
+    @Column(unique = true) // Запрет дубликатов
     private String name;
     // Дополнительные поля (адрес, контакты и т.д.)
 

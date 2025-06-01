@@ -14,7 +14,7 @@ public class Representative {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(unique = true)
+    @Column(unique = true)
     private String name;
 
 //    @ManyToOne // Связь с изготовителем (опционально)
