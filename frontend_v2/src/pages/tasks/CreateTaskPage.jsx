@@ -344,6 +344,14 @@ const CreateTaskPage = () => {
                                     searchApplicants(value);
                                     setFormData({ ...formData, applicantName: value });
                                 }}
+                                onOpen={() => {
+                                    // Загружаем данные только если они еще не загружены
+                                    if (applicants.length === 0) {
+                                        api.get('/api/applicants/search')
+                                            .then(response => setApplicants(response.data))
+                                            .catch(error => console.error('Error loading applicants:', error));
+                                    }
+                                }}
                                 value={formData.applicantName}
                                 renderInput={(params) => (
                                     <TextField
@@ -379,6 +387,13 @@ const CreateTaskPage = () => {
                                 onInputChange={(_, value) => {
                                     searchManufacturers(value);
                                     handleManufacturerChange(value);
+                                }}
+                                onOpen={() => {
+                                    if (manufacturers.length === 0) {
+                                        api.get('/api/manufacturers/search')
+                                            .then(response => setManufacturers(response.data))
+                                            .catch(error => console.error('Error loading manufacturers:', error));
+                                    }
                                 }}
                                 value={formData.manufacturerName}
                                 disabled={manufacturerSameAsApplicant}
@@ -417,6 +432,13 @@ const CreateTaskPage = () => {
                                     onInputChange={(_, value) => {
                                         searchRepresentatives(value);
                                         handleRepresentativeChange(value);
+                                    }}
+                                    onOpen={() => {
+                                        if (representatives.length === 0) {
+                                            api.get('/api/representatives/search')
+                                                .then(response => setRepresentatives(response.data))
+                                                .catch(error => console.error('Error loading representatives:', error));
+                                        }
                                     }}
                                     value={formData.representativeName}
                                     disabled={representativeSameAsApplicant}
