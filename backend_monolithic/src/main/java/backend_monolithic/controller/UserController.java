@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import backend_monolithic.model.User;
-import backend_monolithic.model.UserInfo;
+import backend_monolithic.model.dto.UserInfo;
 import backend_monolithic.model.enums.Role;
 import backend_monolithic.service.UserService;
 

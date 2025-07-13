@@ -1,4 +1,4 @@
-package backend_monolithic.model;
+package backend_monolithic.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
