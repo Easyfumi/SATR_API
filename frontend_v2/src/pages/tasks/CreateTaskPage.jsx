@@ -124,17 +124,17 @@ const CreateTaskPage = () => {
 
     // Варианты для процедуры
     const procedureOptions = [
-        'оформление нового',
-        'распространение',
-        'продление'
+        'Оформление нового',
+        'Распространение',
+        'Продление'
     ];
 
     // Обработчик изменения типа процедуры
     const handleProcedureChange = (value) => {
         let newPreviousNumber = formData.previousNumber;
 
-        if (value !== 'оформление нового') {
-            if (formData.previousNumber === '' || formData.previousNumber === 'оформление нового') {
+        if (value !== 'Оформление нового') {
+            if (formData.previousNumber === '' || formData.previousNumber === 'Оформление нового') {
                 newPreviousNumber = generateDefaultNumber(formData.docType);
             }
         } else {
@@ -146,7 +146,7 @@ const CreateTaskPage = () => {
             procedureType: value,
             previousNumber: newPreviousNumber
         });
-        setShowPreviousNumber(value !== 'оформление нового');
+        setShowPreviousNumber(value !== 'Оформление нового');
     };
 
     const generateDefaultNumber = (docType) => {

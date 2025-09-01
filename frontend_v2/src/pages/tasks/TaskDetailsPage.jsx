@@ -46,7 +46,7 @@ const TaskDetailsPage = () => {
 
   const handleAssignNumber = async () => {
     if (!newNumber.trim()) return;
-    
+
     setIsUpdating(true);
     try {
       const response = await api.put(`/api/tasks/${id}/number`, { number: newNumber });
@@ -80,12 +80,26 @@ const TaskDetailsPage = () => {
       </Link>
 
       <div className="task-details-card">
+
+        <div className="task-row">
+          <div className="approval-type">{task.docType}</div>
+        </div>
+
+        <div className="task-row">
+          <div className="approval-type">{task.previousProcessType} {task.previousNumber}</div>
+        </div>
+
+                <div className="task-row">
+          
+        </div>
+
+
         <div className="card-content">
+
+
           {/* Левая колонка */}
           <div className="column left-column">
-            <div className="task-row">
-              <div className="approval-type">{task.docType}</div>
-            </div>
+
 
             <div className="task-row">
               <span className="task-label">Марка</span>
@@ -96,12 +110,12 @@ const TaskDetailsPage = () => {
               <span className="task-label">Тип</span>
               <span className="task-value">{task.typeName}</span>
             </div>
-            
+
             <div className="task-row">
               <span className="task-label">Заявитель</span>
               <span className="task-value">{task.applicant}</span>
             </div>
-            
+
             <div className="task-row">
               <span className="task-label">Изготовитель</span>
               <span className="task-value">{task.manufacturer}</span>
@@ -156,7 +170,7 @@ const TaskDetailsPage = () => {
               <span className="task-label">Решение по заявке</span>
               <span className="task-value">{formatDate(task.decisionAt)}</span>
             </div>
-            
+
             <div className="task-row">
               <span className="task-label">Статус</span>
               <span className={`status-badge ${task.status.toLowerCase()}`}>
