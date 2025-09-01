@@ -80,9 +80,14 @@ const TaskDetailsPage = () => {
       </Link>
 
       <div className="task-details-card">
-        <div className="approval-type">{task.docType}</div>
+
 
         <div className="card-content">
+
+                    <div className="task-row">
+            <div className="approval-type">{task.docType}</div>
+          </div>
+
           <div className="task-row">
             <span className="task-label">Номер заявки</span>
             {task.number ? (
@@ -114,6 +119,11 @@ const TaskDetailsPage = () => {
           </div>
 
           <div className="task-row">
+            <span className="task-label">Решение по заявке</span>
+            <span className="task-value">{formatDate(task.decisionAt)}</span>
+          </div>
+          
+          <div className="task-row">
             <span className="task-label">Статус</span>
             <span className={`status-badge ${task.status.toLowerCase()}`}>
               {statusLabels[task.status] || task.status}
@@ -129,9 +139,12 @@ const TaskDetailsPage = () => {
             <span className="task-label">Тип</span>
             <span className="task-value">{task.typeName}</span>
           </div>
-
           <div className="task-row">
-            <span className="task-label">Производитель</span>
+            <span className="task-label">Заявитель</span>
+            <span className="task-value">{task.applicant}</span>
+          </div>
+          <div className="task-row">
+            <span className="task-label">Изготовитель</span>
             <span className="task-value">{task.manufacturer}</span>
           </div>
 
@@ -144,20 +157,14 @@ const TaskDetailsPage = () => {
             </div>
           </div>
 
-          <div className="task-row">
-            <span className="task-label">Заявитель</span>
-            <span className="task-value">{task.applicant}</span>
-          </div>
+
 
           <div className="task-row">
             <span className="task-label">Дата создания</span>
             <span className="task-value">{formatDateTime(task.createdAt)}</span>
           </div>
 
-          <div className="task-row">
-            <span className="task-label">Планируемая дата решения</span>
-            <span className="task-value">{formatDate(task.decisionAt)}</span>
-          </div>
+
 
           <div className="task-row">
             <span className="task-label">Статус оплаты</span>
