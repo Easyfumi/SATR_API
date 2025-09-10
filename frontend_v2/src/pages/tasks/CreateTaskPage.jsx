@@ -59,8 +59,8 @@ const CreateTaskPage = () => {
 
     const processOptions = [
         'со сроком действия до 3-х лет',
-        'со сроком действия до 1-ого года в соответствии с п. 35 ТР о безопасности колесных транспортных средств',
-        'на малую партию транспортных средств (шасси) в соответствии с п. 35 технического регламента о безопасности колесных транспортных средств'
+        'со сроком действия до 1-ого года в соответствии с п. 35 ТР ТС',
+        'на малую партию транспортных средств (шасси) в соответствии с п. 35 ТР ТС'
     ];
 
     const getCategoryLabel = (category) => {
@@ -124,17 +124,17 @@ const CreateTaskPage = () => {
 
     // Варианты для процедуры
     const procedureOptions = [
-        'оформление нового',
-        'распространение',
-        'продление'
+        'Оформление нового',
+        'Распространение',
+        'Продление'
     ];
 
     // Обработчик изменения типа процедуры
     const handleProcedureChange = (value) => {
         let newPreviousNumber = formData.previousNumber;
 
-        if (value !== 'оформление нового') {
-            if (formData.previousNumber === '' || formData.previousNumber === 'оформление нового') {
+        if (value !== 'Оформление нового') {
+            if (formData.previousNumber === '' || formData.previousNumber === 'Оформление нового') {
                 newPreviousNumber = generateDefaultNumber(formData.docType);
             }
         } else {
@@ -146,7 +146,7 @@ const CreateTaskPage = () => {
             procedureType: value,
             previousNumber: newPreviousNumber
         });
-        setShowPreviousNumber(value !== 'оформление нового');
+        setShowPreviousNumber(value !== 'Оформление нового');
     };
 
     const generateDefaultNumber = (docType) => {
