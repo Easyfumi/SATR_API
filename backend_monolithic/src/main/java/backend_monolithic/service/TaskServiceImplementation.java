@@ -120,6 +120,8 @@ public class TaskServiceImplementation implements TaskService {
         response.setCategories(task.getCategories());
         response.setMark(task.getMark());
         response.setTypeName(task.getTypeName());
+        response.setPreviousProcessType(task.getPreviousProcessType());
+        response.setPreviousNumber(task.getPreviousNumber());
         response.setRepresentative(task.getRepresentative().getName());
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus().name());

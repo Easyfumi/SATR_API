@@ -21,6 +21,8 @@ public class TaskResponse {
     private String createdBy;
     private UserInfo assignedUser;
     private String status;
+    private String previousProcessType;
+    private String previousNumber;
     private LocalDateTime createdAt;
     private LocalDate decisionAt;
     private Boolean paymentStatus;
