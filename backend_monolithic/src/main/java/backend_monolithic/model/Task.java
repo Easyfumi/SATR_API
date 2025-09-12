@@ -1,5 +1,6 @@
 package backend_monolithic.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -55,7 +56,7 @@ public class Task {
     private TaskStatus status;   // статус
 
     private LocalDateTime createdAt;   // дата время создания заявки
-
+    
     private LocalDate decisionAt;   // дата решения по заявке
 
     private Boolean paymentStatus=false;  // статус оплаты

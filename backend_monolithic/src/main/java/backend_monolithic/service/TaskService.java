@@ -2,7 +2,9 @@ package backend_monolithic.service;
 
 import backend_monolithic.model.dto.TaskRequest;
 import backend_monolithic.model.dto.TaskResponse;
+import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TaskService {
@@ -13,6 +15,8 @@ public interface TaskService {
     TaskResponse getTaskById(Long id);
 
     TaskResponse setTaskNumber(Long taskId, String number);
+
+    TaskResponse setDecisionDate(Long id, @NotNull LocalDate decisionDate);
 
 //    TaskResponse assignUser(Long id, Long userId);
 //    List<TaskResponse> filterTasks(String status, List<String> categories);

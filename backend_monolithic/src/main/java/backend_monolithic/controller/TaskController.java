@@ -1,5 +1,6 @@
 package backend_monolithic.controller;
 
+import backend_monolithic.model.dto.TaskDecisionDateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,22 @@ public class TaskController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{id}/decision-date")
+    public ResponseEntity<?> setDecisionDate(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskDecisionDateRequest request) {
+        try {
+            TaskResponse response = taskService.setDecisionDate(id, request.getDecisionDate());
+            return ResponseEntity.ok(response);
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
 }
 
 

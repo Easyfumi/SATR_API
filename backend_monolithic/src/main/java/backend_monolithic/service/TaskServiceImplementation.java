@@ -16,6 +16,7 @@ import backend_monolithic.repository.ManufacturerRepository;
 import backend_monolithic.repository.RepresentativeRepository;
 import backend_monolithic.repository.TaskRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,25 @@ public class TaskServiceImplementation implements TaskService {
             throw new IllegalStateException("Номер уже назначен");
         }
         task.setNumber(number);
+        task = taskRepository.save(task);
+        return mapEntityToResponse(task);
+    }
+
+    public TaskResponse setDecisionDate(Long taskId, LocalDate decisionDate) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
+
+        // Проверка что дата решения еще не установлена (опционально)
+        if (task.getDecisionAt() != null) {
+            throw new IllegalStateException("Дата решения уже назначена");
+        }
+
+        // Дополнительные проверки даты (например, что дата не в будущем)
+        if (decisionDate.isAfter(LocalDate.now())) {
+            throw new IllegalStateException("Дата решения не может быть в будущем");
+        }
+
+        task.setDecisionAt(decisionDate);
         task = taskRepository.save(task);
         return mapEntityToResponse(task);
     }
