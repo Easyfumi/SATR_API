@@ -13,6 +13,8 @@ const TaskDetailsPage = () => {
   const [error, setError] = useState(null);
   const [newNumber, setNewNumber] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [newDecisionDate, setNewDecisionDate] = useState('');
+  const [isUpdatingDecisionDate, setIsUpdatingDecisionDate] = useState(false);
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -61,13 +63,51 @@ const TaskDetailsPage = () => {
     }
   };
 
+  const handleSetDecisionDate = async () => {
+    if (!newDecisionDate) return;
+
+    setIsUpdatingDecisionDate(true);
+    try {
+      const response = await api.put(`/api/tasks/${id}/decision-date`, { 
+        decisionDate: newDecisionDate 
+      });
+      setTask(response.data);
+      setNewDecisionDate('');
+      alert('Дата решения успешно установлена');
+    } catch (error) {
+      console.error('Ошибка установки даты решения:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка');
+    } finally {
+      setIsUpdatingDecisionDate(false);
+    }
+  };
+
   const formatDateTime = (dateTime) => {
+    if (!dateTime) return 'Не указана';
     return new Date(dateTime).toLocaleString('ru-RU');
   };
 
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('ru-RU');
-  };
+const formatDate = (date) => {
+  console.log(date + "asd");
+  // Проверяем на null, undefined и невалидные даты
+  if (!date || new Date(date).toString() === 'Invalid Date') {
+    return 'Не указана';
+  }
+  
+  const dateObj = new Date(date);
+  // Проверяем, что это не дата по умолчанию (1970 год)
+  if (dateObj.getFullYear() === 1970 && dateObj.getMonth() === 0 && dateObj.getDate() === 1) {
+    return 'Не указана';
+  }
+  
+  return dateObj.toLocaleDateString('ru-RU');
+};
+
+const isDateSet = (date) => {
+  if (!date) return false;
+  const dateObj = new Date(date);
+  return dateObj.getFullYear() > 1970;
+};
 
   if (loading) return <div className="loading">Загрузка...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -89,18 +129,9 @@ const TaskDetailsPage = () => {
           <div className="approval-type">{task.previousProcessType} {task.previousNumber}</div>
         </div>
 
-                <div className="task-row">
-          
-        </div>
-
-
         <div className="card-content">
-
-
           {/* Левая колонка */}
           <div className="column left-column">
-
-
             <div className="task-row">
               <span className="task-label">Марка</span>
               <span className="task-value">{task.mark}</span>
@@ -113,25 +144,25 @@ const TaskDetailsPage = () => {
 
             <div className="task-row">
               <span className="task-label">Заявитель</span>
-              <span className="task-value">{task.applicant}</span>
+              <span className="task-value">{task.applicant?.name || task.applicant}</span>
             </div>
 
             <div className="task-row">
               <span className="task-label">Изготовитель</span>
-              <span className="task-value">{task.manufacturer}</span>
+              <span className="task-value">{task.manufacturer?.name || task.manufacturer}</span>
             </div>
 
             <div className="task-row">
               <span className="task-label">Категории</span>
               <div className="categories-list">
-                {task.categories.map(cat => (
+                {task.categories && task.categories.map(cat => (
                   <span key={cat} className="category-tag">{cat}</span>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Вертикальная разделительная линия */}
+          {/* Вертикальная разделительная линия*/}
           <div className="vertical-divider"></div>
 
           {/* Правая колонка */}
@@ -166,14 +197,42 @@ const TaskDetailsPage = () => {
               )}
             </div>
 
-            <div className="task-row">
-              <span className="task-label">Решение по заявке</span>
-              <span className="task-value">{formatDate(task.decisionAt)}</span>
-            </div>
+<div className="task-row">
+  <span className="task-label">Решение по заявке</span>
+  {task.decisionAt && isDateSet(task.decisionAt) ? (
+    <span className="task-value">{formatDate(task.decisionAt)}</span>
+  ) : (
+    <div className="date-input-container">
+      <TextField
+        type="date"
+        size="small"
+        value={newDecisionDate}
+        onChange={(e) => setNewDecisionDate(e.target.value)}
+        variant="outlined"
+        disabled={isUpdatingDecisionDate}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <Button
+        variant="contained"
+        onClick={handleSetDecisionDate}
+        disabled={!newDecisionDate || isUpdatingDecisionDate}
+        style={{ marginLeft: '10px' }}
+      >
+        {isUpdatingDecisionDate ? (
+          <CircularProgress size={24} />
+        ) : (
+          'Установить дату'
+        )}
+      </Button>
+    </div>
+  )}
+</div>
 
             <div className="task-row">
               <span className="task-label">Статус</span>
-              <span className={`status-badge ${task.status.toLowerCase()}`}>
+              <span className={`status-badge ${task.status?.toLowerCase()}`}>
                 {statusLabels[task.status] || task.status}
               </span>
             </div>
