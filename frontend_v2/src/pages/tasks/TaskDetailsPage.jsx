@@ -68,8 +68,8 @@ const TaskDetailsPage = () => {
 
     setIsUpdatingDecisionDate(true);
     try {
-      const response = await api.put(`/api/tasks/${id}/decision-date`, { 
-        decisionDate: newDecisionDate 
+      const response = await api.put(`/api/tasks/${id}/decision-date`, {
+        decisionDate: newDecisionDate
       });
       setTask(response.data);
       setNewDecisionDate('');
@@ -87,27 +87,27 @@ const TaskDetailsPage = () => {
     return new Date(dateTime).toLocaleString('ru-RU');
   };
 
-const formatDate = (date) => {
-  console.log(date + "asd");
-  // Проверяем на null, undefined и невалидные даты
-  if (!date || new Date(date).toString() === 'Invalid Date') {
-    return 'Не указана';
-  }
-  
-  const dateObj = new Date(date);
-  // Проверяем, что это не дата по умолчанию (1970 год)
-  if (dateObj.getFullYear() === 1970 && dateObj.getMonth() === 0 && dateObj.getDate() === 1) {
-    return 'Не указана';
-  }
-  
-  return dateObj.toLocaleDateString('ru-RU');
-};
+  const formatDate = (date) => {
+    console.log(date + "asd");
+    // Проверяем на null, undefined и невалидные даты
+    if (!date || new Date(date).toString() === 'Invalid Date') {
+      return 'Не указана';
+    }
 
-const isDateSet = (date) => {
-  if (!date) return false;
-  const dateObj = new Date(date);
-  return dateObj.getFullYear() > 1970;
-};
+    const dateObj = new Date(date);
+    // Проверяем, что это не дата по умолчанию (1970 год)
+    if (dateObj.getFullYear() === 1970 && dateObj.getMonth() === 0 && dateObj.getDate() === 1) {
+      return 'Не указана';
+    }
+
+    return dateObj.toLocaleDateString('ru-RU');
+  };
+
+  const isDateSet = (date) => {
+    if (!date) return false;
+    const dateObj = new Date(date);
+    return dateObj.getFullYear() > 1970;
+  };
 
   if (loading) return <div className="loading">Загрузка...</div>;
   if (error) return <div className="error-message">{error}</div>;
@@ -162,7 +162,7 @@ const isDateSet = (date) => {
             </div>
           </div>
 
-          {/* Вертикальная разделительная линия*/}
+          {/* Вертикальная разделительная линия 1*/}
           <div className="vertical-divider"></div>
 
           {/* Правая колонка */}
@@ -197,38 +197,38 @@ const isDateSet = (date) => {
               )}
             </div>
 
-<div className="task-row">
-  <span className="task-label">Решение по заявке</span>
-  {task.decisionAt && isDateSet(task.decisionAt) ? (
-    <span className="task-value">{formatDate(task.decisionAt)}</span>
-  ) : (
-    <div className="date-input-container">
-      <TextField
-        type="date"
-        size="small"
-        value={newDecisionDate}
-        onChange={(e) => setNewDecisionDate(e.target.value)}
-        variant="outlined"
-        disabled={isUpdatingDecisionDate}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-      <Button
-        variant="contained"
-        onClick={handleSetDecisionDate}
-        disabled={!newDecisionDate || isUpdatingDecisionDate}
-        style={{ marginLeft: '10px' }}
-      >
-        {isUpdatingDecisionDate ? (
-          <CircularProgress size={24} />
-        ) : (
-          'Установить дату'
-        )}
-      </Button>
-    </div>
-  )}
-</div>
+            <div className="task-row">
+              <span className="task-label">Решение по заявке</span>
+              {task.decisionAt && isDateSet(task.decisionAt) ? (
+                <span className="task-value">{formatDate(task.decisionAt)}</span>
+              ) : (
+                <div className="date-input-container">
+                  <TextField
+                    type="date"
+                    size="small"
+                    value={newDecisionDate}
+                    onChange={(e) => setNewDecisionDate(e.target.value)}
+                    variant="outlined"
+                    disabled={isUpdatingDecisionDate}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleSetDecisionDate}
+                    disabled={!newDecisionDate || isUpdatingDecisionDate}
+                    style={{ marginLeft: '10px' }}
+                  >
+                    {isUpdatingDecisionDate ? (
+                      <CircularProgress size={24} />
+                    ) : (
+                      'Установить дату'
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
 
             <div className="task-row">
               <span className="task-label">Статус</span>
