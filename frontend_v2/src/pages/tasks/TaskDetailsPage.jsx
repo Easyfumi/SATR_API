@@ -172,7 +172,7 @@ const TaskDetailsPage = () => {
               {task.number ? (
                 <span className="task-value">{task.number}</span>
               ) : (
-                <div className="number-input-container">
+                <div className="input-action-container">
                   <TextField
                     size="small"
                     value={newNumber}
@@ -180,12 +180,13 @@ const TaskDetailsPage = () => {
                     placeholder="Введите номер"
                     variant="outlined"
                     disabled={isUpdating}
+                    sx={{ width: '100%', maxWidth: 143 }}
                   />
                   <Button
                     variant="contained"
                     onClick={handleAssignNumber}
                     disabled={!newNumber || isUpdating}
-                    style={{ marginLeft: '10px' }}
+                    
                   >
                     {isUpdating ? (
                       <CircularProgress size={24} />
@@ -202,23 +203,19 @@ const TaskDetailsPage = () => {
               {task.decisionAt && isDateSet(task.decisionAt) ? (
                 <span className="task-value">{formatDate(task.decisionAt)}</span>
               ) : (
-                <div className="date-input-container">
-                  <TextField
-                    type="date"
-                    size="small"
-                    value={newDecisionDate}
-                    onChange={(e) => setNewDecisionDate(e.target.value)}
-                    variant="outlined"
-                    disabled={isUpdatingDecisionDate}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
+                <div className="input-action-container">
+                  <div className="modern-date-field">
+                    <input
+                      type="date"
+                      value={newDecisionDate}
+                      onChange={(e) => setNewDecisionDate(e.target.value)}
+                      disabled={isUpdatingDecisionDate}
+                    />
+                  </div>
                   <Button
                     variant="contained"
                     onClick={handleSetDecisionDate}
                     disabled={!newDecisionDate || isUpdatingDecisionDate}
-                    style={{ marginLeft: '10px' }}
                   >
                     {isUpdatingDecisionDate ? (
                       <CircularProgress size={24} />
