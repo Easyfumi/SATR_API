@@ -2,6 +2,7 @@ package backend_monolithic.service;
 
 
 import backend_monolithic.model.*;
+import backend_monolithic.model.dto.TaskShortInfo;
 import backend_monolithic.model.dto.UserInfo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import backend_monolithic.repository.TaskRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,11 +39,24 @@ public class TaskServiceImplementation implements TaskService {
         User user = userService.getUserProfile(jwt);
         UserInfo userInfo = new UserInfo(user);
         Task task = mapRequestToEntity(request);
+        if (checkDuplicates(task)) {
+
+        }
         task.setCreatedBy(userInfo.getId());
         task.setCreatedAt(LocalDateTime.now());
         task.setStatus(TaskStatus.RECEIVED);    // Default status
         Task savedTask = taskRepository.save(task);
         return mapEntityToResponse(savedTask);
+    }
+
+    public boolean checkDuplicates(Task task) {
+        TaskShortInfo taskShortInfoNew = new TaskShortInfo(task);
+        List<Task> allTasks = taskRepository.findAll();
+        for (int i = 0; i < allTasks.size(); i++) {
+            TaskShortInfo taskShortInfo = new TaskShortInfo(allTasks.get(i));
+            if (taskShortInfo.equals(taskShortInfoNew)) return true;
+        }
+        return false;
     }
 
     public List<TaskResponse> getAllTasks(String jwt) {
