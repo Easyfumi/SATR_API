@@ -154,7 +154,6 @@ public class TaskServiceImplementation implements TaskService {
                     + createdBy.get().getPatronymic().charAt(0) + ".");
         }
 
-
         return response;
     }
 
@@ -179,76 +178,3 @@ public class TaskServiceImplementation implements TaskService {
 
 }
 
-
-//         Long id; +
-//         String number; +
-//         String docType; +
-//         String applicant; +
-//         String manufacturer; +
-//         List<String> categories; +
-//         String mark; +
-//         String typeName; +
-//         String processType;
-//         String representative; +
-//         Long createdBy;
-//         Long assignedUserId;
-//         String status; +
-//         LocalDateTime createdAt; +
-//         LocalDate decisionAt;
-//         Boolean paymentStatus;
-
-
-//    @Override
-//    public TaskResponse updateTask(Long id, TaskRequest request) {
-//        return null;
-//    }
-//
-//    public TaskResponse updateTask(Long id, TaskRequest request) {
-//        Task task = taskRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-//
-//        mapRequestToEntity(request, task);
-//        Task updatedTask = taskRepository.save(task);
-//        return mapEntityToResponse(updatedTask);
-//    }
-//
-//    public void deleteTask(Long id) {
-//        taskRepository.deleteById(id);
-//    }
-
-//    public TaskResponse changeStatus(Long id, String status) {
-//        Task task = taskRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-//
-//        task.setStatus(TaskStatus.valueOf(status.toUpperCase()));
-//
-//
-//
-//        return mapEntityToResponse(taskRepository.save(task));
-//    }
-
-//    public TaskResponse assignUser(Long id, Long userId) {
-//        Task task = taskRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-//
-//        task.setAssignedUserId(userId);
-//        return mapEntityToResponse(taskRepository.save(task));
-//    }
-
-//    @Override
-//    public List<TaskResponse> filterTasks(String status, List<String> categories) {
-//        return List.of();
-//    }
-//
-//    public List<TaskResponse> filterTasks(String status, List<String> categories) {
-//        List<Task> tasks = taskRepository.findByFilters(
-//                status != null ? TaskStatus.valueOf(status.toUpperCase()) : null,
-//                categories != null ? categories.stream()
-//                        .map(String::toUpperCase)
-//                        .map(VehicleCategories::valueOf)
-//                        .toList() : null
-//        );
-//        return tasks.stream()
-//                .map(this::mapEntityToResponse)
-//                .toList();
-//    }
