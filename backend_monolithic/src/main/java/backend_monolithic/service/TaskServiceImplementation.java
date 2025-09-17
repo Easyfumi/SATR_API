@@ -146,6 +146,15 @@ public class TaskServiceImplementation implements TaskService {
         response.setDecisionAt(task.getDecisionAt());
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus().name());
+
+        Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
+        if (createdBy.isPresent()) {
+            response.setCreatedBy(createdBy.get().getFirstName() + " "
+                    + createdBy.get().getSecondName().charAt(0) + "."
+                    + createdBy.get().getPatronymic().charAt(0) + ".");
+        }
+
+
         return response;
     }
 

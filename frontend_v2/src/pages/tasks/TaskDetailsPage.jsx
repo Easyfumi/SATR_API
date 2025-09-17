@@ -186,7 +186,7 @@ const TaskDetailsPage = () => {
                     variant="contained"
                     onClick={handleAssignNumber}
                     disabled={!newNumber || isUpdating}
-                    
+
                   >
                     {isUpdating ? (
                       <CircularProgress size={24} />
@@ -234,10 +234,7 @@ const TaskDetailsPage = () => {
               </span>
             </div>
 
-            <div className="task-row">
-              <span className="task-label">Дата создания</span>
-              <span className="task-value">{formatDateTime(task.createdAt)}</span>
-            </div>
+
 
             <div className="task-row">
               <span className="task-label">Статус оплаты</span>
@@ -246,6 +243,16 @@ const TaskDetailsPage = () => {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="task-details-card">
+        <div className="task-row">
+          <span className="task-label">Дата создания</span>
+          <span className="task-value">{formatDateTime(task.createdAt)}</span>
+        </div>
+        <div className="task-row">
+          <span className="task-label">Заявка создана</span>
+          <span className="task-value">{task.createdBy}</span>
         </div>
       </div>
     </div>
