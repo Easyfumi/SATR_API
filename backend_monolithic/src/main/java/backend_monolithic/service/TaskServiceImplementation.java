@@ -2,15 +2,12 @@ package backend_monolithic.service;
 
 
 import backend_monolithic.model.*;
-import backend_monolithic.model.dto.TaskShortInfo;
-import backend_monolithic.model.dto.UserInfo;
+import backend_monolithic.model.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import backend_monolithic.error.DuplicateNumberException;
 import backend_monolithic.error.TaskNotFoundException;
-import backend_monolithic.model.dto.TaskRequest;
-import backend_monolithic.model.dto.TaskResponse;
 import backend_monolithic.model.enums.TaskStatus;
 import backend_monolithic.repository.ApplicantRepository;
 import backend_monolithic.repository.ManufacturerRepository;
@@ -23,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -39,9 +37,7 @@ public class TaskServiceImplementation implements TaskService {
         User user = userService.getUserProfile(jwt);
         UserInfo userInfo = new UserInfo(user);
         Task task = mapRequestToEntity(request);
-        if (checkDuplicates(task)) {
 
-        }
         task.setCreatedBy(userInfo.getId());
         task.setCreatedAt(LocalDateTime.now());
         task.setStatus(TaskStatus.RECEIVED);    // Default status
@@ -49,14 +45,28 @@ public class TaskServiceImplementation implements TaskService {
         return mapEntityToResponse(savedTask);
     }
 
-    public boolean checkDuplicates(Task task) {
-        TaskShortInfo taskShortInfoNew = new TaskShortInfo(task);
-        List<Task> allTasks = taskRepository.findAll();
-        for (int i = 0; i < allTasks.size(); i++) {
-            TaskShortInfo taskShortInfo = new TaskShortInfo(allTasks.get(i));
-            if (taskShortInfo.equals(taskShortInfoNew)) return true;
-        }
-        return false;
+    public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
+        // Получаем все заявки кроме завершенных
+        List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
+
+        // Маппим request в TaskShortInfo для сравнения
+        Task task = mapRequestToEntity(request);
+        TaskShortInfo newTaskInfo = new TaskShortInfo(task);
+
+        // Ищем дубликаты
+        return existingTasks.stream()
+                .map(TaskShortInfo::new)
+                .filter(existingTaskInfo -> existingTaskInfo.equals(newTaskInfo))
+                .map(taskShortInfo -> {
+                    Task taskEntity = taskRepository.findById(taskShortInfo.getId())
+                            .orElseThrow(() -> new RuntimeException("Task not found"));
+                    return new TaskDuplicateInfo(
+                            taskEntity.getId(),
+                            taskEntity.getNumber(),
+                            taskEntity.getStatus()
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public List<TaskResponse> getAllTasks(String jwt) {

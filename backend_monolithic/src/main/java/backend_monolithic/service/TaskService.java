@@ -1,5 +1,6 @@
 package backend_monolithic.service;
 
+import backend_monolithic.model.dto.TaskDuplicateInfo;
 import backend_monolithic.model.dto.TaskRequest;
 import backend_monolithic.model.dto.TaskResponse;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,8 @@ public interface TaskService {
     TaskResponse setTaskNumber(Long taskId, String number);
 
     TaskResponse setDecisionDate(Long id, @NotNull LocalDate decisionDate);
+
+    List<TaskDuplicateInfo> checkDuplicates(TaskRequest request);
 
 //    TaskResponse assignUser(Long id, Long userId);
 //    List<TaskResponse> filterTasks(String status, List<String> categories);

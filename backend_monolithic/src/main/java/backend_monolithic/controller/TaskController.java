@@ -1,6 +1,6 @@
 package backend_monolithic.controller;
 
-import backend_monolithic.model.dto.TaskDecisionDateRequest;
+import backend_monolithic.model.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,12 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import backend_monolithic.error.DuplicateNumberException;
 import backend_monolithic.error.TaskNotFoundException;
-import backend_monolithic.model.dto.TaskNumberRequest;
-import backend_monolithic.model.dto.TaskRequest;
-import backend_monolithic.model.dto.TaskResponse;
 import backend_monolithic.service.TaskService;
 import backend_monolithic.service.UserService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +24,28 @@ public class TaskController {
     private final UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<TaskResponse> createTask(
+    public ResponseEntity<?> createTask(
+            @RequestBody TaskRequest request,
+            @RequestHeader("Authorization") String jwt) {
+
+        // Проверяем дубликаты
+        List<TaskDuplicateInfo> duplicates = taskService.checkDuplicates(request);
+
+        if (!duplicates.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("hasDuplicates", true);
+            response.put("duplicates", duplicates);
+            response.put("taskRequest", request); // Сохраняем request для повторной отправки
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        TaskResponse response = taskService.createTask(request, jwt);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Новый endpoint для принудительного создания с игнорированием дубликатов
+    @PostMapping("/create/force")
+    public ResponseEntity<TaskResponse> createTaskForce(
             @RequestBody TaskRequest request,
             @RequestHeader("Authorization") String jwt) {
         TaskResponse response = taskService.createTask(request, jwt);

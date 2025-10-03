@@ -1,0 +1,340 @@
+3. Frontend: Компонент модального окна
+Создадим компонент DuplicateCheckModal.js:
+
+jsx
+import React, { useState } from 'react';
+import { Button, Modal, Box, Typography, Checkbox, FormControlLabel, Link } from '@mui/material';
+
+const DuplicateCheckModal = ({ 
+    open, 
+    onClose, 
+    duplicates, 
+    onForceCreate,
+    isLoading 
+}) => {
+    const [ignoreDuplicates, setIgnoreDuplicates] = useState(false);
+
+    const handleForceCreate = () => {
+        onForceCreate();
+        setIgnoreDuplicates(false);
+    };
+
+    const handleClose = () => {
+        onClose();
+        setIgnoreDuplicates(false);
+    };
+
+    return (
+        <Modal open={open} onClose={handleClose}>
+            <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 600,
+                bgcolor: 'background.paper',
+                boxShadow: 24,
+                p: 4,
+                borderRadius: 2
+            }}>
+                <Typography variant="h6" component="h2" gutterBottom>
+                    {isLoading ? 'Поиск дубликатов...' : 'Найдены дубликаты заявок'}
+                </Typography>
+
+                {isLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                        <div className="loading-spinner">Загрузка...</div>
+                    </Box>
+                ) : (
+                    <>
+                        <Typography variant="body1" sx={{ mb: 2 }}>
+                            Обнаружены заявки с аналогичными данными:
+                        </Typography>
+
+                        <Box sx={{ maxHeight: 200, overflow: 'auto', mb: 2 }}>
+                            {duplicates.map((duplicate) => (
+                                <Box key={duplicate.id} sx={{ 
+                                    p: 1, 
+                                    borderBottom: '1px solid #eee',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center'
+                                }}>
+                                    <Link 
+                                        href={`/api/tasks/${duplicate.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        sx={{ cursor: 'pointer' }}
+                                    >
+                                        {duplicate.taskNumber}
+                                    </Link>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {duplicate.status}
+                                    </Typography>
+                                </Box>
+                            ))}
+                        </Box>
+
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={ignoreDuplicates}
+                                    onChange={(e) => setIgnoreDuplicates(e.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                            label="Продолжить создание заявки, несмотря на найденные дубликаты"
+                        />
+
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3 }}>
+                            <Button onClick={handleClose}>
+                                Отмена
+                            </Button>
+                            <Button 
+                                variant="contained" 
+                                onClick={handleForceCreate}
+                                disabled={!ignoreDuplicates}
+                            >
+                                Все равно зарегистрировать
+                            </Button>
+                        </Box>
+                    </>
+                )}
+            </Box>
+        </Modal>
+    );
+};
+
+export default DuplicateCheckModal;
+4. Frontend: Изменения в CreateTaskPage
+jsx
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
+import './CreateTaskPage.css';
+import { VehicleCategories } from '../../constants/vehicleCategories';
+import DuplicateCheckModal from '../../components/DuplicateCheckModal'; // Импортируем модалку
+
+const CreateTaskPage = () => {
+    const navigate = useNavigate();
+
+    // Состояния для модалки дубликатов
+    const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+    const [duplicates, setDuplicates] = useState([]);
+    const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
+    const [pendingRequest, setPendingRequest] = useState(null);
+
+    // ... остальные состояния остаются без изменений
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsCheckingDuplicates(true);
+        
+        try {
+            const request = {
+                docType: formData.docType,
+                applicantName: formData.applicantName,
+                manufacturerName: formData.manufacturerName,
+                categories: formData.categories,
+                mark: formData.mark,
+                typeName: formData.typeName,
+                processType: formData.processType,
+                representativeName: formData.representativeName,
+                assignedUserId: formData.assignedUserId,
+                previousProcessType: formData.procedureType !== 'оформление нового'
+                    ? formData.procedureType
+                    : null,
+                previousNumber: formData.procedureType !== 'оформление нового'
+                    ? formData.previousNumber
+                    : null
+            };
+
+            // Сохраняем request на случай дубликатов
+            setPendingRequest(request);
+
+            // Пытаемся создать заявку
+            await api.post('/api/tasks/create', request);
+            navigate('/tasks');
+        } catch (error) {
+            if (error.response && error.response.status === 409) {
+                // Найдены дубликаты
+                setDuplicates(error.response.data.duplicates);
+                setShowDuplicateModal(true);
+            } else {
+                console.error('Error creating task:', error);
+                alert('Ошибка при создании заявки');
+            }
+        } finally {
+            setIsCheckingDuplicates(false);
+        }
+    };
+
+    const handleForceCreate = async () => {
+        if (!pendingRequest) return;
+
+        try {
+            await api.post('/api/tasks/create/force', pendingRequest);
+            setShowDuplicateModal(false);
+            setPendingRequest(null);
+            setDuplicates([]);
+            navigate('/tasks');
+        } catch (error) {
+            console.error('Error force creating task:', error);
+            alert('Ошибка при создании заявки');
+        }
+    };
+
+    // Добавляем стили для анимации загрузки
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .loading-spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 2s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
+    return (
+        <div className="content-container">
+            <div className="create-task-form">
+                <h2 className="page-title">Создание новой заявки</h2>
+                
+                {/* Модальное окно проверки дубликатов */}
+                <DuplicateCheckModal
+                    open={showDuplicateModal}
+                    onClose={() => setShowDuplicateModal(false)}
+                    duplicates={duplicates}
+                    onForceCreate={handleForceCreate}
+                    isLoading={isCheckingDuplicates}
+                />
+
+                {/* Остальная форма без изменений */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* ... существующие поля формы ... */}
+                    
+                    <div className="form-actions">
+                        <Button
+                            variant="outlined"
+                            type="button"
+                            onClick={() => navigate('/tasks')}
+                            className="cancel-btn"
+                        >
+                            Отмена
+                        </Button>
+                        <Button
+                            variant="contained"
+                            type="submit"
+                            className="save-btn"
+                            disabled={isCheckingDuplicates}
+                        >
+                            {isCheckingDuplicates ? 'Проверка дубликатов...' : 'Создать заявку'}
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default CreateTaskPage;
+5. CSS для анимации
+Добавим в CreateTaskPage.css:
+
+css
+/* Стили для модального окна */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Анимация загрузки */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+/* Стили для списка дубликатов */
+.duplicates-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.duplicate-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.duplicate-item:last-child {
+    border-bottom: none;
+}
+
+.duplicate-link {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.duplicate-link:hover {
+    text-decoration: underline;
+}
+6. Дополнительные улучшения
+Можно добавить индикатор загрузки на кнопку:
+
+jsx
+<Button
+    variant="contained"
+    type="submit"
+    className="save-btn"
+    disabled={isCheckingDuplicates}
+    startIcon={isCheckingDuplicates ? <CircularProgress size={20} /> : null}
+>
+    {isCheckingDuplicates ? 'Проверка дубликатов...' : 'Создать заявку'}
+</Button>
