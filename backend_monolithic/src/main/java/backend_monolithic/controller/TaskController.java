@@ -35,7 +35,7 @@ public class TaskController {
             Map<String, Object> response = new HashMap<>();
             response.put("hasDuplicates", true);
             response.put("duplicates", duplicates);
-            response.put("taskRequest", request); // Сохраняем request для повторной отправки
+            response.put("taskRequest", request);
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
@@ -43,7 +43,6 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Новый endpoint для принудительного создания с игнорированием дубликатов
     @PostMapping("/create/force")
     public ResponseEntity<TaskResponse> createTaskForce(
             @RequestBody TaskRequest request,

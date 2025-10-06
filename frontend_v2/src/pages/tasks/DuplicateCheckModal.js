@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Box, Typography, Checkbox, FormControlLabel, Link } from '@mui/material';
 
+
 const DuplicateCheckModal = ({ 
     open, 
     onClose, 
@@ -18,6 +19,47 @@ const DuplicateCheckModal = ({
     const handleClose = () => {
         onClose();
         setIgnoreDuplicates(false);
+    };
+
+    // Функция для форматирования даты
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('ru-RU');
+    };
+
+        // Объект для отображения статусов
+    const statusLabels = {
+        RECEIVED: 'Заявка получена',
+        REGISTERED: 'Заявка зарегистрирована',
+        DECISION_DONE: 'Решение по заявке готово',
+        DOCUMENTS_WAITING: 'Ожидание документов',
+        REJECTION: 'Отказ в проведении работ',
+        CANCELLED: 'Аннулирована',
+        PROJECT: 'Переведено в проект',
+        SIGNED: 'Подписано',
+        FOR_REVISION: 'Возвращено на доработку',
+        COMPLETED: 'Заявка выполнена'
+    };
+
+    // Функция для получения читаемого названия статуса
+    const getStatusLabel = (status) => {
+        return statusLabels[status] || status;
+    };
+
+    // Функция для получения цвета статуса
+    const getStatusColor = (status) => {
+        const colors = {
+            'RECEIVED': '#1976d2', // Синий
+            'REGISTERED': '#2e7d32', // Зеленый
+            'DECISION_DONE': '#ed6c02', // Оранжевый
+            'DOCUMENTS_WAITING': '#ffb300', // Желтый
+            'REJECTION': '#d32f2f', // Красный
+            'CANCELLED': '#757575', // Серый
+            'PROJECT': '#7b1fa2', // Фиолетовый
+            'SIGNED': '#2e7d32', // Зеленый
+            'FOR_REVISION': '#ed6c02', // Оранжевый
+            'COMPLETED': '#2e7d32' // Зеленый
+        };
+        return colors[status] || '#757575';
     };
 
     return (
@@ -47,53 +89,111 @@ const DuplicateCheckModal = ({
                             Обнаружены заявки с аналогичными данными:
                         </Typography>
 
-                        <Box sx={{ maxHeight: 200, overflow: 'auto', mb: 2 }}>
-                            {duplicates.map((duplicate) => (
-                                <Box key={duplicate.id} sx={{ 
-                                    p: 1, 
-                                    borderBottom: '1px solid #eee',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}>
-                                    <Link 
-                                        href={`/tasks/${duplicate.id}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        sx={{ cursor: 'pointer' }}
-                                    >
-                                        {duplicate.taskNumber}
-                                    </Link>
+                        <Box sx={{ 
+                            maxHeight: 300, 
+                            overflow: 'auto', 
+                            mb: 2, 
+                            border: '1px solid #e0e0e0', 
+                            borderRadius: 1,
+                            backgroundColor: '#fafafa'
+                        }}>
+                            {duplicates.length === 0 ? (
+                                <Box sx={{ p: 2, textAlign: 'center' }}>
                                     <Typography variant="body2" color="text.secondary">
-                                        {duplicate.status}
+                                        Дубликаты не найдены
                                     </Typography>
                                 </Box>
-                            ))}
+                            ) : (
+                                duplicates.map((duplicate) => (
+                                    <Box key={duplicate.id} sx={{ 
+                                        p: 2, 
+                                        borderBottom: '1px solid #f0f0f0',
+                                        backgroundColor: 'white',
+                                        '&:last-child': { borderBottom: 'none' },
+                                        '&:hover': { backgroundColor: '#f5f5f5' }
+                                    }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                            <Box>
+                                                <Link 
+                                                    href={`/tasks/${duplicate.id}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    sx={{ 
+                                                        cursor: 'pointer',
+                                                        fontWeight: 'bold',
+                                                        textDecoration: 'none',
+                                                        fontSize: '1rem',
+                                                        color: '#1976d2',
+                                                        '&:hover': { 
+                                                            textDecoration: 'underline',
+                                                            color: '#1565c0'
+                                                        }
+                                                    }}
+                                                >
+                                                    {duplicate.displayIdentifier}
+                                                </Link>
+                                            </Box>
+                                            <Typography 
+                                                variant="caption" 
+                                                sx={{ 
+                                                    padding: '4px 8px',
+                                                    borderRadius: 1,
+                                                    backgroundColor: getStatusColor(duplicate.status),
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.7rem',
+                                                    whiteSpace: 'nowrap'
+                                                }}
+                                            >
+                                                {getStatusLabel(duplicate.status)}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Создана: {formatDate(duplicate.createdAt)}
+                                        </Typography>
+                                    </Box>
+                                ))
+                            )}
                         </Box>
 
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={ignoreDuplicates}
-                                    onChange={(e) => setIgnoreDuplicates(e.target.checked)}
-                                    color="primary"
+                        {duplicates.length > 0 && (
+                            <>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={ignoreDuplicates}
+                                            onChange={(e) => setIgnoreDuplicates(e.target.checked)}
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Продолжить создание заявки, несмотря на найденные дубликаты"
+                                    sx={{ mt: 1 }}
                                 />
-                            }
-                            label="Продолжить создание заявки, несмотря на найденные дубликаты"
-                        />
 
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3 }}>
-                            <Button onClick={handleClose}>
-                                Отмена
-                            </Button>
-                            <Button 
-                                variant="contained" 
-                                onClick={handleForceCreate}
-                                disabled={!ignoreDuplicates}
-                            >
-                                Все равно зарегистрировать
-                            </Button>
-                        </Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3 }}>
+                                    <Button 
+                                        onClick={handleClose}
+                                        variant="outlined"
+                                    >
+                                        Отмена
+                                    </Button>
+                                    <Button 
+                                        variant="contained" 
+                                        onClick={handleForceCreate}
+                                        disabled={!ignoreDuplicates}
+                                        color="warning"
+                                        sx={{ 
+                                            backgroundColor: ignoreDuplicates ? '#ed6c02' : '',
+                                            '&:hover': {
+                                                backgroundColor: ignoreDuplicates ? '#e65100' : ''
+                                            }
+                                        }}
+                                    >
+                                        Все равно зарегистрировать
+                                    </Button>
+                                </Box>
+                            </>
+                        )}
                     </>
                 )}
             </Box>

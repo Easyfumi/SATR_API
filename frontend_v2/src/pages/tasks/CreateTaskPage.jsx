@@ -126,7 +126,9 @@ const CreateTaskPage = () => {
             setPendingRequest(request);
 
             // Пытаемся создать заявку
-            await api.post('/api/tasks/create', request);
+            const response = await api.post('/api/tasks/create', request);
+
+            // Если успешно - переходим к списку заявок
             navigate('/tasks');
         } catch (error) {
             if (error.response && error.response.status === 409) {
@@ -135,7 +137,7 @@ const CreateTaskPage = () => {
                 setShowDuplicateModal(true);
             } else {
                 console.error('Error creating task:', error);
-                alert('Ошибка при создании заявки');
+                alert('Ошибка при создании заявки: ' + (error.response?.data?.message || error.message));
             }
         } finally {
             setIsCheckingDuplicates(false);
@@ -153,7 +155,7 @@ const CreateTaskPage = () => {
             navigate('/tasks');
         } catch (error) {
             console.error('Error force creating task:', error);
-            alert('Ошибка при создании заявки');
+            alert('Ошибка при создании заявки: ' + (error.response?.data?.message || error.message));
         }
     };
 

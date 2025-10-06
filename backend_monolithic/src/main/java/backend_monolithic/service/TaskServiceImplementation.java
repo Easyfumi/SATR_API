@@ -16,6 +16,7 @@ import backend_monolithic.repository.TaskRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,26 +47,43 @@ public class TaskServiceImplementation implements TaskService {
         // Получаем все заявки кроме завершенных
         List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
 
-        // Маппим request в TaskShortInfo для сравнения
-        Task task = mapRequestToEntity(request);
-        TaskShortInfo newTaskInfo = new TaskShortInfo(task);
+        // Маппим request в Task для сравнения
+        Task newTask = mapRequestToEntity(request);
 
-        // Ищем дубликаты, сохраняя связь с исходными задачами
+        // Ищем дубликаты путем прямого сравнения полей
         return existingTasks.stream()
-                .map(existingTask -> {
-                    TaskShortInfo existingTaskInfo = new TaskShortInfo(existingTask);
-                    return new AbstractMap.SimpleEntry<>(existingTask, existingTaskInfo);
-                })
-                .filter(entry -> entry.getValue().equals(newTaskInfo))
-                .map(entry -> {
-                    Task taskEntity = entry.getKey();
-                    return new TaskDuplicateInfo(
-                            taskEntity.getId(),
-                            taskEntity.getNumber(),
-                            taskEntity.getStatus()
-                    );
-                })
+                .filter(existingTask -> areTasksDuplicates(existingTask, newTask))
+                .map(existingTask -> new TaskDuplicateInfo(
+                        existingTask.getId(),
+                        getTaskDisplayIdentifier(existingTask), // Используем идентификатор для отображения
+                        existingTask.getStatus(),
+                        existingTask.getCreatedAt() // Добавим дату создания для информации
+                ))
                 .collect(Collectors.toList());
+    }
+
+    private boolean areTasksDuplicates(Task task1, Task task2) {
+        return Objects.equals(task1.getDocType(), task2.getDocType())
+                && Objects.equals(task1.getApplicant(), task2.getApplicant())
+                && Objects.equals(task1.getManufacturer(), task2.getManufacturer())
+                && Objects.equals(task1.getCategories(), task2.getCategories())
+                && Objects.equals(task1.getMark(), task2.getMark())
+                && Objects.equals(task1.getTypeName(), task2.getTypeName())
+                && Objects.equals(task1.getProcessType(), task2.getProcessType())
+                && Objects.equals(task1.getPreviousNumber(), task2.getPreviousNumber())
+                && Objects.equals(task1.getPreviousProcessType(), task2.getPreviousProcessType())
+                && Objects.equals(task1.getRepresentative(), task2.getRepresentative());
+    }
+
+    private String getTaskDisplayIdentifier(Task task) {
+        // Если есть номер - используем его, иначе используем ID и дату создания
+        if (task.getNumber() != null && !task.getNumber().trim().isEmpty()) {
+            return task.getNumber();
+        } else {
+            return String.format("ID: %d (%s)",
+                    task.getId(),
+                    task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        }
     }
 
     public List<TaskResponse> getAllTasks(String jwt) {
