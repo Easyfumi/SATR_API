@@ -16,10 +16,7 @@ import backend_monolithic.repository.TaskRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -53,13 +50,15 @@ public class TaskServiceImplementation implements TaskService {
         Task task = mapRequestToEntity(request);
         TaskShortInfo newTaskInfo = new TaskShortInfo(task);
 
-        // Ищем дубликаты
+        // Ищем дубликаты, сохраняя связь с исходными задачами
         return existingTasks.stream()
-                .map(TaskShortInfo::new)
-                .filter(existingTaskInfo -> existingTaskInfo.equals(newTaskInfo))
-                .map(taskShortInfo -> {
-                    Task taskEntity = taskRepository.findById(taskShortInfo.getId())
-                            .orElseThrow(() -> new RuntimeException("Task not found"));
+                .map(existingTask -> {
+                    TaskShortInfo existingTaskInfo = new TaskShortInfo(existingTask);
+                    return new AbstractMap.SimpleEntry<>(existingTask, existingTaskInfo);
+                })
+                .filter(entry -> entry.getValue().equals(newTaskInfo))
+                .map(entry -> {
+                    Task taskEntity = entry.getKey();
                     return new TaskDuplicateInfo(
                             taskEntity.getId(),
                             taskEntity.getNumber(),

@@ -14,6 +14,7 @@ import {
     TextField,
     Autocomplete
 } from '@mui/material';
+import DuplicateCheckModal from '../../pages/tasks/DuplicateCheckModal';
 
 const CreateTaskPage = () => {
     const navigate = useNavigate();
@@ -31,6 +32,12 @@ const CreateTaskPage = () => {
         };
         fetchExperts();
     }, []);
+
+    // Состояния для модалки дубликатов
+    const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+    const [duplicates, setDuplicates] = useState([]);
+    const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
+    const [pendingRequest, setPendingRequest] = useState(null);
 
 
 
@@ -94,6 +101,8 @@ const CreateTaskPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsCheckingDuplicates(true);
+
         try {
             const request = {
                 docType: formData.docType,
@@ -113,10 +122,38 @@ const CreateTaskPage = () => {
                     : null
             };
 
+            // Сохраняем request на случай дубликатов
+            setPendingRequest(request);
+
+            // Пытаемся создать заявку
             await api.post('/api/tasks/create', request);
             navigate('/tasks');
         } catch (error) {
-            console.error('Error creating task:', error);
+            if (error.response && error.response.status === 409) {
+                // Найдены дубликаты
+                setDuplicates(error.response.data.duplicates);
+                setShowDuplicateModal(true);
+            } else {
+                console.error('Error creating task:', error);
+                alert('Ошибка при создании заявки');
+            }
+        } finally {
+            setIsCheckingDuplicates(false);
+        }
+    };
+
+    const handleForceCreate = async () => {
+        if (!pendingRequest) return;
+
+        try {
+            await api.post('/api/tasks/create/force', pendingRequest);
+            setShowDuplicateModal(false);
+            setPendingRequest(null);
+            setDuplicates([]);
+            navigate('/tasks');
+        } catch (error) {
+            console.error('Error force creating task:', error);
+            alert('Ошибка при создании заявки');
         }
     };
 
@@ -263,11 +300,45 @@ const CreateTaskPage = () => {
         }
     }, [manufacturerSameAsApplicant, formData.applicantName]);
 
+    // Добавляем стили для анимации загрузки
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .loading-spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 2s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
 
     return (
         <div className="content-container">
             <div className="create-task-form">
                 <h2 className="page-title">Создание новой заявки</h2>
+
+                {/* Модальное окно проверки дубликатов */}
+                <DuplicateCheckModal
+                    open={showDuplicateModal}
+                    onClose={() => setShowDuplicateModal(false)}
+                    duplicates={duplicates}
+                    onForceCreate={handleForceCreate}
+                    isLoading={isCheckingDuplicates}
+                />
+
                 <form onSubmit={handleSubmit} className="space-y-4">
 
                     <div className="form-row">
@@ -669,12 +740,22 @@ const CreateTaskPage = () => {
                         >
                             Отмена
                         </Button>
+                        {/* <Button
+                            variant="contained"
+                            type="submit"
+                            className="save-btn"
+                            disabled={isCheckingDuplicates}
+                            startIcon={isCheckingDuplicates ? <CircularProgress size={20} /> : null}
+                        >
+                            {isCheckingDuplicates ? 'Проверка дубликатов...' : 'Создать заявку'}
+                        </Button> */}
                         <Button
                             variant="contained"
                             type="submit"
                             className="save-btn"
+                            disabled={isCheckingDuplicates}
                         >
-                            Создать заявку
+                            {isCheckingDuplicates ? 'Проверка дубликатов...' : 'Создать заявку'}
                         </Button>
                     </div>
                 </form>

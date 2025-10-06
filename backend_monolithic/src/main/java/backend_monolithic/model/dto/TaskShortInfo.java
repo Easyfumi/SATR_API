@@ -11,7 +11,6 @@ import java.util.Objects;
 
 @Data
 public class TaskShortInfo {
-    private Long id;
     private String docType;
     private Applicant applicant;
     private Manufacturer manufacturer;
@@ -24,7 +23,6 @@ public class TaskShortInfo {
     private Representative representative;
 
     public TaskShortInfo(Task task) {
-        this.id = task.getId();
         this.docType = task.getDocType();
         this.applicant = task.getApplicant();
         this.manufacturer = task.getManufacturer();
@@ -43,7 +41,6 @@ public class TaskShortInfo {
         if (o == null || getClass() != o.getClass()) return false;
         TaskShortInfo that = (TaskShortInfo) o;
         return Objects.equals(docType, that.docType)
-                && Objects.equals(id, that.id)
                 && Objects.equals(applicant, that.applicant)
                 && Objects.equals(manufacturer, that.manufacturer)
                 && Objects.equals(categories, that.categories)
@@ -57,7 +54,7 @@ public class TaskShortInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, docType, applicant, manufacturer, categories, mark, typeName, processType, previousNumber,
+        return Objects.hash(docType, applicant, manufacturer, categories, mark, typeName, processType, previousNumber,
                 previousProcessType, representative);
     }
 }
