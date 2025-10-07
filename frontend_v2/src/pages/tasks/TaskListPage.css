@@ -176,6 +176,61 @@
     font-weight: 500;
 }
   
+
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-dropdown-button {
+  min-width: auto !important;
+  padding: 4px !important;
+  margin-left: 4px;
+}
+
+.status-dropdown-button .MuiButton-root {
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.save-status-button {
+  background-color: #1976d2 !important;
+  color: white !important;
+}
+
+.status-menu .MuiPaper-root {
+  max-height: 300px;
+}
+
+@media (max-width: 768px) {
+  .status-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .status-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
   @media (max-width: 768px) {
     .info-grid {
       grid-template-columns: repeat(2, 1fr);

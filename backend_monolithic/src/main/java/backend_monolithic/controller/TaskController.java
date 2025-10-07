@@ -92,7 +92,24 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskStatusRequest request) {
+        try {
+            TaskResponse response = taskService.updateStatus(id, request.getStatus());
+            return ResponseEntity.ok(response);
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
 }
+
+
 
 
 

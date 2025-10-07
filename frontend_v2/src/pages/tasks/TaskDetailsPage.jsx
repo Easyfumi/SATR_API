@@ -4,7 +4,8 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskDetailsPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { TextField, Button, CircularProgress } from '@mui/material';
+import { TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const TaskDetailsPage = () => {
   const { id } = useParams();
@@ -15,6 +16,12 @@ const TaskDetailsPage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [newDecisionDate, setNewDecisionDate] = useState('');
   const [isUpdatingDecisionDate, setIsUpdatingDecisionDate] = useState(false);
+  
+  // Состояния для управления статусом
+  const [statusAnchorEl, setStatusAnchorEl] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [isStatusChanged, setIsStatusChanged] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -34,6 +41,7 @@ const TaskDetailsPage = () => {
       try {
         const response = await api.get(`/api/tasks/${id}`);
         setTask(response.data);
+        setSelectedStatus(response.data.status);
         setError(null);
       } catch (err) {
         console.error('Ошибка загрузки задачи:', err);
@@ -80,6 +88,45 @@ const TaskDetailsPage = () => {
     } finally {
       setIsUpdatingDecisionDate(false);
     }
+  };
+
+  // Функции для работы со статусом
+  const handleStatusButtonClick = (event) => {
+    setStatusAnchorEl(event.currentTarget);
+  };
+
+  const handleStatusMenuClose = () => {
+    setStatusAnchorEl(null);
+  };
+
+  const handleStatusSelect = (status) => {
+    setSelectedStatus(status);
+    setIsStatusChanged(true);
+    handleStatusMenuClose();
+  };
+
+  const handleSaveStatus = async () => {
+    if (!selectedStatus || !isStatusChanged) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      const response = await api.put(`/api/tasks/${id}/status`, {
+        status: selectedStatus
+      });
+      setTask(response.data);
+      setIsStatusChanged(false);
+      alert('Статус успешно обновлен');
+    } catch (error) {
+      console.error('Ошибка обновления статуса:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const handleCancelStatusChange = () => {
+    setSelectedStatus(task.status);
+    setIsStatusChanged(false);
   };
 
   const formatDateTime = (dateTime) => {
@@ -142,10 +189,44 @@ const TaskDetailsPage = () => {
 
             <div className="task-row">
               <span className="task-label">Статус</span>
-              <span className={`status-badge ${task.status?.toLowerCase()}`}>
-                {statusLabels[task.status] || task.status}
-              </span>
+              <div className="status-container">
+                <div className="status-display">
+                  <span className={`status-badge ${task.status?.toLowerCase()}`}>
+                    {statusLabels[selectedStatus] || selectedStatus}
+                  </span>
+                  <Button
+                    className="status-dropdown-button"
+                    onClick={handleStatusButtonClick}
+                    size="small"
+                  >
+                    <ArrowDropDownIcon />
+                  </Button>
+                </div>
+                
+                {isStatusChanged && (
+                  <div className="status-actions">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={handleSaveStatus}
+                      disabled={isUpdatingStatus}
+                      className="save-status-button"
+                    >
+                      {isUpdatingStatus ? <CircularProgress size={20} /> : 'Сохранить'}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={handleCancelStatusChange}
+                      disabled={isUpdatingStatus}
+                    >
+                      Отмена
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
+
             <div className="task-row">
               <span className="task-label">Номер заявки</span>
               {task.number ? (
@@ -165,7 +246,6 @@ const TaskDetailsPage = () => {
                     variant="contained"
                     onClick={handleAssignNumber}
                     disabled={!newNumber || isUpdating}
-
                   >
                     {isUpdating ? (
                       <CircularProgress size={24} />
@@ -209,6 +289,24 @@ const TaskDetailsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Меню выбора статуса */}
+      <Menu
+        anchorEl={statusAnchorEl}
+        open={Boolean(statusAnchorEl)}
+        onClose={handleStatusMenuClose}
+        className="status-menu"
+      >
+        {Object.entries(statusLabels).map(([key, label]) => (
+          <MenuItem
+            key={key}
+            onClick={() => handleStatusSelect(key)}
+            selected={selectedStatus === key}
+          >
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
 
       <div className="task-details-card">
         <div className="card-content">
@@ -289,4 +387,4 @@ const TaskDetailsPage = () => {
   );
 };
 
-export default TaskDetailsPage;
+export default TaskDetailsPage; 

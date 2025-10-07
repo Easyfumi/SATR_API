@@ -11,10 +11,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByStatusNot(TaskStatus status);
 
-//    @Query("SELECT t FROM Task t WHERE " +
-//            "(:status IS NULL OR t.status = :status) AND " +
-//            "(:categories IS EMPTY OR t.categories IN :categories)")
-//    List<Task> findByFilters(
-//            @Param("status") TaskStatus status,
-//            @Param("categories") List<VehicleCategories> categories);
+
 }

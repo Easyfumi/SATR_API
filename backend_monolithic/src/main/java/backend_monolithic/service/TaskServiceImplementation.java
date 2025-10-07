@@ -103,6 +103,34 @@ public class TaskServiceImplementation implements TaskService {
         return result;
     }
 
+    public TaskResponse updateStatus(Long taskId, TaskStatus newStatus) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
+
+        // Дополнительные проверки при необходимости
+        validateStatusTransition(task.getStatus(), newStatus);
+
+        task.setStatus(newStatus);
+
+        // Если статус COMPLETED, можно установить дату завершения
+        if (newStatus == TaskStatus.COMPLETED) {
+            task.setDecisionAt(LocalDate.now());
+        }
+
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
+    }
+
+    private void validateStatusTransition(TaskStatus currentStatus, TaskStatus newStatus) {
+        // Здесь можно добавить бизнес-логику валидации переходов статусов
+        // Например, запретить переход из COMPLETED в другие статусы
+        if (currentStatus == TaskStatus.COMPLETED) {
+            throw new IllegalStateException("Нельзя изменить статус завершенной заявки");
+        }
+
+        // Добавьте другие проверки согласно бизнес-правилам
+    }
+
     public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
