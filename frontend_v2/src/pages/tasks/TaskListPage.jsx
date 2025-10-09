@@ -20,6 +20,20 @@ const TaskListPage = () => {
         { path: '/serts', label: 'Сертификаты' }
     ];
 
+    // Маппинг статусов
+    const statusLabels = {
+        RECEIVED: 'Заявка получена',
+        REGISTERED: 'Заявка зарегистрирована',
+        DECISION_DONE: 'Решение по заявке готово',
+        DOCUMENTS_WAITING: 'Ожидание документов',
+        REJECTION: 'Отказ в проведении работ',
+        CANCELLED: 'Аннулирована',
+        PROJECT: 'Переведено в проект',
+        SIGNED: 'Подписано',
+        FOR_REVISION: 'Возвращено на доработку',
+        COMPLETED: 'Заявка выполнена'
+    };
+
     useEffect(() => {
         const fetchTasks = async () => {
             try {
@@ -79,13 +93,19 @@ const TaskListPage = () => {
                             className="task-card"
                             onClick={() => navigate(`/tasks/${task.id}`)}
                         >
-                            {/* Верхняя строка с номером и статусом оплаты */}
-                            <div className="status-container">
-                                <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
-                                    {task.number || 'Не зарегистрирована'}
+                            {/* Верхняя строка с номером и статусом */}
+                            <div className="task-card-header">
+                                <div className="status-container">
+                                    <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
+                                        {task.number || 'Не зарегистрирована'}
+                                    </div>
                                 </div>
-                                <div className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
-                                    {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
+                                
+                                {/* Статус заявки в правом верхнем углу */}
+                                <div className="task-status-section">
+                                    <span className={`status-badge ${task.status?.toLowerCase()}`}>
+                                        {statusLabels[task.status] || task.status}
+                                    </span>
                                 </div>
                             </div>
 
@@ -106,15 +126,15 @@ const TaskListPage = () => {
                                 <div className="grid-item">
                                     <div className="grid-label">Категории</div>
                                     <div className="grid-value">
-                                        {task.categories.join(', ')}
+                                        {task.categories?.join(', ')}
                                     </div>
                                 </div>
                                 <div className="grid-item">
                                     <div className="grid-label">Заявитель</div>
                                     <div className="grid-value">{task.applicant}</div>
                                 </div>
-
                             </div>
+
                             <div className="applicant-expert-container">
                                 <div className={`info-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
                                     <span className="info-label">Эксперт:</span>
@@ -122,6 +142,14 @@ const TaskListPage = () => {
                                         {task.assignedUser
                                             ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
                                             : 'не назначен'}
+                                    </span>
+                                </div>
+                                
+                                {/* Статус оплаты перенесен сюда */}
+                                <div className="info-row">
+                                    <span className="info-label">Оплата:</span>
+                                    <span className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
+                                        {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
                                     </span>
                                 </div>
                             </div>
