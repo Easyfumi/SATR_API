@@ -89,18 +89,17 @@ public class TaskServiceImplementation implements TaskService {
     public List<TaskResponse> getAllTasks(String jwt) {
         // TODO добавить проверку токена
 
-        List<TaskResponse> result = new ArrayList<>();
-
-        for (Task task : taskRepository.findAll()) {
-            TaskResponse taskResponse = mapEntityToResponse(task);
-            if (task.getAssignedUserId() != null) {
-                Optional<User> assignedUser = userService.getUserById(task.getAssignedUserId());
-                taskResponse.setAssignedUser(new UserInfo(assignedUser.get()));
-            }
-            result.add(taskResponse);
-        }
-
-        return result;
+        return taskRepository.findAll().stream()
+                .sorted(Comparator.comparing(Task::getCreatedAt).reversed())
+                .map(task -> {
+                    TaskResponse taskResponse = mapEntityToResponse(task);
+                    if (task.getAssignedUserId() != null) {
+                        userService.getUserById(task.getAssignedUserId())
+                                .ifPresent(user -> taskResponse.setAssignedUser(new UserInfo(user)));
+                    }
+                    return taskResponse;
+                })
+                .collect(Collectors.toList());
     }
 
     public TaskResponse updateStatus(Long taskId, TaskStatus newStatus) {
