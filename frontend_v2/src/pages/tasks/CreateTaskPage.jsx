@@ -39,9 +39,6 @@ const CreateTaskPage = () => {
     const [isCheckingDuplicates, setIsCheckingDuplicates] = useState(false);
     const [pendingRequest, setPendingRequest] = useState(null);
 
-
-
-
     // Функция для форматирования ФИО
     const formatExpertName = (expert) => {
         const initials = expert.patronymic
@@ -112,7 +109,8 @@ const CreateTaskPage = () => {
                 mark: formData.mark,
                 typeName: formData.typeName,
                 processType: formData.processType,
-                representativeName: formData.representativeName,
+                // Если установлена галочка "отсутствует", отправляем пустую строку
+                representativeName: representativeAbsent ? '' : formData.representativeName,
                 assignedUserId: formData.assignedUserId,
                 previousProcessType: formData.procedureType !== 'оформление нового'
                     ? formData.procedureType
@@ -214,7 +212,6 @@ const CreateTaskPage = () => {
         });
     };
 
-
     // Добавим состояния для хранения вариантов
     const [applicants, setApplicants] = useState([]);
     const [manufacturers, setManufacturers] = useState([]);
@@ -260,6 +257,7 @@ const CreateTaskPage = () => {
     // Добавляем состояния для чекбоксов
     const [manufacturerSameAsApplicant, setManufacturerSameAsApplicant] = useState(false);
     const [representativeSameAsApplicant, setRepresentativeSameAsApplicant] = useState(false);
+    const [representativeAbsent, setRepresentativeAbsent] = useState(false); // Новое состояние для "отсутствует"
 
     // Эффект для синхронизации полей при изменении чекбоксов
     useEffect(() => {
@@ -286,9 +284,22 @@ const CreateTaskPage = () => {
         if (representativeSameAsApplicant && value !== formData.applicantName) {
             setRepresentativeSameAsApplicant(false);
         }
+        // Если пользователь ввел значение, снимаем галочку "отсутствует"
+        if (representativeAbsent && value) {
+            setRepresentativeAbsent(false);
+        }
         setFormData({ ...formData, representativeName: value });
     };
 
+    // Обработчик для галочки "отсутствует"
+    const handleRepresentativeAbsentChange = (checked) => {
+        setRepresentativeAbsent(checked);
+        if (checked) {
+            // Если установили галочку "отсутствует", снимаем другие галочки и очищаем поле
+            setRepresentativeSameAsApplicant(false);
+            setFormData(prev => ({ ...prev, representativeName: '' }));
+        }
+    };
 
     // Эффект для сброса представителя при совпадении изготовителя
     useEffect(() => {
@@ -299,8 +310,16 @@ const CreateTaskPage = () => {
                 manufacturerName: prev.applicantName
             }));
             setRepresentativeSameAsApplicant(false);
+            setRepresentativeAbsent(false); // Сбрасываем галочку "отсутствует"
         }
     }, [manufacturerSameAsApplicant, formData.applicantName]);
+
+    // Эффект для синхронизации галочек (если установлена "отсутствует", снимаем "совпадает с заявителем")
+    useEffect(() => {
+        if (representativeAbsent) {
+            setRepresentativeSameAsApplicant(false);
+        }
+    }, [representativeAbsent]);
 
     // Добавляем стили для анимации загрузки
     useEffect(() => {
@@ -325,7 +344,6 @@ const CreateTaskPage = () => {
             document.head.removeChild(style);
         };
     }, []);
-
 
     return (
         <div className="content-container">
@@ -498,6 +516,13 @@ const CreateTaskPage = () => {
                                     />
                                     <span>Совпадает с заявителем</span>
                                 </div>
+                                <div className="checkbox-container">
+                                    <Checkbox
+                                        checked={representativeAbsent}
+                                        onChange={(e) => handleRepresentativeAbsentChange(e.target.checked)}
+                                    />
+                                    <span>Отсутствует</span>
+                                </div>
                                 <Autocomplete
                                     freeSolo
                                     options={representatives}
@@ -514,7 +539,7 @@ const CreateTaskPage = () => {
                                         }
                                     }}
                                     value={formData.representativeName}
-                                    disabled={representativeSameAsApplicant}
+                                    disabled={representativeSameAsApplicant || representativeAbsent}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
@@ -525,7 +550,7 @@ const CreateTaskPage = () => {
                                                     <span className="placeholder-text">Выберите или введите представителя</span>
                                                 )
                                             }}
-                                            required={!manufacturerSameAsApplicant}
+                                            required={!manufacturerSameAsApplicant && !representativeAbsent}
                                         />
                                     )}
                                 />
@@ -742,15 +767,6 @@ const CreateTaskPage = () => {
                         >
                             Отмена
                         </Button>
-                        {/* <Button
-                            variant="contained"
-                            type="submit"
-                            className="save-btn"
-                            disabled={isCheckingDuplicates}
-                            startIcon={isCheckingDuplicates ? <CircularProgress size={20} /> : null}
-                        >
-                            {isCheckingDuplicates ? 'Проверка дубликатов...' : 'Создать заявку'}
-                        </Button> */}
                         <Button
                             variant="contained"
                             type="submit"
