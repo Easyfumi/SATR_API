@@ -5,6 +5,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HistoryIcon from '@mui/icons-material/History';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -20,6 +21,7 @@ const Sidebar = () => {
     { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },
+    { path: "/api/contracts", text: "Договоры", icon: <RequestQuoteIcon/> },
   ];
 
     const isActive = (item) => {

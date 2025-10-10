@@ -15,6 +15,7 @@ import CreateTaskPage from './pages/tasks/CreateTaskPage';
 import DeclarationPage from './pages/declaration/DeclarationPage'; 
 import CertificatesPage from './pages/certificates/CertificatesPage'; 
 import TaskDetailsPage from './pages/tasks/TaskDetailsPage'; 
+import ContractListPage from './pages/contracts/ContractListPage';
 import HomePage from './pages/HomePage';
 
 
@@ -52,6 +53,7 @@ function App() {
           <Route path="/tasks/:id" element={<TaskDetailsPage />} />
           <Route path="/decl" element={<DeclarationPage />} /> 
           <Route path="/serts" element={<CertificatesPage />} /> 
+          <Route path="api/contracts" element={<ContractListPage />} /> 
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

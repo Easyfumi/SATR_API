@@ -539,7 +539,7 @@ const TaskListPage = () => {
             {/* Панель информации о результатах */}
             <div className="results-info-panel">
                 <div className="results-count">
-                    Найдено задач: {pagination.totalElements}
+                    Найдено заявок: {pagination.totalElements}
                 </div>
                 <div className="page-size-selector">
                     <span>Показывать по:</span>
