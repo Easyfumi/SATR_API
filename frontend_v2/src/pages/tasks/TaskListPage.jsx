@@ -20,7 +20,7 @@ const TaskListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
-    
+
     // Состояния для пагинации
     const [pagination, setPagination] = useState({
         currentPage: 0,
@@ -28,7 +28,7 @@ const TaskListPage = () => {
         totalElements: 0,
         pageSize: 10
     });
-    
+
     const [filters, setFilters] = useState({
         quickSearch: '',
         number: '',
@@ -99,20 +99,20 @@ const TaskListPage = () => {
                 Object.entries(searchFilters).filter(([_, value]) => value !== '' && value != null)
             );
 
-            const response = await api.get('/api/tasks/search', { 
+            const response = await api.get('/api/tasks/search', {
                 params: {
                     ...cleanFilters,
                     page,
                     size
                 }
             });
-            
+
             // Предполагаем, что бэкенд возвращает структуру с пагинацией
             const data = response.data.content || response.data || [];
             const paginationData = response.data;
-            
+
             setTasks(data);
-            
+
             // Обновляем пагинацию
             if (paginationData) {
                 setPagination(prev => ({
@@ -123,7 +123,7 @@ const TaskListPage = () => {
                     pageSize: size
                 }));
             }
-            
+
             setError(null);
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -141,14 +141,14 @@ const TaskListPage = () => {
             const response = await api.get('/api/tasks');
             const data = Array.isArray(response.data) ? response.data : [];
             setTasks(data);
-            
+
             // Для клиентской пагинации (если бэкенд не поддерживает)
             setPagination(prev => ({
                 ...prev,
                 totalPages: Math.ceil(data.length / prev.pageSize),
                 totalElements: data.length
             }));
-            
+
             setError(null);
         } catch (error) {
             console.error('Error fetching tasks:', error);
@@ -171,9 +171,9 @@ const TaskListPage = () => {
             number: '',
             assignedUser: ''
         };
-        
+
         setFilters(newFilters);
-        
+
         if (!value.trim()) {
             fetchAllTasks();
         } else {
@@ -193,7 +193,7 @@ const TaskListPage = () => {
     const handleApplyFilters = () => {
         const filtersWithoutQuickSearch = { ...filters };
         delete filtersWithoutQuickSearch.quickSearch;
-        
+
         fetchTasks(filtersWithoutQuickSearch, 0);
     };
 
@@ -218,17 +218,46 @@ const TaskListPage = () => {
         fetchAllTasks();
     };
 
+    const getActiveFilters = () => {
+        const activeFilters = [];
+
+        if (filters.quickSearch) activeFilters.push({ label: 'Быстрый поиск', value: filters.quickSearch });
+        if (filters.number) activeFilters.push({ label: 'Номер', value: filters.number });
+        if (filters.applicant) activeFilters.push({ label: 'Заявитель', value: filters.applicant });
+        if (filters.manufacturer) activeFilters.push({ label: 'Производитель', value: filters.manufacturer });
+        if (filters.mark) activeFilters.push({ label: 'Марка', value: filters.mark });
+        if (filters.typeName) activeFilters.push({ label: 'Наименование типа', value: filters.typeName });
+        if (filters.representative) activeFilters.push({ label: 'Представитель', value: filters.representative });
+        if (filters.assignedUser) activeFilters.push({ label: 'Ответственный', value: filters.assignedUser });
+        if (filters.status) activeFilters.push({
+            label: 'Статус',
+            value: statusOptions.find(s => s.value === filters.status)?.label
+        });
+        if (filters.paymentStatus) activeFilters.push({
+            label: 'Оплата',
+            value: paymentStatusOptions.find(p => p.value === filters.paymentStatus)?.label
+        });
+        if (filters.createdAtFrom || filters.createdAtTo) {
+            activeFilters.push({
+                label: 'Дата создания',
+                value: `${filters.createdAtFrom || '...'} - ${filters.createdAtTo || '...'}`
+            });
+        }
+
+        return activeFilters;
+    };
+
     // Обработчики пагинации
     const handlePageChange = (newPage) => {
         if (newPage >= 0 && newPage < pagination.totalPages) {
             setPagination(prev => ({ ...prev, currentPage: newPage }));
-            
+
             // Если есть активные фильтры, делаем запрос с пагинацией
             const hasActiveFilters = Object.values(filters).some(value => value !== '');
             if (hasActiveFilters) {
                 const filtersWithoutQuickSearch = { ...filters };
                 delete filtersWithoutQuickSearch.quickSearch;
-                
+
                 if (filters.quickSearch) {
                     fetchTasks({ quickSearch: filters.quickSearch }, newPage);
                 } else {
@@ -243,19 +272,19 @@ const TaskListPage = () => {
     };
 
     const handlePageSizeChange = (newSize) => {
-        setPagination(prev => ({ 
-            ...prev, 
+        setPagination(prev => ({
+            ...prev,
             pageSize: newSize,
             currentPage: 0,
             totalPages: Math.ceil(prev.totalElements / newSize)
         }));
-        
+
         // Перезагружаем данные с новым размером страницы
         const hasActiveFilters = Object.values(filters).some(value => value !== '');
         if (hasActiveFilters) {
             const filtersWithoutQuickSearch = { ...filters };
             delete filtersWithoutQuickSearch.quickSearch;
-            
+
             if (filters.quickSearch) {
                 fetchTasks({ quickSearch: filters.quickSearch }, 0, newSize);
             } else {
@@ -279,7 +308,7 @@ const TaskListPage = () => {
         if (tasks.length <= pagination.pageSize) {
             return tasks;
         }
-        
+
         const startIndex = pagination.currentPage * pagination.pageSize;
         const endIndex = startIndex + pagination.pageSize;
         return tasks.slice(startIndex, endIndex);
@@ -291,18 +320,18 @@ const TaskListPage = () => {
     const getPageNumbers = () => {
         const pages = [];
         const maxVisiblePages = 5;
-        
+
         let startPage = Math.max(0, pagination.currentPage - Math.floor(maxVisiblePages / 2));
         let endPage = Math.min(pagination.totalPages - 1, startPage + maxVisiblePages - 1);
-        
+
         if (endPage - startPage + 1 < maxVisiblePages) {
             startPage = Math.max(0, endPage - maxVisiblePages + 1);
         }
-        
+
         for (let i = startPage; i <= endPage; i++) {
             pages.push(i);
         }
-        
+
         return pages;
     };
 
@@ -346,8 +375,8 @@ const TaskListPage = () => {
                             onChange={(e) => handleQuickSearch(e.target.value)}
                         />
                     </div>
-                    
-                    <button 
+
+                    <button
                         className={`filter-toggle-btn ${showFilters ? 'active' : ''}`}
                         onClick={() => setShowFilters(!showFilters)}
                     >
@@ -356,8 +385,8 @@ const TaskListPage = () => {
                         {Object.entries(filters)
                             .filter(([key, value]) => key !== 'quickSearch' && value !== '')
                             .length > 0 && (
-                            <span className="filter-indicator"></span>
-                        )}
+                                <span className="filter-indicator"></span>
+                            )}
                     </button>
                 </div>
 
@@ -496,24 +525,16 @@ const TaskListPage = () => {
             </div>
 
             {/* Информация о примененных фильтрах */}
-            {(filters.quickSearch || Object.entries(filters)
-                .filter(([key, value]) => key !== 'quickSearch' && value !== '')
-                .length > 0) && (
-                <div className="active-filters-info">
-                    <span>Применены фильтры: </span>
-                    {filters.quickSearch && <span className="filter-tag">Быстрый поиск: {filters.quickSearch}</span>}
-                    {filters.number && <span className="filter-tag">Номер: {filters.number}</span>}
-                    {filters.applicant && <span className="filter-tag">Заявитель: {filters.applicant}</span>}
-                    {filters.mark && <span className="filter-tag">Марка: {filters.mark}</span>}
-                    {filters.status && <span className="filter-tag">Статус: {statusOptions.find(s => s.value === filters.status)?.label}</span>}
-                    {filters.paymentStatus && <span className="filter-tag">Оплата: {paymentStatusOptions.find(p => p.value === filters.paymentStatus)?.label}</span>}
-                    {(filters.createdAtFrom || filters.createdAtTo) && (
-                        <span className="filter-tag">
-                            Дата: {filters.createdAtFrom || '...'} - {filters.createdAtTo || '...'}
-                        </span>
-                    )}
-                </div>
-            )}
+     {getActiveFilters().length > 0 && (
+    <div className="active-filters-info">
+        <span>Применены фильтры: </span>
+        {getActiveFilters().map((filter, index) => (
+            <span key={index} className="filter-tag">
+                {filter.label}: {filter.value}
+            </span>
+        ))}
+    </div>
+)}
 
             {/* Панель информации о результатах */}
             <div className="results-info-panel">
@@ -522,8 +543,8 @@ const TaskListPage = () => {
                 </div>
                 <div className="page-size-selector">
                     <span>Показывать по:</span>
-                    <select 
-                        value={pagination.pageSize} 
+                    <select
+                        value={pagination.pageSize}
                         onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
                     >
                         {pageSizeOptions.map(size => (
@@ -542,8 +563,8 @@ const TaskListPage = () => {
                     <div className="tasks-list">
                         {currentTasks.length === 0 ? (
                             <div className="no-tasks-message">
-                                {filters.quickSearch || Object.values(filters).some(value => value !== '') 
-                                    ? 'Задачи по заданным фильтрам не найдены' 
+                                {filters.quickSearch || Object.values(filters).some(value => value !== '')
+                                    ? 'Задачи по заданным фильтрам не найдены'
                                     : 'Задачи не найдены'
                                 }
                             </div>
@@ -561,7 +582,7 @@ const TaskListPage = () => {
                                                 {task.number || 'Не зарегистрирована'}
                                             </div>
                                         </div>
-                                        
+
                                         {/* Статус заявки в правом верхнем углу */}
                                         <div className="task-status-section">
                                             <span className={`status-badge ${task.status?.toLowerCase()}`}>
@@ -605,7 +626,7 @@ const TaskListPage = () => {
                                                     : 'не назначен'}
                                             </span>
                                         </div>
-                                        
+
                                         {/* Статус оплаты перенесен сюда */}
                                         <div className="info-row">
                                             <span className="info-label">Оплата:</span>
@@ -625,17 +646,17 @@ const TaskListPage = () => {
                             <div className="pagination-info">
                                 Страница {pagination.currentPage + 1} из {pagination.totalPages}
                             </div>
-                            
+
                             <div className="pagination-controls">
-                                <button 
+                                <button
                                     className="pagination-btn"
                                     onClick={() => handlePageChange(0)}
                                     disabled={pagination.currentPage === 0}
                                 >
                                     <FirstPageIcon />
                                 </button>
-                                
-                                <button 
+
+                                <button
                                     className="pagination-btn"
                                     onClick={() => handlePageChange(pagination.currentPage - 1)}
                                     disabled={pagination.currentPage === 0}
@@ -653,15 +674,15 @@ const TaskListPage = () => {
                                     </button>
                                 ))}
 
-                                <button 
+                                <button
                                     className="pagination-btn"
                                     onClick={() => handlePageChange(pagination.currentPage + 1)}
                                     disabled={pagination.currentPage >= pagination.totalPages - 1}
                                 >
                                     <NavigateNextIcon />
                                 </button>
-                                
-                                <button 
+
+                                <button
                                     className="pagination-btn"
                                     onClick={() => handlePageChange(pagination.totalPages - 1)}
                                     disabled={pagination.currentPage >= pagination.totalPages - 1}
