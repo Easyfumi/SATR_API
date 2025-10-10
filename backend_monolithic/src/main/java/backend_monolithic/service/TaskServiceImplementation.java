@@ -1,10 +1,13 @@
 package backend_monolithic.service;
 
 
+import backend_monolithic.config.TaskSpecifications;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import backend_monolithic.error.DuplicateNumberException;
 import backend_monolithic.error.TaskNotFoundException;
@@ -88,9 +91,26 @@ public class TaskServiceImplementation implements TaskService {
 
     public List<TaskResponse> getAllTasks(String jwt) {
         // TODO добавить проверку токена
-
         return taskRepository.findAll().stream()
                 .sorted(Comparator.comparing(Task::getCreatedAt).reversed())
+                .map(task -> {
+                    TaskResponse taskResponse = mapEntityToResponse(task);
+                    if (task.getAssignedUserId() != null) {
+                        userService.getUserById(task.getAssignedUserId())
+                                .ifPresent(user -> taskResponse.setAssignedUser(new UserInfo(user)));
+                    }
+                    return taskResponse;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // Новый метод для фильтрации задач
+    public List<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt) {
+        // TODO добавить проверку токена
+
+        Specification<Task> spec = TaskSpecifications.buildSpecification(filter);
+
+        return taskRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
                 .map(task -> {
                     TaskResponse taskResponse = mapEntityToResponse(task);
                     if (task.getAssignedUserId() != null) {

@@ -212,6 +212,209 @@
     font-weight: 500;
 }
 
+/* Панель поиска и фильтров */
+.search-filters-panel {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--silver-accent);
+}
+
+.quick-search-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.search-input-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--ice-blue);
+    box-shadow: 0 0 0 3px rgba(163, 184, 204, 0.1);
+}
+
+.filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.filter-toggle-btn:hover {
+    border-color: var(--deep-frost);
+    background: #f8fafc;
+}
+
+.filter-toggle-btn.active {
+    background: var(--deep-frost);
+    color: #fff;
+    border-color: var(--ice-blue);
+}
+
+.filter-indicator {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+}
+
+/* Расширенные фильтры */
+.advanced-filters {
+    border-top: 1px solid #031c3d;
+    padding-top: 20px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--ice-blue);
+    box-shadow: 0 0 0 2px rgba(163, 184, 204, 0.1);
+}
+
+.date-filter input {
+    min-width: 140px;
+}
+
+/* Кнопки фильтров */
+.filter-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.apply-filters-btn {
+    padding: 10px 20px;
+    background: var(--deep-frost);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.apply-filters-btn:hover {
+    background: var(--cold-steel);
+    transform: translateY(-1px);
+}
+
+.reset-filters-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 15px;
+    background: #fff;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.reset-filters-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* Информация о примененных фильтрах */
+.active-filters-info {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #0369a1;
+}
+
+.active-filters-info span:first-child {
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.filter-tag {
+    display: inline-block;
+    background: #e0f2fe;
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin: 0 4px;
+    font-size: 0.8rem;
+}
+
+/* Сообщение об отсутствии задач */
+.no-tasks-message {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+    font-size: 1.1rem;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
 @media (max-width: 768px) {
     .task-card-header {
         flex-direction: column;
@@ -234,6 +437,32 @@
     .status-badge {
         font-size: 0.75rem;
         padding: 4px 8px;
+    }
+
+    .quick-search-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input-container {
+        max-width: none;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .active-filters-info {
+        font-size: 0.8rem;
+    }
+
+    .filter-tag {
+        display: block;
+        margin: 4px 0;
     }
 }
 
@@ -259,5 +488,19 @@
     
     .status-badge {
         font-size: 0.7rem;
+    }
+    .search-filters-panel {
+        padding: 15px;
+    }
+
+    .filter-toggle-btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+
+    .apply-filters-btn,
+    .reset-filters-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
     }
 }

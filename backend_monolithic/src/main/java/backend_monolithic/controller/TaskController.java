@@ -1,8 +1,10 @@
 package backend_monolithic.controller;
 
 import backend_monolithic.model.dto.*;
+import backend_monolithic.model.enums.TaskStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.service.TaskService;
 import backend_monolithic.service.UserService;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +108,48 @@ public class TaskController {
             return ResponseEntity.badRequest()
                     .body(Map.of("message", e.getMessage()));
         }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<TaskResponse>> searchTasks(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false) String number,
+            @RequestParam(required = false) String applicant,
+            @RequestParam(required = false) String manufacturer,
+            @RequestParam(required = false) String mark,
+            @RequestParam(required = false) String typeName,
+            @RequestParam(required = false) String representative,
+            @RequestParam(required = false) String assignedUser,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) Boolean paymentStatus,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtTo) {
+
+        TaskFilter filter = new TaskFilter();
+        filter.setNumber(number);
+        filter.setApplicant(applicant);
+        filter.setManufacturer(manufacturer);
+        filter.setMark(mark);
+        filter.setTypeName(typeName);
+        filter.setRepresentative(representative);
+        filter.setAssignedUser(assignedUser);
+        filter.setStatus(status);
+        filter.setPaymentStatus(paymentStatus);
+        filter.setCreatedAtFrom(createdAtFrom);
+        filter.setCreatedAtTo(createdAtTo);
+
+        List<TaskResponse> tasks = taskService.getFilteredTasks(filter, jwt);
+        return ResponseEntity.ok(tasks);
+    }
+
+    // Альтернативный вариант с POST запросом для сложных фильтров
+    @PostMapping("/search")
+    public ResponseEntity<List<TaskResponse>> searchTasksPost(
+            @RequestHeader("Authorization") String jwt,
+            @RequestBody TaskFilter filter) {
+
+        List<TaskResponse> tasks = taskService.getFilteredTasks(filter, jwt);
+        return ResponseEntity.ok(tasks);
     }
 
 }
