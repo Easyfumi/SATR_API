@@ -1,8 +1,12 @@
 package backend_monolithic.config;
 
 import backend_monolithic.model.Task;
+import backend_monolithic.model.User;
 import backend_monolithic.model.dto.TaskFilter;
 import backend_monolithic.model.enums.TaskStatus;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -92,9 +96,49 @@ public class TaskSpecifications {
             if (assignedUser == null || assignedUser.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            // Здесь предполагается, что assignedUserId связан с User entity
-            // Если нужно искать по имени пользователя, потребуется join
-            return criteriaBuilder.conjunction(); // Заглушка - нужно адаптировать под вашу структуру
+
+            // Если пользователь ввел "не назначен" или подобное
+            if (assignedUser.toLowerCase().contains("не назначен") ||
+                    assignedUser.toLowerCase().contains("не назначен")) {
+                return root.get("assignedUserId").isNull();
+            }
+
+            try {
+                // Пытаемся парсить как ID
+                Long userId = Long.parseLong(assignedUser);
+                return criteriaBuilder.equal(root.get("assignedUserId"), userId);
+            } catch (NumberFormatException e) {
+                // Если не число, ищем по ФИО через подзапрос
+                Subquery<Long> userSubquery = query.subquery(Long.class);
+                Root<User> userRoot = userSubquery.from(User.class);
+                userSubquery.select(userRoot.get("id"));
+
+                // Ищем по фамилии, имени или отчеству
+                Predicate namePredicate = criteriaBuilder.or(
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(userRoot.get("secondName")),
+                                "%" + assignedUser.toLowerCase() + "%"
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(userRoot.get("firstName")),
+                                "%" + assignedUser.toLowerCase() + "%"
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(userRoot.get("patronymic")),
+                                "%" + assignedUser.toLowerCase() + "%"
+                        ),
+                        criteriaBuilder.like(
+                                criteriaBuilder.concat(
+                                        criteriaBuilder.concat(userRoot.get("secondName"), " "),
+                                        criteriaBuilder.concat(userRoot.get("firstName"), " ")
+                                ),
+                                "%" + assignedUser + "%"
+                        )
+                );
+
+                userSubquery.where(namePredicate);
+                return criteriaBuilder.in(root.get("assignedUserId")).value(userSubquery);
+            }
         };
     }
 
