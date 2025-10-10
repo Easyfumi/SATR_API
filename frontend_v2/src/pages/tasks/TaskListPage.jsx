@@ -1,6 +1,6 @@
 // TaskListPage.jsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskListPage.css';
@@ -17,6 +17,7 @@ const TaskListPage = () => {
     const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
+        quickSearch: '', // Добавляем поле для быстрого поиска
         number: '',
         applicant: '',
         manufacturer: '',
@@ -74,12 +75,12 @@ const TaskListPage = () => {
     ];
 
     // Загрузка задач с фильтрами
-    const fetchTasks = async (searchFilters = {}) => {
+    const fetchTasks = useCallback(async (searchFilters = {}) => {
         setLoading(true);
         try {
             // Удаляем пустые поля из фильтров
             const cleanFilters = Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => value !== '')
+                Object.entries(searchFilters).filter(([_, value]) => value !== '' && value != null)
             );
 
             const response = await api.get('/api/tasks/search', { params: cleanFilters });
@@ -93,10 +94,10 @@ const TaskListPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     // Загрузка всех задач (без фильтров)
-    const fetchAllTasks = async () => {
+    const fetchAllTasks = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.get('/api/tasks');
@@ -110,11 +111,30 @@ const TaskListPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchAllTasks();
-    }, []);
+    }, [fetchAllTasks]);
+
+    // Обработчик быстрого поиска
+    const handleQuickSearch = useCallback((value) => {
+        const newFilters = {
+            ...filters,
+            quickSearch: value,
+            // Сбрасываем отдельные поля при быстром поиске
+            number: '',
+            assignedUser: ''
+        };
+        
+        setFilters(newFilters);
+        
+        if (!value.trim()) {
+            fetchAllTasks();
+        } else {
+            fetchTasks({ quickSearch: value });
+        }
+    }, [filters, fetchTasks, fetchAllTasks]);
 
     // Обработчик изменения фильтров
     const handleFilterChange = (field, value) => {
@@ -126,12 +146,17 @@ const TaskListPage = () => {
 
     // Применить фильтры
     const handleApplyFilters = () => {
-        fetchTasks(filters);
+        // При применении расширенных фильтров сбрасываем быстрый поиск
+        const filtersWithoutQuickSearch = { ...filters };
+        delete filtersWithoutQuickSearch.quickSearch;
+        
+        fetchTasks(filtersWithoutQuickSearch);
     };
 
     // Сбросить фильтры
     const handleResetFilters = () => {
         const resetFilters = {
+            quickSearch: '',
             number: '',
             applicant: '',
             manufacturer: '',
@@ -146,20 +171,6 @@ const TaskListPage = () => {
         };
         setFilters(resetFilters);
         fetchAllTasks();
-    };
-
-    // Быстрый поиск (по номеру и марке)
-    const handleQuickSearch = (value) => {
-        if (!value.trim()) {
-            fetchAllTasks();
-            return;
-        }
-        
-        const searchFilters = {
-            number: value,
-            mark: value
-        };
-        fetchTasks(searchFilters);
     };
 
     return (
@@ -196,8 +207,9 @@ const TaskListPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру или марке..."
+                            placeholder="Поиск по номеру заявки или эксперту..."
                             className="search-input"
+                            value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
                         />
                     </div>
@@ -208,7 +220,9 @@ const TaskListPage = () => {
                     >
                         <FilterListIcon />
                         Фильтры
-                        {Object.values(filters).some(value => value !== '') && (
+                        {Object.entries(filters)
+                            .filter(([key, value]) => key !== 'quickSearch' && value !== '')
+                            .length > 0 && (
                             <span className="filter-indicator"></span>
                         )}
                     </button>
@@ -349,9 +363,12 @@ const TaskListPage = () => {
             </div>
 
             {/* Информация о примененных фильтрах */}
-            {Object.values(filters).some(value => value !== '') && (
+            {(filters.quickSearch || Object.entries(filters)
+                .filter(([key, value]) => key !== 'quickSearch' && value !== '')
+                .length > 0) && (
                 <div className="active-filters-info">
                     <span>Применены фильтры: </span>
+                    {filters.quickSearch && <span className="filter-tag">Быстрый поиск: {filters.quickSearch}</span>}
                     {filters.number && <span className="filter-tag">Номер: {filters.number}</span>}
                     {filters.applicant && <span className="filter-tag">Заявитель: {filters.applicant}</span>}
                     {filters.mark && <span className="filter-tag">Марка: {filters.mark}</span>}
@@ -373,7 +390,7 @@ const TaskListPage = () => {
                 <div className="tasks-list">
                     {tasks.length === 0 ? (
                         <div className="no-tasks-message">
-                            {Object.values(filters).some(value => value !== '') 
+                            {filters.quickSearch || Object.values(filters).some(value => value !== '') 
                                 ? 'Задачи по заданным фильтрам не найдены' 
                                 : 'Задачи не найдены'
                             }

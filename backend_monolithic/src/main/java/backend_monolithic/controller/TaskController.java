@@ -113,6 +113,7 @@ public class TaskController {
     @GetMapping("/search")
     public ResponseEntity<List<TaskResponse>> searchTasks(
             @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false) String quickSearch, // Добавляем параметр быстрого поиска
             @RequestParam(required = false) String number,
             @RequestParam(required = false) String applicant,
             @RequestParam(required = false) String manufacturer,
@@ -126,6 +127,7 @@ public class TaskController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtTo) {
 
         TaskFilter filter = new TaskFilter();
+        filter.setQuickSearch(quickSearch); // Устанавливаем быстрый поиск
         filter.setNumber(number);
         filter.setApplicant(applicant);
         filter.setManufacturer(manufacturer);

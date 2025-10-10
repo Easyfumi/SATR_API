@@ -187,15 +187,68 @@ public class TaskSpecifications {
     }
 
     public static Specification<Task> buildSpecification(TaskFilter filter) {
-        return Specification.where(withNumber(filter.getNumber()))
-                .and(withApplicant(filter.getApplicant()))
-                .and(withManufacturer(filter.getManufacturer()))
-                .and(withMark(filter.getMark()))
-                .and(withTypeName(filter.getTypeName()))
-                .and(withRepresentative(filter.getRepresentative()))
-                .and(withAssignedUser(filter.getAssignedUser()))
-                .and(withStatus(filter.getStatus()))
-                .and(withPaymentStatus(filter.getPaymentStatus()))
-                .and(withCreatedAtBetween(filter.getCreatedAtFrom(), filter.getCreatedAtTo()));
+        Specification<Task> spec = Specification.where(null);
+
+        // Если задан быстрый поиск, используем его
+        if (filter.getQuickSearch() != null && !filter.getQuickSearch().isEmpty()) {
+            spec = spec.and(withQuickSearch(filter.getQuickSearch()));
+        } else {
+            // Иначе используем отдельные фильтры
+            spec = spec.and(withNumber(filter.getNumber()))
+                    .and(withApplicant(filter.getApplicant()))
+                    .and(withManufacturer(filter.getManufacturer()))
+                    .and(withMark(filter.getMark()))
+                    .and(withTypeName(filter.getTypeName()))
+                    .and(withRepresentative(filter.getRepresentative()))
+                    .and(withAssignedUser(filter.getAssignedUser()))
+                    .and(withStatus(filter.getStatus()))
+                    .and(withPaymentStatus(filter.getPaymentStatus()))
+                    .and(withCreatedAtBetween(filter.getCreatedAtFrom(), filter.getCreatedAtTo()));
+        }
+
+        return spec;
+    }
+
+    public static Specification<Task> withQuickSearch(String quickSearch) {
+        return (root, query, criteriaBuilder) -> {
+            if (quickSearch == null || quickSearch.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String searchPattern = "%" + quickSearch.toLowerCase() + "%";
+
+            // Условие для поиска по номеру
+            Predicate numberPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("number")),
+                    searchPattern
+            );
+
+            // Условие для поиска по назначенному пользователю
+            Predicate assignedUserPredicate = criteriaBuilder.conjunction();
+
+            try {
+                // Пытаемся парсить как ID пользователя
+                Long userId = Long.parseLong(quickSearch);
+                assignedUserPredicate = criteriaBuilder.equal(root.get("assignedUserId"), userId);
+            } catch (NumberFormatException e) {
+                // Если не число, ищем по ФИО пользователя через подзапрос
+                Subquery<Long> userSubquery = query.subquery(Long.class);
+                Root<User> userRoot = userSubquery.from(User.class);
+                userSubquery.select(userRoot.get("id"));
+
+                Predicate userSearchPredicate = criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("secondName")), searchPattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("firstName")), searchPattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("patronymic")), searchPattern),
+                        criteriaBuilder.like(criteriaBuilder.lower(userRoot.get("email")), searchPattern)
+                );
+
+                userSubquery.where(userSearchPredicate);
+                assignedUserPredicate = criteriaBuilder.in(root.get("assignedUserId")).value(userSubquery);
+            }
+
+            // Объединяем условия через OR
+            return criteriaBuilder.or(numberPredicate, assignedUserPredicate);
+        };
     }
 }

@@ -19,5 +19,5 @@ public class TaskFilter {
     private Boolean paymentStatus;
     private LocalDate createdAtFrom;
     private LocalDate createdAtTo;
-
+    private String quickSearch;
 }

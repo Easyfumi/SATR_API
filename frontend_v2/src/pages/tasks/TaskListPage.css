@@ -214,12 +214,14 @@
 
 /* Панель поиска и фильтров */
 .search-filters-panel {
+    margin-top: 20px;
     background: #fff;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--silver-accent);
+
 }
 
 .quick-search-section {
@@ -296,6 +298,7 @@
 .advanced-filters {
     border-top: 1px solid #031c3d;
     padding-top: 20px;
+    
 }
 
 .filters-grid {
@@ -381,6 +384,7 @@
 
 /* Информация о примененных фильтрах */
 .active-filters-info {
+    
     background: #f0f9ff;
     border: 1px solid #bae6fd;
     border-radius: 8px;
@@ -414,6 +418,37 @@
     border-radius: 10px;
     border: 1px solid #e2e8f0;
 }
+
+.search-input-container {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+    
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--ice-blue);
+    box-shadow: 0 0 0 3px rgba(163, 184, 204, 0.1);
+}
+
 
 @media (max-width: 768px) {
     .task-card-header {
@@ -491,6 +526,7 @@
     }
     .search-filters-panel {
         padding: 15px;
+        
     }
 
     .filter-toggle-btn {
