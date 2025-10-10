@@ -23,13 +23,7 @@ const ContractListPage = () => {
         comments: ''
     });
 
-    // Навигационные кнопки
-    const navItems = [
-        { path: '/tasks', label: 'ОТТС / ОТШ' },
-        { path: '/decl', label: 'Декларации' },
-        { path: '/serts', label: 'Сертификаты' },
-        { path: '/contracts', label: 'Договоры' }
-    ];
+
 
     // Маппинг статусов оплаты
     const paymentStatusLabels = {
@@ -163,22 +157,12 @@ const ContractListPage = () => {
     return (
         <div className="content-container">
             <div className="contracts-header">
-                <div className="nav-buttons-container">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`nav-button ${location.pathname === item.path ? 'active' : ''}`}
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
-                </div>
+
 
                 <h2 className="page-title">Раздел договоров</h2>
 
                 <Link
-                    to="/contracts/create"
+                    to="/api/contracts/create"
                     className="create-contract-button"
                 >
                     <LibraryAddIcon className="create-contract-icon" />
