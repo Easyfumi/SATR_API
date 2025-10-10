@@ -111,9 +111,9 @@ public class TaskController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<TaskResponse>> searchTasks(
+    public ResponseEntity<PageResponse<TaskResponse>> searchTasks(
             @RequestHeader("Authorization") String jwt,
-            @RequestParam(required = false) String quickSearch, // Добавляем параметр быстрого поиска
+            @RequestParam(required = false) String quickSearch,
             @RequestParam(required = false) String number,
             @RequestParam(required = false) String applicant,
             @RequestParam(required = false) String manufacturer,
@@ -124,10 +124,12 @@ public class TaskController {
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) Boolean paymentStatus,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtTo) {
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtTo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         TaskFilter filter = new TaskFilter();
-        filter.setQuickSearch(quickSearch); // Устанавливаем быстрый поиск
+        filter.setQuickSearch(quickSearch);
         filter.setNumber(number);
         filter.setApplicant(applicant);
         filter.setManufacturer(manufacturer);
@@ -140,19 +142,19 @@ public class TaskController {
         filter.setCreatedAtFrom(createdAtFrom);
         filter.setCreatedAtTo(createdAtTo);
 
-        List<TaskResponse> tasks = taskService.getFilteredTasks(filter, jwt);
-        return ResponseEntity.ok(tasks);
+        PageResponse<TaskResponse> response = taskService.getFilteredTasks(filter, jwt, page, size);
+        return ResponseEntity.ok(response);
     }
 
-    // Альтернативный вариант с POST запросом для сложных фильтров
-    @PostMapping("/search")
-    public ResponseEntity<List<TaskResponse>> searchTasksPost(
-            @RequestHeader("Authorization") String jwt,
-            @RequestBody TaskFilter filter) {
-
-        List<TaskResponse> tasks = taskService.getFilteredTasks(filter, jwt);
-        return ResponseEntity.ok(tasks);
-    }
+//    // Альтернативный вариант с POST запросом для сложных фильтров
+//    @PostMapping("/search")
+//    public ResponseEntity<List<TaskResponse>> searchTasksPost(
+//            @RequestHeader("Authorization") String jwt,
+//            @RequestBody TaskFilter filter) {
+//
+//        List<TaskResponse> tasks = taskService.getFilteredTasks(filter, jwt);
+//        return ResponseEntity.ok(tasks);
+//    }
 
 }
 

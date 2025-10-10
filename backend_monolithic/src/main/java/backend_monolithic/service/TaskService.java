@@ -1,9 +1,6 @@
 package backend_monolithic.service;
 
-import backend_monolithic.model.dto.TaskDuplicateInfo;
-import backend_monolithic.model.dto.TaskFilter;
-import backend_monolithic.model.dto.TaskRequest;
-import backend_monolithic.model.dto.TaskResponse;
+import backend_monolithic.model.dto.*;
 import backend_monolithic.model.enums.TaskStatus;
 import jakarta.validation.constraints.NotNull;
 
@@ -25,7 +22,7 @@ public interface TaskService {
 
     TaskResponse updateStatus(Long taskId, TaskStatus newStatus);
 
-    List<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt);
+    PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
 
 //    TaskResponse assignUser(Long id, Long userId);
 //    List<TaskResponse> filterTasks(String status, List<String> categories);

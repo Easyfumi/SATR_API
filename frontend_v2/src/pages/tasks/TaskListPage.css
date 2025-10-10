@@ -31,7 +31,118 @@
     color: var(--deep-frost);
     box-shadow: 0 2px 8px var(--glacial-shadow);
 }
+.results-info-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
 
+.results-count {
+    font-weight: 600;
+    color: #374151;
+}
+
+.page-size-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.page-size-selector select {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+}
+
+/* Выделение найденных задач */
+.task-card.highlighted {
+    border-left: 4px solid var(--ice-blue);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    box-shadow: 0 4px 12px rgba(163, 184, 204, 0.2);
+}
+
+/* Пагинация */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    margin-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.pagination-btn.active {
+    background: var(--ice-blue);
+    color: white;
+    border-color: var(--ice-blue);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-jump {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.pagination-jump input {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.pagination-jump input:focus {
+    outline: none;
+    border-color: var(--ice-blue);
+    box-shadow: 0 0 0 2px rgba(163, 184, 204, 0.1);
+}
 .tasks-list {
     display: flex;
     flex-direction: column;
@@ -451,6 +562,20 @@
 
 
 @media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .pagination-controls {
+        order: -1;
+    }
+    
+    .results-info-panel {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
     .task-card-header {
         flex-direction: column;
         align-items: flex-start;
@@ -502,6 +627,16 @@
 }
 
 @media (max-width: 480px) {
+    .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pagination-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 6px 8px;
+    }
     .info-grid {
         grid-template-columns: 1fr;
     }
