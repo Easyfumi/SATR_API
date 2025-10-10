@@ -145,6 +145,18 @@ public class TaskController {
         PageResponse<TaskResponse> response = taskService.getFilteredTasks(filter, jwt, page, size);
         return ResponseEntity.ok(response);
     }
+
+    // POST метод также нужно обновить, если он используется
+    @PostMapping("/search")
+    public ResponseEntity<PageResponse<TaskResponse>> searchTasksPost(
+            @RequestHeader("Authorization") String jwt,
+            @RequestBody TaskFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageResponse<TaskResponse> response = taskService.getFilteredTasks(filter, jwt, page, size);
+        return ResponseEntity.ok(response);
+    }
 }
 
 

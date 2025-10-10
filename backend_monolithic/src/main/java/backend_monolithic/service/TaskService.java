@@ -24,6 +24,7 @@ public interface TaskService {
 
     PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
 
+
 //    TaskResponse assignUser(Long id, Long userId);
 //    List<TaskResponse> filterTasks(String status, List<String> categories);
 //    TaskResponse updateTask(Long id, TaskRequest request);

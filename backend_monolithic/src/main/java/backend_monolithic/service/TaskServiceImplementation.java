@@ -23,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 
 @Service
 @RequiredArgsConstructor
@@ -105,12 +110,19 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     // Новый метод для фильтрации задач
-    public List<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt) {
+    public PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size) {
         // TODO добавить проверку токена
 
         Specification<Task> spec = TaskSpecifications.buildSpecification(filter);
 
-        return taskRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+        // Создаем Pageable для пагинации
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // Получаем страницу задач
+        Page<Task> taskPage = taskRepository.findAll(spec, pageable);
+
+        // Преобразуем задачи в TaskResponse
+        List<TaskResponse> taskResponses = taskPage.getContent().stream()
                 .map(task -> {
                     TaskResponse taskResponse = mapEntityToResponse(task);
                     if (task.getAssignedUserId() != null) {
@@ -120,7 +132,20 @@ public class TaskServiceImplementation implements TaskService {
                     return taskResponse;
                 })
                 .collect(Collectors.toList());
+
+        // Создаем и возвращаем PageResponse
+        PageResponse<TaskResponse> pageResponse = new PageResponse<>();
+        pageResponse.setContent(taskResponses);
+        pageResponse.setCurrentPage(taskPage.getNumber());
+        pageResponse.setTotalPages(taskPage.getTotalPages());
+        pageResponse.setTotalElements(taskPage.getTotalElements());
+        pageResponse.setPageSize(taskPage.getSize());
+
+        return pageResponse;
     }
+
+
+
 
     public TaskResponse updateStatus(Long taskId, TaskStatus newStatus) {
         Task task = taskRepository.findById(taskId)
