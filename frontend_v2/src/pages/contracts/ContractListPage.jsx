@@ -287,7 +287,7 @@ const ContractListPage = () => {
                             <div
                                 key={contract.id}
                                 className={`contract-card ${filters.quickSearch ? 'highlighted' : ''}`}
-                                onClick={() => navigate(`/contracts/${contract.id}`)}
+                                onClick={() => navigate(`/api/contracts/${contract.id}`)}
                             >
                                 {/* Верхняя строка с номером и статусом */}
                                 <div className="contract-card-header">
@@ -307,6 +307,18 @@ const ContractListPage = () => {
 
                                 {/* Основная информация */}
                                 <div className="contract-info">
+                                    <div className="info-row">
+                                        <span className="info-label">Дата:</span>
+                                        <span className="info-value">
+                                            {contract.date ? new Date(contract.date).toLocaleDateString('ru-RU') : 'Не указана'}
+                                        </span>
+                                    </div>
+                                    <div className="info-row">
+                                        <span className="info-label">Заявитель:</span>
+                                        <span className="info-value">
+                                            {contract.applicant ? contract.applicant.name : 'Не указан'}
+                                        </span>
+                                    </div>
                                     <div className="info-row">
                                         <span className="info-label">Связанная задача:</span>
                                         <span className="info-value">

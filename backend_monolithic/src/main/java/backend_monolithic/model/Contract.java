@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -20,6 +21,11 @@ public class Contract {
 
     @Column(unique = true)
     private String number;
+
+    private LocalDate date;
+
+    @ManyToOne
+    private Applicant applicant;   // заявитель
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;

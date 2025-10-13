@@ -1,6 +1,7 @@
 package backend_monolithic.controller;
 
 import backend_monolithic.model.Contract;
+import backend_monolithic.model.dto.ContractRequest;
 import backend_monolithic.service.ContractService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,18 +29,18 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createContract(@RequestBody Contract contract) {
+    public ResponseEntity<?> createContract(@RequestBody ContractRequest request) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(contractService.save(contract));
+            return ResponseEntity.status(HttpStatus.CREATED).body(contractService.save(request));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContract(@PathVariable Long id, @RequestBody Contract contractDetails) {
+    public ResponseEntity<?> updateContract(@PathVariable Long id, @RequestBody ContractRequest request) {
         try {
-            return ResponseEntity.ok(contractService.update(id, contractDetails));
+            return ResponseEntity.ok(contractService.update(id, request));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

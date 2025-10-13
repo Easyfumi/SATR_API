@@ -16,25 +16,32 @@ const CreateContractPage = () => {
     const navigate = useNavigate();
 
     const [tasks, setTasks] = useState([]);
+    const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Загрузка списка задач для привязки
+    // Загрузка списка задач и заявителей
     useEffect(() => {
-        const fetchTasks = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get('/api/tasks');
-                setTasks(response.data);
+                const [tasksResponse, applicantsResponse] = await Promise.all([
+                    api.get('/api/tasks'),
+                    api.get('/api/applicants/search')
+                ]);
+                setTasks(tasksResponse.data);
+                setApplicants(applicantsResponse.data);
             } catch (error) {
-                console.error('Error fetching tasks:', error);
+                console.error('Error fetching data:', error);
             }
         };
-        fetchTasks();
+        fetchData();
     }, []);
 
     const [formData, setFormData] = useState({
         number: '',
+        date: '',
         paymentStatus: '',
         taskId: null,
+        applicantName: '',
         comments: ''
     });
 
@@ -45,26 +52,33 @@ const CreateContractPage = () => {
         { value: 'PAIDFOR', label: 'Оплачен' }
     ];
 
-    // Генерация номера договора
-    const generateContractNumber = () => {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        
-        return `Д-${year}${month}${day}-${random}`;
+    // Функция для поиска с задержкой
+    const debounce = (func, delay) => {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
     };
 
-    // Автозаполнение номера договора
-    useEffect(() => {
-        if (!formData.number) {
-            setFormData(prev => ({
-                ...prev,
-                number: generateContractNumber()
-            }));
+    // Обработчики поиска
+    const searchApplicants = debounce(async (searchText) => {
+        try {
+            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            setApplicants(response.data);
+        } catch (error) {
+            console.error('Error searching applicants:', error);
         }
-    }, []);
+    }, 300);
+
+    const searchTasks = debounce(async (searchText) => {
+        try {
+            const response = await api.get(`/api/tasks/search?quickSearch=${encodeURIComponent(searchText)}`);
+            setTasks(response.data.content || response.data);
+        } catch (error) {
+            console.error('Error searching tasks:', error);
+        }
+    }, 300);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,8 +87,10 @@ const CreateContractPage = () => {
         try {
             const request = {
                 number: formData.number,
+                date: formData.date,
                 paymentStatus: formData.paymentStatus,
-                tasks: formData.taskId ? { id: formData.taskId } : null,
+                taskId: formData.taskId,
+                applicantName: formData.applicantName,
                 comments: formData.comments
             };
 
@@ -98,23 +114,10 @@ const CreateContractPage = () => {
         return `№${task.number || task.id} - ${task.mark} ${task.typeName}`;
     };
 
-    // Поиск задач с задержкой
-    const debounce = (func, delay) => {
-        let timer;
-        return function (...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
+    // Получение текущей даты в формате YYYY-MM-DD
+    const getCurrentDate = () => {
+        return new Date().toISOString().split('T')[0];
     };
-
-    const searchTasks = debounce(async (searchText) => {
-        try {
-            const response = await api.get(`/api/tasks/search?quickSearch=${encodeURIComponent(searchText)}`);
-            setTasks(response.data.content || response.data);
-        } catch (error) {
-            console.error('Error searching tasks:', error);
-        }
-    }, 300);
 
     return (
         <div className="content-container">
@@ -125,23 +128,27 @@ const CreateContractPage = () => {
                     {/* Номер договора */}
                     <div className="form-row">
                         <label className="form-label">Номер договора:</label>
-                        <div className="number-input-container">
-                            <input
-                                type="text"
-                                value={formData.number}
-                                onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-                                className="form-input"
-                                required
-                                placeholder="Введите номер договора"
-                            />
-                            <button
-                                type="button"
-                                className="generate-number-btn"
-                                onClick={() => setFormData({ ...formData, number: generateContractNumber() })}
-                            >
-                                Сгенерировать
-                            </button>
-                        </div>
+                        <input
+                            type="text"
+                            value={formData.number}
+                            onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                            className="form-input"
+                            required
+                            placeholder="Введите номер договора"
+                        />
+                    </div>
+
+                    {/* Дата договора */}
+                    <div className="form-row">
+                        <label className="form-label">Дата договора:</label>
+                        <input
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            className="form-input"
+                            required
+                            max={getCurrentDate()}
+                        />
                     </div>
 
                     {/* Статус оплаты */}
@@ -180,6 +187,43 @@ const CreateContractPage = () => {
                                     </MenuItem>
                                 ))}
                             </Select>
+                        </FormControl>
+                    </div>
+
+                    {/* Заявитель */}
+                    <div className="form-row">
+                        <label className="form-label">Заявитель:</label>
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                freeSolo
+                                options={applicants}
+                                getOptionLabel={(option) => typeof option === 'string' ? option : option.name}
+                                onInputChange={(_, value) => {
+                                    searchApplicants(value);
+                                    setFormData({ ...formData, applicantName: value });
+                                }}
+                                onOpen={() => {
+                                    if (applicants.length === 0) {
+                                        api.get('/api/applicants/search')
+                                            .then(response => setApplicants(response.data))
+                                            .catch(error => console.error('Error loading applicants:', error));
+                                    }
+                                }}
+                                value={formData.applicantName}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        InputProps={{
+                                            ...params.InputProps,
+                                            className: 'form-input',
+                                            startAdornment: !formData.applicantName && (
+                                                <span className="placeholder-text">Выберите или введите заявителя</span>
+                                            )
+                                        }}
+                                        required
+                                    />
+                                )}
+                            />
                         </FormControl>
                     </div>
 
@@ -256,14 +300,6 @@ const CreateContractPage = () => {
                                                 <span className="detail-label">Заявитель:</span>
                                                 <span className="detail-value">{selectedTask.applicantName}</span>
                                             </div>
-                                            {selectedTask.assignedUser && (
-                                                <div className="task-detail-row">
-                                                    <span className="detail-label">Ответственный эксперт:</span>
-                                                    <span className="detail-value">
-                                                        {selectedTask.assignedUser.secondName} {selectedTask.assignedUser.firstName?.[0]}.{selectedTask.assignedUser.patronymic?.[0] || ''}.
-                                                    </span>
-                                                </div>
-                                            )}
                                         </>
                                     );
                                 })()}

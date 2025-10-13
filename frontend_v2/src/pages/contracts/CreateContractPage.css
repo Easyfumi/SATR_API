@@ -73,6 +73,10 @@
     flex: 1;
 }
 
+.form-input[type="date"] {
+    font-family: inherit;
+}
+
 .generate-number-btn {
     padding: 10px 15px;
     background: var(--ice-blue);
