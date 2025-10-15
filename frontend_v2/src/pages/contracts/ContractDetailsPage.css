@@ -1,0 +1,236 @@
+.contract-details {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--silver-accent);
+}
+
+.header-navigation .back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    color: var(--deep-frost);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.header-navigation .back-button:hover {
+    background: #f0f4f8;
+    border-color: var(--cold-steel);
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.edit-button, .delete-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.edit-button {
+    background: var(--ice-blue);
+    color: var(--deep-frost);
+    border: 1px solid var(--silver-accent);
+}
+
+.edit-button:hover {
+    background: var(--cold-steel);
+    color: white;
+}
+
+.delete-button {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.delete-button:hover {
+    background: #ffcdd2;
+}
+
+.details-content {
+    padding: 25px;
+}
+
+.contract-main-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--silver-accent);
+}
+
+.contract-title {
+    color: var(--deep-frost);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.status-badge-container {
+    display: flex;
+    gap: 10px;
+}
+
+.payment-status-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.payment-status-badge.paid {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.payment-status-badge.partially-paid {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.payment-status-badge.not-paid {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.details-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.detail-section {
+    background: #f8fafc;
+    border: 1px solid var(--silver-accent);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.detail-section h3 {
+    color: var(--deep-frost);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.detail-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.detail-label {
+    color: #475569;
+    font-size: 0.95rem;
+    min-width: 180px;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #1e293b;
+    font-weight: 500;
+    flex: 1;
+}
+
+.comments-content {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    line-height: 1.5;
+    color: #374151;
+}
+
+.comments-content p {
+    margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .details-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .header-actions {
+        justify-content: center;
+    }
+
+    .contract-main-info {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+
+    .contract-title {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .status-badge-container {
+        justify-content: center;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-label {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .details-content {
+        padding: 15px;
+    }
+
+    .detail-section {
+        padding: 15px;
+    }
+
+    .header-actions {
+        flex-direction: column;
+    }
+
+    .edit-button, .delete-button {
+        justify-content: center;
+    }
+}

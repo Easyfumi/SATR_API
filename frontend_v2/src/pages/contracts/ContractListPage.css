@@ -167,6 +167,8 @@
     border: 1px solid #e2e8f0;
 }
 
+
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .contracts-header {

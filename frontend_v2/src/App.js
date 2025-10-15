@@ -9,14 +9,16 @@ import SignIn from './auth/SignIn';
 import SignUp from './auth/SignUp';
 import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
-import UserDetailPage from './pages/users/UserDetailPage'; 
+import UserDetailPage from './pages/users/UserDetailPage';
 import TaskListPage from './pages/tasks/TaskListPage';
-import CreateTaskPage from './pages/tasks/CreateTaskPage'; 
-import DeclarationPage from './pages/declaration/DeclarationPage'; 
-import CertificatesPage from './pages/certificates/CertificatesPage'; 
-import TaskDetailsPage from './pages/tasks/TaskDetailsPage'; 
+import CreateTaskPage from './pages/tasks/CreateTaskPage';
+import DeclarationPage from './pages/declaration/DeclarationPage';
+import CertificatesPage from './pages/certificates/CertificatesPage';
+import TaskDetailsPage from './pages/tasks/TaskDetailsPage';
 import ContractListPage from './pages/contracts/ContractListPage';
 import CreateContractPage from './pages/contracts/CreateContractPage';
+import ContractDetailsPage  from './pages/contracts/ContractDetailsPage';
+import EditContractPage  from './pages/contracts/EditContractPage';
 import HomePage from './pages/HomePage';
 
 
@@ -45,17 +47,19 @@ function App() {
 
           {/* Защищенные маршруты */}
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/users/profile" element={<Profile />} />
-          <Route path="/users/all" element={<UsersPage />} />
-          <Route path="/users/:id" element={<UserDetailPage />} />
-          <Route path="/tasks" element={<TaskListPage />} />
-          <Route path="/tasks/create" element={<CreateTaskPage />} />
-          <Route path="/tasks/:id" element={<TaskDetailsPage />} />
-          <Route path="/decl" element={<DeclarationPage />} /> 
-          <Route path="/serts" element={<CertificatesPage />} /> 
-          <Route path="/api/contracts" element={<ContractListPage />} /> 
-          <Route path="/api/contracts/create" element={<CreateContractPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/users/profile" element={<Profile />} />
+            <Route path="/users/all" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserDetailPage />} />
+            <Route path="/tasks" element={<TaskListPage />} />
+            <Route path="/tasks/create" element={<CreateTaskPage />} />
+            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
+            <Route path="/decl" element={<DeclarationPage />} />
+            <Route path="/serts" element={<CertificatesPage />} />
+            <Route path="/api/contracts" element={<ContractListPage />} />
+            <Route path="/api/contracts/create" element={<CreateContractPage />} />
+            <Route path="/api/contracts/:id" element={<ContractDetailsPage />} />
+            <Route path="/api/contracts/edit/:id" element={<EditContractPage />} />
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}
