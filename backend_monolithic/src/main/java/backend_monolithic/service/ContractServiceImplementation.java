@@ -4,6 +4,7 @@ import backend_monolithic.model.Applicant;
 import backend_monolithic.model.Contract;
 import backend_monolithic.model.Task;
 import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.repository.ApplicantRepository;
 import backend_monolithic.repository.ContractRepository;
 import backend_monolithic.repository.TaskRepository;
@@ -93,5 +94,19 @@ public class ContractServiceImplementation implements ContractService {
     @Override
     public void deleteById(Long id) {
 
+    }
+
+    public Contract updateComments(Long id, String comments) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
+        contract.setComments(comments);
+        return contractRepository.save(contract);
+    }
+
+    public Contract updatePaymentStatus(Long id, PaymentStatus paymentStatus) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
+        contract.setPaymentStatus(paymentStatus);
+        return contractRepository.save(contract);
     }
 }

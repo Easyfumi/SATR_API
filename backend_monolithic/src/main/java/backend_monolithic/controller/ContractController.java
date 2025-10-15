@@ -2,6 +2,7 @@ package backend_monolithic.controller;
 
 import backend_monolithic.model.Contract;
 import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.service.ContractService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/contracts")
@@ -53,6 +55,25 @@ public class ContractController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+    @PatchMapping("/{id}/comments")
+    public ResponseEntity<?> updateComments(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        try {
+            String comments = request.get("comments");
+            return ResponseEntity.ok(contractService.updateComments(id, comments));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PatchMapping("/{id}/payment-status")
+    public ResponseEntity<?> updatePaymentStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        try {
+            PaymentStatus paymentStatus = PaymentStatus.valueOf(request.get("paymentStatus"));
+            return ResponseEntity.ok(contractService.updatePaymentStatus(id, paymentStatus));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

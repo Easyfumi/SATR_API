@@ -5,6 +5,14 @@ import './ContractDetailsPage.css';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import {
+    FormControl,
+    Select,
+    MenuItem,
+    Checkbox
+} from '@mui/material';
 
 const ContractDetailsPage = () => {
     const { id } = useParams();
@@ -12,6 +20,20 @@ const ContractDetailsPage = () => {
     const [contract, setContract] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Состояния для inline-редактирования
+    const [editingComments, setEditingComments] = useState(false);
+    const [editingPaymentStatus, setEditingPaymentStatus] = useState(false);
+    const [tempComments, setTempComments] = useState('');
+    const [tempPaymentStatus, setTempPaymentStatus] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    // Статусы оплаты
+    const paymentStatusOptions = [
+        { value: 'NOTPAIDFOR', label: 'Не оплачен' },
+        { value: 'PARTIALLYPAIDFOR', label: 'Оплачен частично' },
+        { value: 'PAIDFOR', label: 'Оплачен' }
+    ];
 
     useEffect(() => {
         const fetchContract = async () => {
@@ -38,6 +60,60 @@ const ContractDetailsPage = () => {
                 console.error('Error deleting contract:', error);
                 alert('Ошибка при удалении договора: ' + (error.response?.data?.message || error.message));
             }
+        }
+    };
+
+    // Функции для комментариев
+    const startEditingComments = () => {
+        setTempComments(contract.comments || '');
+        setEditingComments(true);
+    };
+
+    const cancelEditingComments = () => {
+        setEditingComments(false);
+        setTempComments('');
+    };
+
+    const saveComments = async () => {
+        setSaving(true);
+        try {
+            const response = await api.patch(`/api/contracts/${id}/comments`, {
+                comments: tempComments
+            });
+            setContract(response.data);
+            setEditingComments(false);
+        } catch (error) {
+            console.error('Error updating comments:', error);
+            alert('Ошибка при обновлении комментария: ' + (error.response?.data?.message || error.message));
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    // Функции для статуса оплаты
+    const startEditingPaymentStatus = () => {
+        setTempPaymentStatus(contract.paymentStatus);
+        setEditingPaymentStatus(true);
+    };
+
+    const cancelEditingPaymentStatus = () => {
+        setEditingPaymentStatus(false);
+        setTempPaymentStatus('');
+    };
+
+    const savePaymentStatus = async () => {
+        setSaving(true);
+        try {
+            const response = await api.patch(`/api/contracts/${id}/payment-status`, {
+                paymentStatus: tempPaymentStatus
+            });
+            setContract(response.data);
+            setEditingPaymentStatus(false);
+        } catch (error) {
+            console.error('Error updating payment status:', error);
+            alert('Ошибка при обновлении статуса оплаты: ' + (error.response?.data?.message || error.message));
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -107,9 +183,63 @@ const ContractDetailsPage = () => {
                         <h1 className="contract-title">Договор № {contract.number}</h1>
                         
                         <div className="status-badge-container">
-                            <span className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)}`}>
-                                {getPaymentStatusLabel(contract.paymentStatus)}
-                            </span>
+                            {editingPaymentStatus ? (
+                                <div className="status-edit-container">
+                                    <FormControl className="status-select">
+                                        <Select
+                                            value={tempPaymentStatus}
+                                            onChange={(e) => setTempPaymentStatus(e.target.value)}
+                                            displayEmpty
+                                            renderValue={(selected) => (
+                                                <div className="selected-process">
+                                                    {selected ? paymentStatusOptions.find(opt => opt.value === selected)?.label 
+                                                             : <span className="placeholder-text">Выберите статус оплаты</span>}
+                                                </div>
+                                            )}
+                                        >
+                                            {paymentStatusOptions.map((option) => (
+                                                <MenuItem key={option.value} value={option.value} style={{ whiteSpace: 'normal' }}>
+                                                    <div className="process-option">
+                                                        <Checkbox
+                                                            checked={tempPaymentStatus === option.value}
+                                                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                                        />
+                                                        <span>{option.label}</span>
+                                                    </div>
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    <div className="inline-edit-actions">
+                                        <button 
+                                            onClick={savePaymentStatus}
+                                            className="save-inline-btn"
+                                            disabled={saving}
+                                        >
+                                            <SaveIcon />
+                                            {saving ? 'Сохранение...' : 'Сохранить'}
+                                        </button>
+                                        <button 
+                                            onClick={cancelEditingPaymentStatus}
+                                            className="cancel-inline-btn"
+                                            disabled={saving}
+                                        >
+                                            <CancelIcon />
+                                            Отмена
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="status-display-container">
+                                    <span 
+                                        className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)} editable`}
+                                        onClick={startEditingPaymentStatus}
+                                    >
+                                        {getPaymentStatusLabel(contract.paymentStatus)}
+                                    </span>
+           
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -136,14 +266,54 @@ const ContractDetailsPage = () => {
                         </div>
 
                         {/* Комментарии */}
-                        {contract.comments && (
-                            <div className="detail-section">
+                        <div className="detail-section">
+                            <div className="section-header">
                                 <h3>Комментарий</h3>
-                                <div className="comments-content">
-                                    <p>{contract.comments}</p>
-                                </div>
+                                {!editingComments && (
+                                    <button 
+                                        className="edit-comments-btn"
+                                        onClick={startEditingComments}
+                                    >
+                                        <EditIcon />
+                                        Редактировать
+                                    </button>
+                                )}
                             </div>
-                        )}
+                            
+                            {editingComments ? (
+                                <div className="comments-edit-container">
+                                    <textarea
+                                        value={tempComments}
+                                        onChange={(e) => setTempComments(e.target.value)}
+                                        className="comments-edit-textarea"
+                                        placeholder="Введите комментарий..."
+                                        rows={4}
+                                    />
+                                    <div className="inline-edit-actions">
+                                        <button 
+                                            onClick={saveComments}
+                                            className="save-inline-btn"
+                                            disabled={saving}
+                                        >
+                                            <SaveIcon />
+                                            {saving ? 'Сохранение...' : 'Сохранить'}
+                                        </button>
+                                        <button 
+                                            onClick={cancelEditingComments}
+                                            className="cancel-inline-btn"
+                                            disabled={saving}
+                                        >
+                                            <CancelIcon />
+                                            Отмена
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="comments-content">
+                                    <p>{contract.comments || 'Комментарий отсутствует'}</p>
+                                </div>
+                            )}
+                        </div>
 
                         {/* Связанная задача (если есть) */}
                         {contract.tasks && (

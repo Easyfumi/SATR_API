@@ -105,6 +105,7 @@
     font-weight: 600;
     text-transform: uppercase;
     white-space: nowrap;
+    transition: all 0.3s ease;
 }
 
 .payment-status-badge.paid {
@@ -120,6 +121,58 @@
 .payment-status-badge.not-paid {
     background: #ffebee;
     color: #c62828;
+}
+
+.payment-status-badge.editable {
+    cursor: pointer;
+    position: relative;
+}
+
+.payment-status-badge.editable:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-display-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-status-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f8fafc;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--deep-frost);
+    transition: all 0.3s ease;
+}
+
+.edit-status-btn:hover {
+    background: var(--ice-blue);
+    color: white;
+}
+
+.status-edit-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-select {
+    min-width: 200px !important;
+}
+
+.status-select .MuiSelect-select {
+    background: white;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    padding: 8px 12px;
 }
 
 .details-grid {
@@ -140,6 +193,32 @@
     margin-bottom: 15px;
     font-size: 1.2rem;
     font-weight: 600;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.edit-comments-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    color: var(--deep-frost);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.edit-comments-btn:hover {
+    background: var(--ice-blue);
+    color: white;
 }
 
 .detail-items {
@@ -174,10 +253,85 @@
     border: 1px solid #e2e8f0;
     line-height: 1.5;
     color: #374151;
+    min-height: 60px;
 }
 
 .comments-content p {
     margin: 0;
+}
+
+.comments-edit-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.comments-edit-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.4;
+    background: white;
+}
+
+.comments-edit-textarea:focus {
+    outline: none;
+    border-color: var(--ice-blue);
+    box-shadow: 0 0 0 2px rgba(163, 184, 204, 0.1);
+}
+
+.inline-edit-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.save-inline-btn, .cancel-inline-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.save-inline-btn {
+    background: var(--deep-frost);
+    color: white;
+}
+
+.save-inline-btn:hover:not(:disabled) {
+    background: var(--cold-steel);
+}
+
+.save-inline-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cancel-inline-btn {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.cancel-inline-btn:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.cancel-inline-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Адаптивность */
@@ -207,6 +361,19 @@
         justify-content: center;
     }
 
+    .status-edit-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .status-select {
+        min-width: 100% !important;
+    }
+
+    .inline-edit-actions {
+        justify-content: center;
+    }
+
     .detail-item {
         flex-direction: column;
         gap: 5px;
@@ -214,6 +381,12 @@
 
     .detail-label {
         min-width: auto;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
     }
 }
 
@@ -231,6 +404,14 @@
     }
 
     .edit-button, .delete-button {
+        justify-content: center;
+    }
+
+    .inline-edit-actions {
+        flex-direction: column;
+    }
+
+    .save-inline-btn, .cancel-inline-btn {
         justify-content: center;
     }
 }
