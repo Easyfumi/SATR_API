@@ -15,32 +15,26 @@ import {
 const CreateContractPage = () => {
     const navigate = useNavigate();
 
-    const [tasks, setTasks] = useState([]);
     const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Загрузка списка задач и заявителей
+    // Загрузка списка заявителей
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchApplicants = async () => {
             try {
-                const [tasksResponse, applicantsResponse] = await Promise.all([
-                    api.get('/api/tasks'),
-                    api.get('/api/applicants/search')
-                ]);
-                setTasks(tasksResponse.data);
-                setApplicants(applicantsResponse.data);
+                const response = await api.get('/api/applicants/search');
+                setApplicants(response.data);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching applicants:', error);
             }
         };
-        fetchData();
+        fetchApplicants();
     }, []);
 
     const [formData, setFormData] = useState({
         number: '',
         date: '',
         paymentStatus: '',
-        taskId: null,
         applicantName: '',
         comments: ''
     });
@@ -61,22 +55,13 @@ const CreateContractPage = () => {
         };
     };
 
-    // Обработчики поиска
+    // Обработчик поиска заявителей
     const searchApplicants = debounce(async (searchText) => {
         try {
             const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
             setApplicants(response.data);
         } catch (error) {
             console.error('Error searching applicants:', error);
-        }
-    }, 300);
-
-    const searchTasks = debounce(async (searchText) => {
-        try {
-            const response = await api.get(`/api/tasks/search?quickSearch=${encodeURIComponent(searchText)}`);
-            setTasks(response.data.content || response.data);
-        } catch (error) {
-            console.error('Error searching tasks:', error);
         }
     }, 300);
 
@@ -89,7 +74,6 @@ const CreateContractPage = () => {
                 number: formData.number,
                 date: formData.date,
                 paymentStatus: formData.paymentStatus,
-                taskId: formData.taskId,
                 applicantName: formData.applicantName,
                 comments: formData.comments
             };
@@ -106,12 +90,6 @@ const CreateContractPage = () => {
         } finally {
             setLoading(false);
         }
-    };
-
-    // Форматирование отображения задачи
-    const formatTaskDisplay = (task) => {
-        if (!task) return '';
-        return `№${task.number || task.id} - ${task.mark} ${task.typeName}`;
     };
 
     // Получение текущей даты в формате YYYY-MM-DD
@@ -227,40 +205,6 @@ const CreateContractPage = () => {
                         </FormControl>
                     </div>
 
-                    {/* Привязанная задача */}
-                    <div className="form-row">
-                        <label className="form-label">Привязанная задача:</label>
-                        <FormControl fullWidth>
-                            <Autocomplete
-                                options={tasks}
-                                getOptionLabel={(option) => formatTaskDisplay(option)}
-                                onInputChange={(_, value) => {
-                                    if (value) {
-                                        searchTasks(value);
-                                    }
-                                }}
-                                onChange={(_, value) => {
-                                    setFormData({ ...formData, taskId: value ? value.id : null });
-                                }}
-                                value={tasks.find(task => task.id === formData.taskId) || null}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        InputProps={{
-                                            ...params.InputProps,
-                                            className: 'form-input',
-                                            startAdornment: !formData.taskId && (
-                                                <span className="placeholder-text">Выберите задачу для привязки</span>
-                                            )
-                                        }}
-                                        placeholder="Начните вводить номер задачи или марку ТС"
-                                    />
-                                )}
-                                noOptionsText="Задачи не найдены"
-                            />
-                        </FormControl>
-                    </div>
-
                     {/* Комментарий */}
                     <div className="form-row form-row-textarea">
                         <label className="form-label">Комментарий:</label>
@@ -272,40 +216,6 @@ const CreateContractPage = () => {
                             rows={4}
                         />
                     </div>
-
-                    {/* Информация о выбранной задаче */}
-                    {formData.taskId && (
-                        <div className="task-info-preview">
-                            <h4>Информация о выбранной задаче:</h4>
-                            <div className="task-details">
-                                {(() => {
-                                    const selectedTask = tasks.find(task => task.id === formData.taskId);
-                                    if (!selectedTask) return null;
-                                    
-                                    return (
-                                        <>
-                                            <div className="task-detail-row">
-                                                <span className="detail-label">Номер:</span>
-                                                <span className="detail-value">{selectedTask.number || 'Не назначен'}</span>
-                                            </div>
-                                            <div className="task-detail-row">
-                                                <span className="detail-label">Марка:</span>
-                                                <span className="detail-value">{selectedTask.mark}</span>
-                                            </div>
-                                            <div className="task-detail-row">
-                                                <span className="detail-label">Тип:</span>
-                                                <span className="detail-value">{selectedTask.typeName}</span>
-                                            </div>
-                                            <div className="task-detail-row">
-                                                <span className="detail-label">Заявитель:</span>
-                                                <span className="detail-value">{selectedTask.applicantName}</span>
-                                            </div>
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    )}
 
                     <div className="form-actions">
                         <Button
