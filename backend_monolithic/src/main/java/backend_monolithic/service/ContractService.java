@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ContractService {
     List<Contract> findAll();
     Optional<Contract> findById(Long id);
-    Contract save(ContractRequest request);
+    Contract save(ContractRequest request, String jwt);
     Contract update(Long id, ContractRequest requestDetails);
     void deleteById(Long id);
     Applicant getOrCreateApplicant(String applicantName);

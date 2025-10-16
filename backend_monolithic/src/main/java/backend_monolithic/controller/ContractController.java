@@ -31,9 +31,10 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createContract(@RequestBody ContractRequest request) {
+    public ResponseEntity<?> createContract(@RequestBody ContractRequest request,
+                                            @RequestHeader("Authorization") String jwt) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(contractService.save(request));
+            return ResponseEntity.status(HttpStatus.CREATED).body(contractService.save(request, jwt));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -162,7 +162,7 @@ const ContractListPage = () => {
                 <h2 className="page-title">Раздел договоров</h2>
 
                 <Link
-                    to="/api/contracts/create"
+                    to="/contracts/create"
                     className="create-contract-button"
                 >
                     <LibraryAddIcon className="create-contract-icon" />
@@ -287,7 +287,7 @@ const ContractListPage = () => {
                             <div
                                 key={contract.id}
                                 className={`contract-card ${filters.quickSearch ? 'highlighted' : ''}`}
-                                onClick={() => navigate(`/api/contracts/${contract.id}`)}
+                                onClick={() => navigate(`/contracts/${contract.id}`)}
                             >
                                 {/* Верхняя строка с номером и статусом */}
                                 <div className="contract-card-header">

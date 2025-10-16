@@ -79,7 +79,7 @@ const CreateContractPage = () => {
             };
 
             await api.post('/api/contracts', request);
-            navigate('/api/contracts');
+            navigate('/contracts');
         } catch (error) {
             console.error('Error creating contract:', error);
             if (error.response?.status === 400) {
@@ -221,7 +221,7 @@ const CreateContractPage = () => {
                         <Button
                             variant="outlined"
                             type="button"
-                            onClick={() => navigate('/api/contracts')}
+                            onClick={() => navigate('/contracts')}
                             className="cancel-btn"
                         >
                             Отмена

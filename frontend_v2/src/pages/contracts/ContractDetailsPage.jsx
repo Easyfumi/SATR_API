@@ -20,6 +20,7 @@ const ContractDetailsPage = () => {
     const [contract, setContract] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [creatorInfo, setCreatorInfo] = useState(null);
 
     // Состояния для inline-редактирования
     const [editingComments, setEditingComments] = useState(false);
@@ -41,6 +42,11 @@ const ContractDetailsPage = () => {
                 const response = await api.get(`/api/contracts/${id}`);
                 setContract(response.data);
                 setError(null);
+                
+                // Если есть createdBy, загружаем информацию о создателе
+                if (response.data.createdBy) {
+                    fetchCreatorInfo(response.data.createdBy);
+                }
             } catch (error) {
                 console.error('Error fetching contract:', error);
                 setError('Ошибка загрузки данных договора');
@@ -50,6 +56,19 @@ const ContractDetailsPage = () => {
         };
         fetchContract();
     }, [id]);
+
+    // Функция для загрузки информации о создателе договора
+    const fetchCreatorInfo = async (userId) => {
+        try {
+            // Предполагаем, что есть endpoint для получения информации о пользователе по ID
+            const response = await api.get(`/api/users/${userId}`);
+            setCreatorInfo(response.data);
+        } catch (error) {
+            console.error('Error fetching creator info:', error);
+            // Если endpoint недоступен, просто сохраняем ID
+            setCreatorInfo({ id: userId });
+        }
+    };
 
     const handleDelete = async () => {
         if (window.confirm('Вы уверены, что хотите удалить этот договор? Это действие нельзя отменить.')) {
@@ -122,6 +141,11 @@ const ContractDetailsPage = () => {
         return new Date(dateString).toLocaleDateString('ru-RU');
     };
 
+    const formatDateTime = (dateTimeString) => {
+        if (!dateTimeString) return 'Не указано';
+        return new Date(dateTimeString).toLocaleString('ru-RU');
+    };
+
     const getPaymentStatusLabel = (status) => {
         const statusLabels = {
             'PAIDFOR': 'Оплачен',
@@ -140,6 +164,15 @@ const ContractDetailsPage = () => {
         }
     };
 
+    // Функция для форматирования имени пользователя
+    const formatUserName = (user) => {
+        if (!user) return 'Неизвестный пользователь';
+        if (user.firstName && user.secondName) {
+            return `${user.secondName} ${user.firstName}${user.patronymic ? ' ' + user.patronymic : ''}`;
+        }
+        return user.username || `Пользователь #${user.id}`;
+    };
+
     if (loading) return <div className="loading">Загрузка...</div>;
     if (error) return <div className="error-message">{error}</div>;
     if (!contract) return <div className="error-message">Договор не найден</div>;
@@ -152,7 +185,7 @@ const ContractDetailsPage = () => {
                     <div className="header-navigation">
                         <button 
                             className="back-button"
-                            onClick={() => navigate('/api/contracts')}
+                            onClick={() => navigate('/contracts')}
                         >
                             <ArrowBackIcon />
                             Назад к списку
@@ -161,7 +194,7 @@ const ContractDetailsPage = () => {
                     
                     <div className="header-actions">
                         <Link
-                            to={`/api/contracts/edit/${contract.id}`}
+                            to={`/contracts/edit/${contract.id}`}
                             className="edit-button"
                         >
                             <EditIcon />
@@ -237,7 +270,6 @@ const ContractDetailsPage = () => {
                                     >
                                         {getPaymentStatusLabel(contract.paymentStatus)}
                                     </span>
-           
                                 </div>
                             )}
                         </div>
@@ -352,11 +384,19 @@ const ContractDetailsPage = () => {
                                     <span className="detail-label">ID договора:</span>
                                     <span className="detail-value">{contract.id}</span>
                                 </div>
+                                {contract.createdBy && (
+                                    <div className="detail-item">
+                                        <span className="detail-label">Создал:</span>
+                                        <span className="detail-value">
+                                            {creatorInfo ? formatUserName(creatorInfo) : `Пользователь #${contract.createdBy}`}
+                                        </span>
+                                    </div>
+                                )}
                                 {contract.createdAt && (
                                     <div className="detail-item">
-                                        <span className="detail-label">Создан:</span>
+                                        <span className="detail-label">Дата создания:</span>
                                         <span className="detail-value">
-                                            {new Date(contract.createdAt).toLocaleString('ru-RU')}
+                                            {formatDateTime(contract.createdAt)}
                                         </span>
                                     </div>
                                 )}

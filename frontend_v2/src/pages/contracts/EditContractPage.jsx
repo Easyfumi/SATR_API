@@ -47,7 +47,7 @@ const EditContractPage = () => {
                     api.get(`/api/contracts/${id}`),
                     api.get('/api/applicants/search')
                 ]);
-                
+
                 setContract(contractResponse.data);
                 setApplicants(applicantsResponse.data);
 
@@ -102,7 +102,7 @@ const EditContractPage = () => {
             };
 
             await api.put(`/api/contracts/${id}`, request);
-            navigate(`/api/contracts/${id}`);
+            navigate(`/contracts/${id}`);
         } catch (error) {
             console.error('Error updating contract:', error);
             if (error.response?.status === 400) {
@@ -116,7 +116,7 @@ const EditContractPage = () => {
     };
 
     const handleCancel = () => {
-        navigate(`/api/contracts/${id}`);
+        navigate(`/contracts/${id}`);
     };
 
     // Получение текущей даты в формате YYYY-MM-DD
@@ -131,9 +131,9 @@ const EditContractPage = () => {
         <div className="content-container">
             <div className="edit-contract-form">
                 <div className="form-header">
-                    <button 
+                    <button
                         className="back-button"
-                        onClick={() => navigate(`/api/contracts/${id}`)}
+                        onClick={() => navigate(`/contracts/${id}`)}
                     >
                         <ArrowBackIcon />
                         Назад к договору
@@ -178,8 +178,8 @@ const EditContractPage = () => {
                                 displayEmpty
                                 renderValue={(selected) => (
                                     <div className="selected-process">
-                                        {selected ? paymentStatusOptions.find(opt => opt.value === selected)?.label 
-                                                 : <span className="placeholder-text">Выберите статус оплаты</span>}
+                                        {selected ? paymentStatusOptions.find(opt => opt.value === selected)?.label
+                                            : <span className="placeholder-text">Выберите статус оплаты</span>}
                                     </div>
                                 )}
                                 MenuProps={{
@@ -255,6 +255,23 @@ const EditContractPage = () => {
                             rows={4}
                         />
                     </div>
+
+                    {contract.createdBy && (
+                        <div className="form-row">
+                            <label className="form-label">Создал:</label>
+                            <div className="readonly-field">
+                                {contract.createdBy} {/* Здесь можно также загрузить и отобразить имя пользователя */}
+                            </div>
+                        </div>
+                    )}
+                    {contract.createdAt && (
+                        <div className="form-row">
+                            <label className="form-label">Дата создания:</label>
+                            <div className="readonly-field">
+                                {new Date(contract.createdAt).toLocaleString('ru-RU')}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="form-actions">
                         <Button

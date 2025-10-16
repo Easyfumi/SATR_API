@@ -3,7 +3,9 @@ package backend_monolithic.service;
 import backend_monolithic.model.Applicant;
 import backend_monolithic.model.Contract;
 import backend_monolithic.model.Task;
+import backend_monolithic.model.User;
 import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.dto.UserInfo;
 import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.repository.ApplicantRepository;
 import backend_monolithic.repository.ContractRepository;
@@ -11,6 +13,7 @@ import backend_monolithic.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +23,7 @@ public class ContractServiceImplementation implements ContractService {
     private final ContractRepository contractRepository;
     private final TaskRepository taskRepository;
     private final ApplicantRepository applicantRepository;
+    private final UserService userService;
 
     public List<Contract> findAll() {
         return contractRepository.findAll();
@@ -29,13 +33,19 @@ public class ContractServiceImplementation implements ContractService {
         return contractRepository.findById(id);
     }
 
-    public Contract save(ContractRequest request) {
+    public Contract save(ContractRequest request, String jwt) {
         // Проверка уникальности номера
         if (contractRepository.existsByNumber(request.getNumber())) {
             throw new RuntimeException("Contract with number " + request.getNumber() + " already exists");
         }
 
         Contract contract = new Contract();
+        User user = userService.getUserProfile(jwt);
+        UserInfo userInfo = new UserInfo(user);
+
+
+        contract.setCreatedBy(userInfo.getId());
+        contract.setCreatedAt(LocalDateTime.now());
         contract.setNumber(request.getNumber());
         contract.setDate(request.getDate());
         contract.setPaymentStatus(request.getPaymentStatus());

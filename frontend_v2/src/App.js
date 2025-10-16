@@ -56,10 +56,10 @@ function App() {
             <Route path="/tasks/:id" element={<TaskDetailsPage />} />
             <Route path="/decl" element={<DeclarationPage />} />
             <Route path="/serts" element={<CertificatesPage />} />
-            <Route path="/api/contracts" element={<ContractListPage />} />
-            <Route path="/api/contracts/create" element={<CreateContractPage />} />
-            <Route path="/api/contracts/:id" element={<ContractDetailsPage />} />
-            <Route path="/api/contracts/edit/:id" element={<EditContractPage />} />
+            <Route path="/contracts" element={<ContractListPage />} />
+            <Route path="/contracts/create" element={<CreateContractPage />} />
+            <Route path="/contracts/:id" element={<ContractDetailsPage />} />
+            <Route path="/contracts/edit/:id" element={<EditContractPage />} />
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

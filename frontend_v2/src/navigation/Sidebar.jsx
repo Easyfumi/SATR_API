@@ -21,7 +21,7 @@ const Sidebar = () => {
     { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },
-    { path: "/api/contracts", text: "Договоры", icon: <RequestQuoteIcon/> },
+    { path: "/contracts", text: "Договоры", icon: <RequestQuoteIcon/> },
   ];
 
     const isActive = (item) => {
