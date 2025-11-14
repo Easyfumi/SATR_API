@@ -59,6 +59,8 @@ public class Task {
     
     private LocalDate decisionAt;   // дата решения по заявке
 
-    private Boolean paymentStatus=false;  // статус оплаты
+    @ManyToOne
+    @JoinColumn(name = "contract_id")
+    private Contract contract;   // добавленная связь с договором
 
 }

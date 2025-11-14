@@ -89,15 +89,6 @@ public class ContractServiceImplementation implements ContractService {
             contract.setApplicant(null);
         }
 
-        // Обновление задачи
-        if (contractDetails.getTaskId() != null) {
-            Task task = taskRepository.findById(contractDetails.getTaskId())
-                    .orElseThrow(() -> new RuntimeException("Task not found with id: " + contractDetails.getTaskId()));
-            contract.setTasks(task);
-        } else {
-            contract.setTasks(null);
-        }
-
         return contractRepository.save(contract);
     }
 

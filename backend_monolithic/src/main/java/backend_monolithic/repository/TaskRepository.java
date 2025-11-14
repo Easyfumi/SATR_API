@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import backend_monolithic.model.Task;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Boolean existsByNumber(String number);
@@ -20,4 +23,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     // Остальные методы остаются
     List<Task> findAll(Specification<Task> spec);
     List<Task> findAll(Specification<Task> spec, Sort sort);
+
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.contract WHERE t.id = :taskId")
+    Optional<Task> findByIdWithContract(@Param("taskId") Long taskId);
+
+    List<Task> findByContractId(Long contractId);
+
+    List<Task> findByContractIsNull();
 }

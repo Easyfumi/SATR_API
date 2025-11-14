@@ -1,6 +1,7 @@
 package backend_monolithic.model;
 
 import backend_monolithic.model.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Entity
 @Data
@@ -31,8 +34,9 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @OneToOne
-    private Task tasks;
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
+    @JsonIgnore // чтобы избежать циклических ссылок при сериализации
+    private List<Task> tasks = new ArrayList<>();
 
     private String comments;
 

@@ -4,8 +4,18 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 import './TaskDetailsPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
+import { 
+  TextField, 
+  Button, 
+  CircularProgress, 
+  Menu, 
+  MenuItem,
+  InputAdornment,
+  IconButton
+} from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClearIcon from '@mui/icons-material/Clear';
+import SearchIcon from '@mui/icons-material/Search';
 
 const TaskDetailsPage = () => {
   const { id } = useParams();
@@ -23,6 +33,15 @@ const TaskDetailsPage = () => {
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
+  // Состояния для управления договором
+  const [contracts, setContracts] = useState([]);
+  const [filteredContracts, setFilteredContracts] = useState([]);
+  const [contractAnchorEl, setContractAnchorEl] = useState(null);
+  const [isLoadingContracts, setIsLoadingContracts] = useState(false);
+  const [contractError, setContractError] = useState(null);
+  const [isUpdatingContract, setIsUpdatingContract] = useState(false);
+  const [contractSearch, setContractSearch] = useState('');
+
   const statusLabels = {
     RECEIVED: 'Заявка получена',
     REGISTERED: 'Заявка зарегистрирована',
@@ -34,6 +53,12 @@ const TaskDetailsPage = () => {
     SIGNED: 'Подписано',
     FOR_REVISION: 'Возвращено на доработку',
     COMPLETED: 'Заявка выполнена'
+  };
+
+  const paymentStatusLabels = {
+    PAID: 'Оплачено',
+    UNPAID: 'Не оплачено',
+    PARTIALLY_PAID: 'Частично оплачено'
   };
 
   useEffect(() => {
@@ -53,6 +78,85 @@ const TaskDetailsPage = () => {
 
     fetchTask();
   }, [id]);
+
+  // Загрузка всех договоров для поиска по номеру
+  const fetchAllContracts = async () => {
+    setIsLoadingContracts(true);
+    setContractError(null);
+    try {
+      const response = await api.get('/api/contracts');
+      setContracts(response.data);
+      setFilteredContracts(response.data); // Изначально показываем все договоры
+    } catch (err) {
+      console.error('Ошибка загрузки договоров:', err);
+      setContractError('Не удалось загрузить список договоров');
+    } finally {
+      setIsLoadingContracts(false);
+    }
+  };
+
+  // Фильтрация договоров по номеру
+  const filterContracts = (searchText) => {
+    if (!searchText.trim()) {
+      setFilteredContracts(contracts);
+    } else {
+      const filtered = contracts.filter(contract => 
+        contract.number.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredContracts(filtered);
+    }
+  };
+
+  const handleContractButtonClick = async (event) => {
+    setContractAnchorEl(event.currentTarget);
+    setContractSearch(''); // Сбрасываем поиск при открытии
+    await fetchAllContracts();
+  };
+
+  const handleContractMenuClose = () => {
+    setContractAnchorEl(null);
+    setContractSearch(''); // Сбрасываем поиск при закрытии
+  };
+
+  const handleContractSearchChange = (event) => {
+    const searchText = event.target.value;
+    setContractSearch(searchText);
+    filterContracts(searchText);
+  };
+
+  const handleClearSearch = () => {
+    setContractSearch('');
+    setFilteredContracts(contracts);
+  };
+
+  const handleContractSelect = async (contractId) => {
+    setIsUpdatingContract(true);
+    try {
+      const response = await api.put(`/api/tasks/${id}/contract`, { contractId });
+      setTask(response.data);
+      alert('Договор успешно привязан к задаче');
+    } catch (error) {
+      console.error('Ошибка привязки договора:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка при привязке договора');
+    } finally {
+      setIsUpdatingContract(false);
+      handleContractMenuClose();
+    }
+  };
+
+  const handleRemoveContract = async () => {
+    setIsUpdatingContract(true);
+    try {
+      const response = await api.delete(`/api/tasks/${id}/contract`);
+      setTask(response.data);
+      alert('Договор успешно отвязан от задачи');
+    } catch (error) {
+      console.error('Ошибка отвязки договора:', error);
+      alert(error.response?.data?.message || 'Произошла ошибка при отвязке договора');
+    } finally {
+      setIsUpdatingContract(false);
+    }
+  };
 
   const handleAssignNumber = async () => {
     if (!newNumber.trim()) return;
@@ -135,14 +239,11 @@ const TaskDetailsPage = () => {
   };
 
   const formatDate = (date) => {
-    console.log(date + "asd");
-    // Проверяем на null, undefined и невалидные даты
     if (!date || new Date(date).toString() === 'Invalid Date') {
       return 'Не указана';
     }
 
     const dateObj = new Date(date);
-    // Проверяем, что это не дата по умолчанию (1970 год)
     if (dateObj.getFullYear() === 1970 && dateObj.getMonth() === 0 && dateObj.getDate() === 1) {
       return 'Не указана';
     }
@@ -169,9 +270,7 @@ const TaskDetailsPage = () => {
       <div className="task-details-card">
         <div className="card-content">
           {/* Левая колонка */}
-
           <div className="column left-column">
-
             <div className="task-row">
               <div className="approval-type">{task.docType}</div>
             </div>
@@ -186,7 +285,6 @@ const TaskDetailsPage = () => {
 
           {/* Правая колонка */}
           <div className="column right-column">
-
             <div className="task-row">
               <span className="task-label">Статус</span>
               <div className="status-container">
@@ -286,6 +384,51 @@ const TaskDetailsPage = () => {
               )}
             </div>
 
+            {/* Блок выбора договора */}
+            <div className="task-row">
+              <span className="task-label">Договор</span>
+              <div className="contract-selection">
+                {task.contract ? (
+                  <div className="contract-display">
+                    <div className="contract-info">
+                      <div className="contract-number">
+                        {task.contract.number}
+                      </div>
+                      <div className="contract-details">
+                        от {formatDate(task.contract.date)} • 
+                        Статус оплаты: {paymentStatusLabels[task.contract.paymentStatus] || task.contract.paymentStatus}
+                        {task.contract.applicant && (
+                          <div className="contract-applicant">
+                            Заявитель: {task.contract.applicant.name || task.contract.applicant}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="contract-actions">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={handleRemoveContract}
+                        disabled={isUpdatingContract}
+                        startIcon={<ClearIcon />}
+                      >
+                        {isUpdatingContract ? <CircularProgress size={16} /> : 'Отвязать'}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleContractButtonClick}
+                    disabled={isUpdatingContract}
+                    startIcon={<SearchIcon />}
+                    endIcon={<ArrowDropDownIcon />}
+                  >
+                    {isUpdatingContract ? 'Загрузка...' : 'Выбрать договор'}
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -308,11 +451,77 @@ const TaskDetailsPage = () => {
         ))}
       </Menu>
 
+      {/* Меню выбора договора с поиском */}
+      <Menu
+        anchorEl={contractAnchorEl}
+        open={Boolean(contractAnchorEl)}
+        onClose={handleContractMenuClose}
+        className="contract-menu"
+      >
+        <div className="contract-search-container">
+          <TextField
+            className="contract-search-field"
+            placeholder="Поиск по номеру договора..."
+            value={contractSearch}
+            onChange={handleContractSearchChange}
+            variant="outlined"
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: contractSearch && (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={handleClearSearch}>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+
+        {isLoadingContracts ? (
+          <div className="contracts-loading">
+            <CircularProgress size={20} />
+            <span>Загрузка договоров...</span>
+          </div>
+        ) : filteredContracts.length === 0 ? (
+          <div className="no-contracts-message">
+            {contractSearch ? 'Договоры не найдены' : 'Нет доступных договоров'}
+          </div>
+        ) : (
+          filteredContracts.map((contract) => (
+            <MenuItem
+              key={contract.id}
+              onClick={() => handleContractSelect(contract.id)}
+              className="contract-menu-item"
+            >
+              <div className="contract-item-details">
+                <div className="contract-item-number">
+                  {contract.number}
+                </div>
+                <div className="contract-item-info">
+                  <span>от {formatDate(contract.date)}</span>
+                  <span>{paymentStatusLabels[contract.paymentStatus] || contract.paymentStatus}</span>
+                </div>
+                {contract.applicant && (
+                  <div className="contract-applicant">
+                    Заявитель: {contract.applicant.name || contract.applicant}
+                  </div>
+                )}
+              </div>
+            </MenuItem>
+          ))
+        )}
+      </Menu>
+
       <div className="task-details-card">
         <div className="card-content">
           {/* Левая колонка */}
           <div className="column left-column">
-
             <div className="task-row">
               <span className="task-label">Марка</span>
               <span className="task-value">{task.mark}</span>
@@ -338,7 +547,6 @@ const TaskDetailsPage = () => {
 
           {/* Правая колонка */}
           <div className="column right-column">
-
             <div className="task-row">
               <span className="task-label">Заявитель</span>
               <span className="task-value">{task.applicant?.name || task.applicant}</span>
@@ -353,13 +561,11 @@ const TaskDetailsPage = () => {
               <span className="task-label">Представитель</span>
               <span className="task-value">{task.representative?.name || task.representative}</span>
             </div>
-
           </div>
         </div>
       </div>
 
       <div className="task-details-card">
-
         <div className="task-row">
           <span className="task-label">Дата создания</span>
           <span className="task-value">{formatDateTime(task.createdAt)}</span>
@@ -369,22 +575,18 @@ const TaskDetailsPage = () => {
           <span className="task-label">Заявка создана</span>
           <span className="task-value">{task.createdBy}</span>
         </div>
-
       </div>
 
       <div className="task-details-card">
-
         <div className="task-row">
           <span className="task-label">Статус оплаты</span>
           <span className={`details-payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
             {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
           </span>
         </div>
-
       </div>
-
     </div>
   );
 };
 
-export default TaskDetailsPage; 
+export default TaskDetailsPage;

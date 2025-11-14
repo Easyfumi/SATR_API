@@ -2,8 +2,10 @@ package backend_monolithic.service;
 
 
 import backend_monolithic.config.TaskSpecifications;
+import backend_monolithic.error.BusinessException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
+import backend_monolithic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -12,10 +14,6 @@ import org.springframework.stereotype.Service;
 import backend_monolithic.error.DuplicateNumberException;
 import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.model.enums.TaskStatus;
-import backend_monolithic.repository.ApplicantRepository;
-import backend_monolithic.repository.ManufacturerRepository;
-import backend_monolithic.repository.RepresentativeRepository;
-import backend_monolithic.repository.TaskRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +36,7 @@ public class TaskServiceImplementation implements TaskService {
     private final ManufacturerRepository manufacturerRepository;
     private final RepresentativeRepository representativeRepository;
     private final UserService userService;
+    private final ContractRepository contractRepository;
 
     public TaskResponse createTask(TaskRequest request, String jwt) {
         User user = userService.getUserProfile(jwt);
@@ -288,6 +287,74 @@ public class TaskServiceImplementation implements TaskService {
     private Representative getOrCreateRepresentative(String name) {
         return representativeRepository.findByName(name)
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
+    }
+
+
+    public TaskWithContractDTO assignContractToTask(Long taskId, Long contractId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new EntityNotFoundException("Contract not found with id: " + contractId));
+
+        // Проверяем, что договор и задача принадлежат одному заявителю (опционально)
+        if (!task.getApplicant().getId().equals(contract.getApplicant().getId())) {
+            throw new BusinessException("Task and contract must belong to the same applicant");
+        }
+
+        task.setContract(contract);
+        Task savedTask = taskRepository.save(task);
+
+        return convertToTaskWithContractDTO(savedTask);
+    }
+
+    public TaskWithContractDTO removeContractFromTask(Long taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+        task.setContract(null);
+        Task savedTask = taskRepository.save(task);
+
+        return convertToTaskWithContractDTO(savedTask);
+    }
+
+    public TaskWithContractDTO getTaskWithContractInfo(Long taskId) {
+        Task task = taskRepository.findByIdWithContract(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
+
+        return convertToTaskWithContractDTO(task);
+    }
+
+    public List<TaskWithContractDTO> getTasksByContract(Long contractId) {
+        List<Task> tasks = taskRepository.findByContractId(contractId);
+        return tasks.stream()
+                .map(this::convertToTaskWithContractDTO)
+                .collect(Collectors.toList());
+    }
+
+    private TaskWithContractDTO convertToTaskWithContractDTO(Task task) {
+        TaskWithContractDTO dto = new TaskWithContractDTO();
+        dto.setId(task.getId());
+        dto.setNumber(task.getNumber());
+        dto.setDocType(task.getDocType());
+        dto.setMark(task.getMark());
+        dto.setTypeName(task.getTypeName());
+        dto.setStatus(task.getStatus());
+        dto.setCreatedAt(task.getCreatedAt());
+
+        if (task.getContract() != null) {
+            Contract contract = task.getContract();
+            TaskWithContractDTO.ContractInfoDTO contractInfo = new TaskWithContractDTO.ContractInfoDTO();
+            contractInfo.setId(contract.getId());
+            contractInfo.setNumber(contract.getNumber());
+            contractInfo.setDate(contract.getDate());
+            contractInfo.setPaymentStatus(contract.getPaymentStatus());
+            contractInfo.setApplicantName(contract.getApplicant().getName()); // предполагая, что у Applicant есть поле name
+
+            dto.setContract(contractInfo);
+        }
+
+        return dto;
     }
 
 }

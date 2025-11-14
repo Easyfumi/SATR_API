@@ -1,5 +1,6 @@
 package backend_monolithic.service;
 
+import backend_monolithic.model.Task;
 import backend_monolithic.model.dto.*;
 import backend_monolithic.model.enums.TaskStatus;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +24,16 @@ public interface TaskService {
     TaskResponse updateStatus(Long taskId, TaskStatus newStatus);
 
     PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
+
+    TaskWithContractDTO assignContractToTask(Long taskId, Long contractId);
+
+    TaskWithContractDTO removeContractFromTask(Long taskId);
+
+    TaskWithContractDTO getTaskWithContractInfo(Long taskId);
+
+    List<TaskWithContractDTO> getTasksByContract(Long contractId);
+
+//    TaskWithContractDTO  convertToTaskWithContractDTO(Task task);
 
 
 //    TaskResponse assignUser(Long id, Long userId);
