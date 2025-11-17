@@ -1,6 +1,7 @@
 package backend_monolithic.controller;
 
 import backend_monolithic.model.Contract;
+import backend_monolithic.model.Task;
 import backend_monolithic.model.dto.ContractRequest;
 import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.service.ContractService;
@@ -58,6 +59,7 @@ public class ContractController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PatchMapping("/{id}/comments")
     public ResponseEntity<?> updateComments(@PathVariable Long id, @RequestBody Map<String, String> request) {
         try {
@@ -76,5 +78,24 @@ public class ContractController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    // Новый endpoint для связывания существующей задачи с контрактом
+    @PostMapping("/{contractId}/tasks/{taskId}")
+    public ResponseEntity<?> linkTaskToContract(
+            @PathVariable Long contractId,
+            @PathVariable Long taskId) {
+        try {
+            Task task = contractService.linkTaskToContract(contractId, taskId);
+            return ResponseEntity.ok(task);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Новый endpoint для получения задач без контракта
+    @GetMapping("/available-tasks")
+    public ResponseEntity<List<Task>> getAvailableTasks() {
+        return ResponseEntity.ok(contractService.findTasksWithoutContract());
     }
 }

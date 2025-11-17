@@ -7,6 +7,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import TaskIcon from '@mui/icons-material/Assignment';
+import LinkIcon from '@mui/icons-material/Link';
 import {
     FormControl,
     Select,
@@ -21,13 +23,18 @@ const ContractDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [creatorInfo, setCreatorInfo] = useState(null);
-
+    
     // Состояния для inline-редактирования
     const [editingComments, setEditingComments] = useState(false);
     const [editingPaymentStatus, setEditingPaymentStatus] = useState(false);
     const [tempComments, setTempComments] = useState('');
     const [tempPaymentStatus, setTempPaymentStatus] = useState('');
     const [saving, setSaving] = useState(false);
+
+    // Состояния для связывания задач
+    const [linkTaskDialog, setLinkTaskDialog] = useState(false);
+    const [availableTasks, setAvailableTasks] = useState([]);
+    const [selectedTaskId, setSelectedTaskId] = useState('');
 
     // Статусы оплаты
     const paymentStatusOptions = [
@@ -60,26 +67,72 @@ const ContractDetailsPage = () => {
     // Функция для загрузки информации о создателе договора
     const fetchCreatorInfo = async (userId) => {
         try {
-            // Предполагаем, что есть endpoint для получения информации о пользователе по ID
             const response = await api.get(`/api/users/${userId}`);
             setCreatorInfo(response.data);
         } catch (error) {
             console.error('Error fetching creator info:', error);
-            // Если endpoint недоступен, просто сохраняем ID
             setCreatorInfo({ id: userId });
         }
+    };
+
+    // Функция для загрузки доступных задач (без контракта)
+const fetchAvailableTasks = async () => {
+    try {
+        const response = await api.get('/api/contracts/available-tasks');
+        setAvailableTasks(response.data);
+    } catch (error) {
+        console.error('Error fetching available tasks:', error);
+        alert('Ошибка загрузки доступных задач: ' + (error.response?.data?.message || error.message));
+    }
+};
+
+    // Функция для открытия диалога связывания
+    const openLinkTaskDialog = () => {
+        setLinkTaskDialog(true);
+        fetchAvailableTasks();
+    };
+
+    // Функция для связывания задачи
+    const handleLinkTask = async () => {
+        if (!selectedTaskId) {
+            alert('Выберите задачу для связывания');
+            return;
+        }
+
+        try {
+            await api.post(`/api/contracts/${id}/tasks/${selectedTaskId}`);
+            // Обновляем данные контракта
+            const response = await api.get(`/api/contracts/${id}`);
+            setContract(response.data);
+            setLinkTaskDialog(false);
+            setSelectedTaskId('');
+            alert('Задача успешно связана с договором');
+        } catch (error) {
+            console.error('Error linking task:', error);
+            alert('Ошибка при связывании задачи: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleCreateTask = () => {
+        navigate('/tasks/create', { 
+            state: { contractId: id, contractNumber: contract.number }
+        });
     };
 
     const handleDelete = async () => {
         if (window.confirm('Вы уверены, что хотите удалить этот договор? Это действие нельзя отменить.')) {
             try {
                 await api.delete(`/api/contracts/${id}`);
-                navigate('/api/contracts');
+                navigate('/contracts');
             } catch (error) {
                 console.error('Error deleting contract:', error);
                 alert('Ошибка при удалении договора: ' + (error.response?.data?.message || error.message));
             }
         }
+    };
+
+    const handleTaskClick = (taskId) => {
+        navigate(`/tasks/${taskId}`);
     };
 
     // Функции для комментариев
@@ -193,6 +246,20 @@ const ContractDetailsPage = () => {
                     </div>
                     
                     <div className="header-actions">
+                        <button
+                            onClick={openLinkTaskDialog}
+                            className="link-task-button"
+                        >
+                            <LinkIcon />
+                            Привязать задачу
+                        </button>
+                        <button
+                            onClick={handleCreateTask}
+                            className="create-task-button"
+                        >
+                            <TaskIcon />
+                            Создать задачу
+                        </button>
                         <Link
                             to={`/contracts/edit/${contract.id}`}
                             className="edit-button"
@@ -297,6 +364,103 @@ const ContractDetailsPage = () => {
                             </div>
                         </div>
 
+                        {/* Связанные задачи */}
+                        <div className="detail-section">
+                            <div className="section-header">
+                                <h3>Связанные задачи</h3>
+                                <div className="task-actions">
+                                    <button 
+                                        className="link-task-button"
+                                        onClick={openLinkTaskDialog}
+                                    >
+                                        <LinkIcon />
+                                        Привязать задачу
+                                    </button>
+                                    <button 
+                                        className="create-task-button"
+                                        onClick={handleCreateTask}
+                                    >
+                                        <TaskIcon />
+                                        Создать задачу
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {contract.tasks && contract.tasks.length > 0 ? (
+                                <div className="tasks-list">
+                                    {contract.tasks.map((task) => (
+                                        <div 
+                                            key={task.id}
+                                            className="task-item clickable"
+                                            onClick={() => handleTaskClick(task.id)}
+                                        >
+                                            <div className="task-header">
+                                                <span className="task-number">
+                                                    Задача #{task.number || task.id}
+                                                </span>
+                                                <span className={`task-status ${task.status?.toLowerCase()}`}>
+                                                    {task.status || 'Не указан'}
+                                                </span>
+                                            </div>
+                                            <div className="task-details">
+                                                <div className="task-detail">
+                                                    <span className="task-label">Марка ТС:</span>
+                                                    <span className="task-value">{task.mark || 'Не указана'}</span>
+                                                </div>
+                                                <div className="task-detail">
+                                                    <span className="task-label">Тип ТС:</span>
+                                                    <span className="task-value">{task.typeName || 'Не указан'}</span>
+                                                </div>
+                                                <div className="task-detail">
+                                                    <span className="task-label">Заявитель:</span>
+                                                    <span className="task-value">
+                                                        {task.applicant ? (typeof task.applicant === 'object' ? task.applicant.name : task.applicant) : 'Не указан'}
+                                                    </span>
+                                                </div>
+                                                {task.assignedUser && (
+                                                    <div className="task-detail">
+                                                        <span className="task-label">Эксперт:</span>
+                                                        <span className="task-value">
+                                                            {typeof task.assignedUser === 'object' ? 
+                                                                formatUserName(task.assignedUser) : task.assignedUser}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                {task.createdAt && (
+                                                    <div className="task-detail">
+                                                        <span className="task-label">Дата создания:</span>
+                                                        <span className="task-value">
+                                                            {formatDateTime(task.createdAt)}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="no-tasks-message">
+                                    <p>Нет связанных задач</p>
+                                    <div className="no-tasks-actions">
+                                        <button 
+                                            className="create-task-button primary"
+                                            onClick={handleCreateTask}
+                                        >
+                                            <TaskIcon />
+                                            Создать первую задачу
+                                        </button>
+                                        <button 
+                                            className="link-task-button secondary"
+                                            onClick={openLinkTaskDialog}
+                                        >
+                                            <LinkIcon />
+                                            Привязать существующую задачу
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Комментарии */}
                         <div className="detail-section">
                             <div className="section-header">
@@ -347,35 +511,6 @@ const ContractDetailsPage = () => {
                             )}
                         </div>
 
-                        {/* Связанная задача (если есть) */}
-                        {contract.tasks && (
-                            <div className="detail-section">
-                                <h3>Связанная задача</h3>
-                                <div className="detail-items">
-                                    <div className="detail-item">
-                                        <span className="detail-label">Номер задачи:</span>
-                                        <span className="detail-value">
-                                            {contract.tasks.number || `#${contract.tasks.id}`}
-                                        </span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="detail-label">Марка ТС:</span>
-                                        <span className="detail-value">{contract.tasks.mark}</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="detail-label">Тип ТС:</span>
-                                        <span className="detail-value">{contract.tasks.typeName}</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <span className="detail-label">Статус задачи:</span>
-                                        <span className="detail-value">
-                                            {contract.tasks.status || 'Не указан'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
                         {/* Мета-информация */}
                         <div className="detail-section">
                             <h3>Системная информация</h3>
@@ -405,6 +540,50 @@ const ContractDetailsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Диалог для связывания задачи */}
+            {linkTaskDialog && (
+                <div className="dialog-overlay">
+                    <div className="dialog-content">
+                        <h3>Привязать существующую задачу</h3>
+                        <div className="dialog-body">
+                            <label>Выберите задачу:</label>
+                            <select 
+                                value={selectedTaskId} 
+                                onChange={(e) => setSelectedTaskId(e.target.value)}
+                                className="task-select"
+                            >
+                                <option value="">Выберите задачу...</option>
+                                {availableTasks.map(task => (
+                                    <option key={task.id} value={task.id}>
+                                        {task.number} - {task.mark} - {task.typeName}
+                                    </option>
+                                ))}
+                            </select>
+                            {availableTasks.length === 0 && (
+                                <p className="no-tasks-available">
+                                    Нет доступных задач для привязки. Все задачи уже привязаны к договорам.
+                                </p>
+                            )}
+                        </div>
+                        <div className="dialog-actions">
+                            <button 
+                                onClick={handleLinkTask} 
+                                className="primary-button"
+                                disabled={!selectedTaskId}
+                            >
+                                Привязать
+                            </button>
+                            <button 
+                                onClick={() => setLinkTaskDialog(false)} 
+                                className="secondary-button"
+                            >
+                                Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -388,6 +388,96 @@
         gap: 10px;
         align-items: flex-start;
     }
+
+    /* Стили для кнопки привязки задачи */
+.link-task-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.link-task-button:hover {
+    background: #388e3c;
+}
+
+/* Стили для диалога */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.dialog-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 400px;
+    max-width: 500px;
+}
+
+.dialog-content h3 {
+    margin-bottom: 20px;
+    color: var(--deep-frost);
+}
+
+.dialog-body {
+    margin-bottom: 20px;
+}
+
+.dialog-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.task-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--silver-accent);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.primary-button {
+    padding: 10px 20px;
+    background: var(--deep-frost);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.secondary-button {
+    padding: 10px 20px;
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+}
 }
 
 @media (max-width: 480px) {

@@ -1,5 +1,6 @@
 package backend_monolithic.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,49 +19,47 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "tasks")
 public class Task {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
-    private String number;   //  номер заявки, присваивается при регистрации
+    private String number;
 
-    private String docType;   // ОТТС/ОТШ
-
-    @ManyToOne
-    private Applicant applicant;   // заявитель
+    private String docType;
 
     @ManyToOne
-    private Manufacturer manufacturer;   // изготовитель
-
-    private List<String> categories;   // категории
-
-    private String mark;  // марка
-
-    private String typeName;  // наименование типа
-
-    private String processType;  // процедура
-
-    private String previousNumber; // номер предыдущего / процедура
-
-    private String previousProcessType;  // процедура распространения?
+    private Applicant applicant;
 
     @ManyToOne
-    private Representative representative;  // представитель изготовителя
+    private Manufacturer manufacturer;
 
-    private Long createdBy;   // кем создана
+    private List<String> categories;
+    private String mark;
+    private String typeName;
+    private String processType;
+    private String previousNumber;
+    private String previousProcessType;
 
-    private Long assignedUserId;   // назначен для работы по заявке
+    @ManyToOne
+    private Representative representative;
 
-    private TaskStatus status;   // статус
-
-    private LocalDateTime createdAt;   // дата время создания заявки
-    
-    private LocalDate decisionAt;   // дата решения по заявке
+    private Long createdBy;
+    private Long assignedUserId;
+    private TaskStatus status;
+    private LocalDateTime createdAt;
+    private LocalDate decisionAt;
 
     @ManyToOne
     @JoinColumn(name = "contract_id")
-    private Contract contract;   // добавленная связь с договором
+    @JsonBackReference // Добавляем для корректной сериализации
+    private Contract contract;
 
+    // Хелпер-метод для установки контракта
+    public void setContract(Contract contract) {
+        this.contract = contract;
+        if (contract != null && !contract.getTasks().contains(this)) {
+            contract.getTasks().add(this);
+        }
+    }
 }

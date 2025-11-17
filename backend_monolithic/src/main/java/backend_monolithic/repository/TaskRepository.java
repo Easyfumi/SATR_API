@@ -29,5 +29,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findByContractId(Long contractId);
 
+    // Метод для поиска задач без привязанного контракта
     List<Task> findByContractIsNull();
 }

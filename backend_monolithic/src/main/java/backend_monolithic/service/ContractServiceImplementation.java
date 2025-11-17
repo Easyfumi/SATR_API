@@ -29,10 +29,12 @@ public class ContractServiceImplementation implements ContractService {
         return contractRepository.findAll();
     }
 
+    // Используем метод с задачами
     public Optional<Contract> findById(Long id) {
-        return contractRepository.findById(id);
+        return contractRepository.findByIdWithTasks(id);
     }
 
+    // Остальные методы остаются без изменений...
     public Contract save(ContractRequest request, String jwt) {
         // Проверка уникальности номера
         if (contractRepository.existsByNumber(request.getNumber())) {
@@ -42,7 +44,6 @@ public class ContractServiceImplementation implements ContractService {
         Contract contract = new Contract();
         User user = userService.getUserProfile(jwt);
         UserInfo userInfo = new UserInfo(user);
-
 
         contract.setCreatedBy(userInfo.getId());
         contract.setCreatedAt(LocalDateTime.now());
@@ -59,15 +60,16 @@ public class ContractServiceImplementation implements ContractService {
         return contractRepository.save(contract);
     }
 
-        public Applicant getOrCreateApplicant(String applicantName) {
-            return applicantRepository.findByName(applicantName)
-                    .orElseGet(() -> {
-                        Applicant newApplicant = new Applicant(applicantName);
-                        return applicantRepository.save(newApplicant);
-                    });
-        }
+    public Applicant getOrCreateApplicant(String applicantName) {
+        return applicantRepository.findByName(applicantName)
+                .orElseGet(() -> {
+                    Applicant newApplicant = new Applicant(applicantName);
+                    return applicantRepository.save(newApplicant);
+                });
+    }
 
     public Contract update(Long id, ContractRequest contractDetails) {
+        // Используем обычный findById без задач для обновления
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
 
@@ -94,7 +96,7 @@ public class ContractServiceImplementation implements ContractService {
 
     @Override
     public void deleteById(Long id) {
-
+        contractRepository.deleteById(id);
     }
 
     public Contract updateComments(Long id, String comments) {
@@ -109,5 +111,24 @@ public class ContractServiceImplementation implements ContractService {
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
         contract.setPaymentStatus(paymentStatus);
         return contractRepository.save(contract);
+    }
+
+    // Метод для связывания задачи с контрактом
+    public Task linkTaskToContract(Long contractId, Long taskId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + contractId));
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
+
+        // Связываем задачу с контрактом
+        task.setContract(contract);
+
+        return taskRepository.save(task);
+    }
+
+    // Метод для получения задач без контракта
+    public List<Task> findTasksWithoutContract() {
+        return taskRepository.findByContractIsNull();
     }
 }
