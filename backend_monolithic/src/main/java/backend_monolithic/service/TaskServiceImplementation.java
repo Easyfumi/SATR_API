@@ -260,11 +260,21 @@ public class TaskServiceImplementation implements TaskService {
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus().name());
 
+        // Обработка createdBy
         Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
         if (createdBy.isPresent()) {
             response.setCreatedBy(createdBy.get().getFirstName() + " "
                     + createdBy.get().getSecondName().charAt(0) + "."
                     + createdBy.get().getPatronymic().charAt(0) + ".");
+        }
+
+        // Добавляем маппинг договора
+        if (task.getContract() != null) {
+            ContractInfo contractInfo = new ContractInfo();
+            contractInfo.setId(task.getContract().getId());
+            contractInfo.setNumber(task.getContract().getNumber());
+
+            response.setContract(contractInfo);
         }
 
         return response;

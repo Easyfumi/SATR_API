@@ -26,6 +26,7 @@ public class TaskResponse {
     private LocalDateTime createdAt;
     private LocalDate decisionAt;
     private Boolean paymentStatus;
+    private ContractInfo contract;
 }
 
 
