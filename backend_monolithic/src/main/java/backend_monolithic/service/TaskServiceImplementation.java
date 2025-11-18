@@ -5,6 +5,7 @@ import backend_monolithic.config.TaskSpecifications;
 import backend_monolithic.error.BusinessException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
+import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -268,11 +269,14 @@ public class TaskServiceImplementation implements TaskService {
                     + createdBy.get().getPatronymic().charAt(0) + ".");
         }
 
-        // Добавляем маппинг договора
+        // Обновленный маппинг договора с новыми полями
         if (task.getContract() != null) {
             ContractInfo contractInfo = new ContractInfo();
             contractInfo.setId(task.getContract().getId());
             contractInfo.setNumber(task.getContract().getNumber());
+            contractInfo.setDate(task.getContract().getDate());
+            contractInfo.setPaymentStatus(task.getContract().getPaymentStatus());
+            contractInfo.setApplicant(task.getContract().getApplicant());
 
             response.setContract(contractInfo);
         }
@@ -359,7 +363,7 @@ public class TaskServiceImplementation implements TaskService {
             contractInfo.setNumber(contract.getNumber());
             contractInfo.setDate(contract.getDate());
             contractInfo.setPaymentStatus(contract.getPaymentStatus());
-            contractInfo.setApplicantName(contract.getApplicant().getName()); // предполагая, что у Applicant есть поле name
+            contractInfo.setApplicantName(contract.getApplicant() != null ? contract.getApplicant().getName() : null);
 
             dto.setContract(contractInfo);
         }
@@ -367,5 +371,26 @@ public class TaskServiceImplementation implements TaskService {
         return dto;
     }
 
+
+    public TaskResponse updateTask(Long taskId, TaskRequest request) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+
+        // Обновляем только разрешенные поля
+        task.setDocType(request.getDocType());
+        task.setApplicant(getOrCreateApplicant(request.getApplicantName()));
+        task.setManufacturer(getOrCreateManufacturer(request.getManufacturerName()));
+        task.setCategories(request.getCategories());
+        task.setMark(request.getMark());
+        task.setTypeName(request.getTypeName());
+        task.setPreviousProcessType(request.getPreviousProcessType());
+        task.setPreviousNumber(request.getPreviousNumber());
+        task.setProcessType(request.getProcessType());
+        task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
+        task.setAssignedUserId(request.getAssignedUserId());
+
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
+    }
 }
 

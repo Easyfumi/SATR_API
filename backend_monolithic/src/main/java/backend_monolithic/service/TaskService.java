@@ -33,13 +33,6 @@ public interface TaskService {
 
     List<TaskWithContractDTO> getTasksByContract(Long contractId);
 
-//    TaskWithContractDTO  convertToTaskWithContractDTO(Task task);
-
-
-//    TaskResponse assignUser(Long id, Long userId);
-//    List<TaskResponse> filterTasks(String status, List<String> categories);
-//    TaskResponse updateTask(Long id, TaskRequest request);
-//    void deleteTask(Long id);
-//    TaskResponse changeStatus(Long id, String status);
+    TaskResponse updateTask(Long taskId, TaskRequest request);
 
 }

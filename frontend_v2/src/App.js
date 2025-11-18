@@ -11,6 +11,7 @@ import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
 import UserDetailPage from './pages/users/UserDetailPage';
 import TaskListPage from './pages/tasks/TaskListPage';
+import TaskEditPage from './pages/tasks/TaskEditPage';
 import CreateTaskPage from './pages/tasks/CreateTaskPage';
 import DeclarationPage from './pages/declaration/DeclarationPage';
 import CertificatesPage from './pages/certificates/CertificatesPage';
@@ -60,6 +61,8 @@ function App() {
             <Route path="/contracts/create" element={<CreateContractPage />} />
             <Route path="/contracts/:id" element={<ContractDetailsPage />} />
             <Route path="/contracts/edit/:id" element={<EditContractPage />} />
+            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
+<Route path="/tasks/edit/:id" element={<TaskEditPage />} />
           </Route>
 
           {/* Fallback для несуществующих маршрутов */}

@@ -1,0 +1,367 @@
+/* Общие стили для страницы редактирования */
+.edit-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--silver-accent);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Стили для полей ввода в режиме редактирования */
+.edit-form-control {
+  margin-top: 4px;
+}
+
+.edit-form-control .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.edit-text-field .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.edit-form-control .MuiSelect-select,
+.edit-text-field .MuiOutlinedInput-input {
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+/* Стили для выбранных значений */
+.selected-process {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+.placeholder-text {
+  color: #999;
+  font-style: italic;
+}
+
+.process-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.selected-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 20px;
+}
+
+.category-chip {
+  background: #e3f2fd;
+  color: #1976d2;
+  font-size: 0.75rem;
+  height: 24px;
+}
+
+/* Чекбоксы */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.checkbox-container .MuiCheckbox-root {
+  padding: 4px 8px 4px 4px;
+}
+
+.checkbox-container span {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .edit-page-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .edit-actions {
+    justify-content: center;
+  }
+
+  .card-content {
+    flex-direction: column;
+  }
+  
+  .vertical-divider {
+    display: none;
+  }
+
+  .task-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .task-label {
+    min-width: auto;
+    margin-right: 0;
+  }
+
+  .edit-form-control,
+  .edit-text-field {
+    width: 100%;
+  }
+
+  .contract-display {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contract-actions {
+    align-self: stretch;
+  }
+
+  .contract-actions button {
+    width: 100%;
+  }
+}
+
+/* Совместимость со стилями TaskDetailsPage */
+.task-details-card {
+  background: #fff;
+  border: 1px solid #dde4ec;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.card-content {
+  display: flex;
+  gap: 25px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: #f0f4f8;
+  margin: 0 10px;
+}
+
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.task-row:last-child {
+  border-bottom: none;
+}
+
+.task-label {
+  color: #6b7c93;
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-width: 160px;
+  margin-right: 15px;
+  padding-top: 12px;
+}
+
+.task-value {
+  color: #1a2a3a;
+  font-size: 1rem;
+  font-weight: 500;
+  flex-grow: 1;
+  padding-top: 12px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.received { background: #e3f2fd; color: #1976d2; }
+.status-badge.registered { background: #fff3e0; color: #ef6c00; }
+.status-badge.decision_done { background: #e8f5e9; color: #2e7d32; }
+.status-badge.documents_waiting { background: #fff9c4; color: #f57f17; }
+.status-badge.rejection { background: #ffcdd2; color: #c62828; }
+.status-badge.cancelled { background: #f5f5f5; color: #616161; }
+.status-badge.project { background: #e1bee7; color: #6a1b9a; }
+.status-badge.signed { background: #c8e6c9; color: #2e7d32; }
+.status-badge.for_revision { background: #ffe0b2; color: #ef6c00; }
+.status-badge.completed { background: #dcedc8; color: #689f38; }
+
+/* Стили для договора */
+.contract-selection {
+  width: 100%;
+}
+
+.contract-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  width: 100%;
+}
+
+.contract-info {
+  flex: 1;
+}
+
+.contract-number {
+  font-weight: 600;
+  color: #2a4a68;
+  margin-bottom: 8px;
+}
+
+.contract-details {
+  margin-top: 8px;
+}
+
+.contract-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.contract-detail:last-child {
+  margin-bottom: 0;
+}
+
+.contract-detail-label {
+  color: #6c757d;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.contract-detail-value {
+  color: #495057;
+  text-align: right;
+  flex: 1;
+}
+
+.payment-status-paidfor {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.payment-status-partiallypaidfor {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.payment-status-notpaidfor {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.contract-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Меню договора */
+.contract-menu {
+  max-height: 300px;
+  width: 400px;
+}
+
+.contract-menu-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.contract-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.contract-menu-item:last-child {
+  border-bottom: none;
+}
+
+.contract-item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.contract-item-number {
+  font-weight: 600;
+  color: #2a4a68;
+  margin-bottom: 4px;
+}
+
+.contract-item-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.contract-search-container {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contract-search-field {
+  width: 100%;
+}
+
+.contracts-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  padding: 16px;
+}
+
+.no-contracts-message {
+  padding: 16px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.contract-applicant {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Кнопка "Назад" */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2a4a68;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background: #f0f4f8;
+  transform: translateX(-3px);
+}

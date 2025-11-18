@@ -2,6 +2,7 @@ package backend_monolithic.controller;
 
 import backend_monolithic.model.dto.*;
 import backend_monolithic.model.enums.TaskStatus;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -156,6 +157,20 @@ public class TaskController {
 
         PageResponse<TaskResponse> response = taskService.getFilteredTasks(filter, jwt, page, size);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTask(
+            @PathVariable Long id,
+            @RequestBody TaskRequest request) {
+        try {
+            TaskResponse response = taskService.updateTask(id, request);
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
 
