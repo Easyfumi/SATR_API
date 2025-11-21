@@ -10,12 +10,19 @@ import {
   Menu,
   MenuItem,
   InputAdornment,
-  IconButton
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
+import LinkIcon from '@mui/icons-material/Link';
+import UnlinkIcon from '@mui/icons-material/LinkOff';
 
 const TaskDetailsPage = () => {
   const { id } = useParams();
@@ -33,14 +40,18 @@ const TaskDetailsPage = () => {
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  // Состояния для управления договором
+  // Состояния для управления договорами (many-to-many)
   const [contracts, setContracts] = useState([]);
   const [filteredContracts, setFilteredContracts] = useState([]);
+  const [contractLinks, setContractLinks] = useState([]);
   const [contractAnchorEl, setContractAnchorEl] = useState(null);
   const [isLoadingContracts, setIsLoadingContracts] = useState(false);
   const [contractError, setContractError] = useState(null);
   const [isUpdatingContract, setIsUpdatingContract] = useState(false);
   const [contractSearch, setContractSearch] = useState('');
+  const [linkComment, setLinkComment] = useState('');
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [selectedContractId, setSelectedContractId] = useState('');
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -62,24 +73,32 @@ const TaskDetailsPage = () => {
   };
 
   useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const response = await api.get(`/api/tasks/${id}`);
-        setTask(response.data);
-        setSelectedStatus(response.data.status);
-        setError(null);
-      } catch (err) {
-        console.error('Ошибка загрузки задачи:', err);
-        setError('Не удалось загрузить данные задачи');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTask();
+    fetchTaskWithContracts();
   }, [id]);
 
-  // Загрузка всех договоров для поиска по номеру
+  // Функция для загрузки задачи с договорами
+  const fetchTaskWithContracts = async () => {
+    try {
+      setLoading(true);
+      // Загружаем основную информацию о задаче
+      const taskResponse = await api.get(`/api/tasks/${id}`);
+      setTask(taskResponse.data);
+      setSelectedStatus(taskResponse.data.status);
+      
+      // Загружаем связанные договоры через новый endpoint
+      const contractsResponse = await api.get(`/api/task-contract-links/task/${id}/contracts`);
+      setContractLinks(contractsResponse.data);
+      
+      setError(null);
+    } catch (err) {
+      console.error('Ошибка загрузки задачи:', err);
+      setError('Не удалось загрузить данные задачи');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Загрузка всех договоров для поиска
   const fetchAllContracts = async () => {
     setIsLoadingContracts(true);
     setContractError(null);
@@ -110,6 +129,8 @@ const TaskDetailsPage = () => {
   const handleContractButtonClick = async (event) => {
     setContractAnchorEl(event.currentTarget);
     setContractSearch('');
+    setSelectedContractId('');
+    setLinkComment('');
     await fetchAllContracts();
   };
 
@@ -129,26 +150,53 @@ const TaskDetailsPage = () => {
     setFilteredContracts(contracts);
   };
 
-  const handleContractSelect = async (contractId) => {
+  const handleContractSelect = (contractId) => {
+    setSelectedContractId(contractId);
+    setContractAnchorEl(null);
+    setLinkDialogOpen(true);
+  };
+
+  // Функция для привязки договора к задаче
+  const handleLinkContract = async () => {
+    if (!selectedContractId) {
+      alert('Выберите договор для привязки');
+      return;
+    }
+
     setIsUpdatingContract(true);
     try {
-      const response = await api.put(`/api/tasks/${id}/contract`, { contractId });
-      setTask(response.data);
+      await api.post('/api/task-contract-links/link', {
+        taskId: id,
+        contractId: selectedContractId,
+        comment: linkComment
+      });
+      
+      // Обновляем данные
+      await fetchTaskWithContracts();
+      setLinkDialogOpen(false);
+      setSelectedContractId('');
+      setLinkComment('');
       alert('Договор успешно привязан к задаче');
     } catch (error) {
       console.error('Ошибка привязки договора:', error);
       alert(error.response?.data?.message || 'Произошла ошибка при привязке договора');
     } finally {
       setIsUpdatingContract(false);
-      handleContractMenuClose();
     }
   };
 
-  const handleRemoveContract = async () => {
+  // Функция для отвязки договора от задачи
+  const handleUnlinkContract = async (contractId) => {
+    if (!window.confirm('Вы уверены, что хотите отвязать договор от задачи?')) {
+      return;
+    }
+
     setIsUpdatingContract(true);
     try {
-      const response = await api.delete(`/api/tasks/${id}/contract`);
-      setTask(response.data);
+      await api.delete(`/api/task-contract-links/unlink/task/${id}/contract/${contractId}`);
+      
+      // Обновляем данные
+      await fetchTaskWithContracts();
       alert('Договор успешно отвязан от задачи');
     } catch (error) {
       console.error('Ошибка отвязки договора:', error);
@@ -462,158 +510,205 @@ const TaskDetailsPage = () => {
         </div>
       </div>
 
+      {/* Блок договоров (many-to-many) */}
       <div className="task-details-card">
-        {/* Меню выбора статуса */}
-        <Menu
-          anchorEl={statusAnchorEl}
-          open={Boolean(statusAnchorEl)}
-          onClose={handleStatusMenuClose}
-          className="status-menu"
-        >
-          {Object.entries(statusLabels).map(([key, label]) => (
-            <MenuItem
-              key={key}
-              onClick={() => handleStatusSelect(key)}
-              selected={selectedStatus === key}
-            >
-              {label}
-            </MenuItem>
-          ))}
-        </Menu>
-
-        {/* Меню выбора договора с поиском */}
-        <Menu
-          anchorEl={contractAnchorEl}
-          open={Boolean(contractAnchorEl)}
-          onClose={handleContractMenuClose}
-          className="contract-menu"
-        >
-          <div className="contract-search-container">
-            <TextField
-              className="contract-search-field"
-              placeholder="Поиск по номеру договора..."
-              value={contractSearch}
-              onChange={handleContractSearchChange}
-              variant="outlined"
-              size="small"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: contractSearch && (
-                  <InputAdornment position="end">
-                    <IconButton size="small" onClick={handleClearSearch}>
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-
-          {isLoadingContracts ? (
-            <div className="contracts-loading">
-              <CircularProgress size={20} />
-              <span>Загрузка договоров...</span>
-            </div>
-          ) : filteredContracts.length === 0 ? (
-            <div className="no-contracts-message">
-              {contractSearch ? 'Договоры не найдены' : 'Нет доступных договоров'}
-            </div>
-          ) : (
-            filteredContracts.map((contract) => (
-              <MenuItem
-                key={contract.id}
-                onClick={() => handleContractSelect(contract.id)}
-                className="contract-menu-item"
-              >
-                <div className="contract-item-details">
-                  <div className="contract-item-number">
-                    {contract.number}
-                  </div>
-                  <div className="contract-item-info">
-                    <span>от {formatDate(contract.date)}</span>
-                    <span>{getPaymentStatusLabel(contract.paymentStatus)}</span>
-                  </div>
-                  {contract.applicant && (
-                    <div className="contract-applicant">
-                      Заявитель: {contract.applicant.name || contract.applicant}
-                    </div>
-                  )}
-                </div>
-              </MenuItem>
-            ))
-          )}
-        </Menu>
-
-        <div className="task-row">
-          <span className="task-label">Статус оплаты</span>
-          <span className={`details-payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
-            {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
-          </span>
-        </div>
-
-        {/* Блок выбора договора */}
-        <div className="task-row">
-          <span className="task-label">Договор</span>
-          <div className="contract-selection">
-            {task.contract ? (
-              <div className="contract-display">
-                <div className="contract-info">
-                  <div className="contract-number">
-                    {task.contract.number}
-                  </div>
-                  <div className="contract-details">
-                    <div className="contract-detail">
-                      <span className="contract-detail-label">Дата:</span>
-                      <span className="contract-detail-value">{formatDate(task.contract.date)}</span>
-                    </div>
-                    <div className="contract-detail">
-                      <span className="contract-detail-label">Статус оплаты:</span>
-                      <span className={`contract-detail-value payment-status-${task.contract.paymentStatus?.toLowerCase()}`}>
-                        {getPaymentStatusLabel(task.contract.paymentStatus)}
-                      </span>
-                    </div>
-                    {task.contract.applicant && (
-                      <div className="contract-detail">
-                        <span className="contract-detail-label">Заявитель:</span>
-                        <span className="contract-detail-value">
-                          {typeof task.contract.applicant === 'object'
-                            ? task.contract.applicant.name
-                            : task.contract.applicant}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
+        <div className="task-row contract-section">
+          <span className="task-label">Договоры</span>
+          <div className="contracts-container">
+            <div className="contracts-header">
               <Button
                 variant="outlined"
                 onClick={handleContractButtonClick}
                 disabled={isUpdatingContract}
-                startIcon={<SearchIcon />}
+                startIcon={<LinkIcon />}
                 endIcon={<ArrowDropDownIcon />}
               >
-                {isUpdatingContract ? 'Загрузка...' : 'Выбрать договор'}
+                Привязать договор
               </Button>
+            </div>
+
+            {contractLinks.length > 0 ? (
+              <div className="contracts-list">
+                {contractLinks.map((link) => (
+                  <div key={link.id} className="contract-item">
+                    <div className="contract-info">
+                      <div className="contract-number">
+                        {link.contractNumber}
+                      </div>
+                      <div className="contract-details">
+                        <div className="contract-detail">
+                          <span className="contract-detail-label">Дата:</span>
+                          <span className="contract-detail-value">{formatDate(link.contractDate)}</span>
+                        </div>
+                        <div className="contract-detail">
+                          <span className="contract-detail-label">Статус оплаты:</span>
+                          <span className={`contract-detail-value payment-status-${link.paymentStatus?.toLowerCase()}`}>
+                            {getPaymentStatusLabel(link.paymentStatus)}
+                          </span>
+                        </div>
+                        {link.linkComment && (
+                          <div className="contract-detail">
+                            <span className="contract-detail-label">Комментарий:</span>
+                            <span className="contract-detail-value">{link.linkComment}</span>
+                          </div>
+                        )}
+                        {link.linkedAt && (
+                          <div className="contract-detail">
+                            <span className="contract-detail-label">Привязан:</span>
+                            <span className="contract-detail-value">{formatDateTime(link.linkedAt)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      startIcon={<UnlinkIcon />}
+                      onClick={() => handleUnlinkContract(link.contractId)}
+                      disabled={isUpdatingContract}
+                    >
+                      Отвязать
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="no-contracts-message">
+                <p>Нет привязанных договоров</p>
+              </div>
             )}
           </div>
         </div>
-
       </div>
-      <div className="task-row">
-        <div className="column right-column">
-        </div>
+
+      <div className="task-actions-footer">
         <Link to={`/tasks/edit/${task.id}`} className="edit-button">
           <EditIcon />
           Редактировать
         </Link>
       </div>
-    </div>
 
+      {/* Меню выбора статуса */}
+      <Menu
+        anchorEl={statusAnchorEl}
+        open={Boolean(statusAnchorEl)}
+        onClose={handleStatusMenuClose}
+        className="status-menu"
+      >
+        {Object.entries(statusLabels).map(([key, label]) => (
+          <MenuItem
+            key={key}
+            onClick={() => handleStatusSelect(key)}
+            selected={selectedStatus === key}
+          >
+            {label}
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {/* Меню выбора договора с поиском */}
+      <Menu
+        anchorEl={contractAnchorEl}
+        open={Boolean(contractAnchorEl)}
+        onClose={handleContractMenuClose}
+        className="contract-menu"
+      >
+        <div className="contract-search-container">
+          <TextField
+            className="contract-search-field"
+            placeholder="Поиск по номеру договора..."
+            value={contractSearch}
+            onChange={handleContractSearchChange}
+            variant="outlined"
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: contractSearch && (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={handleClearSearch}>
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+
+        {isLoadingContracts ? (
+          <div className="contracts-loading">
+            <CircularProgress size={20} />
+            <span>Загрузка договоров...</span>
+          </div>
+        ) : filteredContracts.length === 0 ? (
+          <div className="no-contracts-message">
+            {contractSearch ? 'Договоры не найдены' : 'Нет доступных договоров'}
+          </div>
+        ) : (
+          filteredContracts.map((contract) => (
+            <MenuItem
+              key={contract.id}
+              onClick={() => handleContractSelect(contract.id)}
+              className="contract-menu-item"
+            >
+              <div className="contract-item-details">
+                <div className="contract-item-number">
+                  {contract.number}
+                </div>
+                <div className="contract-item-info">
+                  <span>от {formatDate(contract.date)}</span>
+                  <span>{getPaymentStatusLabel(contract.paymentStatus)}</span>
+                </div>
+                {contract.applicant && (
+                  <div className="contract-applicant">
+                    Заявитель: {contract.applicant.name || contract.applicant}
+                  </div>
+                )}
+              </div>
+            </MenuItem>
+          ))
+        )}
+      </Menu>
+
+      {/* Диалог привязки договора */}
+      <Dialog 
+        open={linkDialogOpen} 
+        onClose={() => setLinkDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          Привязать договор к задаче
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Комментарий связи (необязательно)"
+            value={linkComment}
+            onChange={(e) => setLinkComment(e.target.value)}
+            multiline
+            rows={3}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLinkDialogOpen(false)}>
+            Отмена
+          </Button>
+          <Button 
+            onClick={handleLinkContract}
+            variant="contained"
+            disabled={isUpdatingContract}
+          >
+            {isUpdatingContract ? <CircularProgress size={24} /> : 'Привязать'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 };
 

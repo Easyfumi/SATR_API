@@ -4,6 +4,7 @@ import backend_monolithic.model.Applicant;
 import backend_monolithic.model.Contract;
 import backend_monolithic.model.Task;
 import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.dto.ContractResponse;
 import backend_monolithic.model.enums.PaymentStatus;
 
 import java.util.List;
@@ -19,6 +20,6 @@ public interface ContractService {
     Contract updateComments(Long id, String comments);
     public Contract updatePaymentStatus(Long id, PaymentStatus paymentStatus);
     // Task createTaskForContract(Long contractId, Task taskRequest, String jwt);
-    Task linkTaskToContract(Long contractId, Long taskId);
-    List<Task> findTasksWithoutContract();
+ //   ContractResponse getContractWithTasks(Long id);
+
 }

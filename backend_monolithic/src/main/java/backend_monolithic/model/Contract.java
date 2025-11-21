@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -35,23 +36,41 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    // Важно: убрать @JsonIgnore или настроить корректно
     @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // Добавляем для корректной сериализации
-    private List<Task> tasks = new ArrayList<>();
+    @JsonManagedReference("contract-task")
+    private List<TaskContract> taskContracts = new ArrayList<>();
 
     private String comments;
     private Long createdBy;
     private LocalDateTime createdAt;
 
-    // Хелпер-метод для синхронизации связей
-    public void addTask(Task task) {
-        tasks.add(task);
-        task.setContract(this);
+    // Хелпер-методы для работы со связями
+    public void addTask(Task task, Long linkedBy, String comment) {
+        TaskContract taskContract = new TaskContract();
+        taskContract.setContract(this);
+        taskContract.setTask(task);
+        taskContract.setLinkedBy(linkedBy);
+        taskContract.setLinkComment(comment);
+        this.taskContracts.add(taskContract);
+        task.getTaskContracts().add(taskContract);
     }
 
     public void removeTask(Task task) {
-        tasks.remove(task);
-        task.setContract(null);
+        TaskContract taskContract = this.taskContracts.stream()
+                .filter(tc -> tc.getTask().equals(task))
+                .findFirst()
+                .orElse(null);
+        if (taskContract != null) {
+            this.taskContracts.remove(taskContract);
+            task.getTaskContracts().remove(taskContract);
+            taskContract.setContract(null);
+            taskContract.setTask(null);
+        }
+    }
+
+    public List<Task> getTasks() {
+        return this.taskContracts.stream()
+                .map(TaskContract::getTask)
+                .collect(Collectors.toList());
     }
 }

@@ -1,40 +1,44 @@
 package backend_monolithic.service;
 
-import backend_monolithic.model.Applicant;
-import backend_monolithic.model.Contract;
-import backend_monolithic.model.Task;
-import backend_monolithic.model.User;
+import backend_monolithic.model.*;
 import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.dto.ContractResponse;
+import backend_monolithic.model.dto.TaskInfo;
 import backend_monolithic.model.dto.UserInfo;
 import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.repository.ApplicantRepository;
 import backend_monolithic.repository.ContractRepository;
 import backend_monolithic.repository.TaskRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class ContractServiceImplementation implements ContractService {
     private final ContractRepository contractRepository;
-    private final TaskRepository taskRepository;
+    // УДАЛЯЕМ taskRepository, так как связь теперь через TaskContractLinkService
+    // private final TaskRepository taskRepository;
     private final ApplicantRepository applicantRepository;
     private final UserService userService;
+    private final TaskContractLinkService taskContractLinkService; // Добавляем новый сервис
 
     public List<Contract> findAll() {
         return contractRepository.findAll();
     }
 
-    // Используем метод с задачами
+    // Используем метод с задачами через связь many-to-many
     public Optional<Contract> findById(Long id) {
         return contractRepository.findByIdWithTasks(id);
     }
 
-    // Остальные методы остаются без изменений...
     public Contract save(ContractRequest request, String jwt) {
         // Проверка уникальности номера
         if (contractRepository.existsByNumber(request.getNumber())) {
@@ -69,7 +73,6 @@ public class ContractServiceImplementation implements ContractService {
     }
 
     public Contract update(Long id, ContractRequest contractDetails) {
-        // Используем обычный findById без задач для обновления
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Contract not found with id: " + id));
 
@@ -113,22 +116,22 @@ public class ContractServiceImplementation implements ContractService {
         return contractRepository.save(contract);
     }
 
-    // Метод для связывания задачи с контрактом
+    // УДАЛЯЕМ старые методы для связывания задач
+    /*
     public Task linkTaskToContract(Long contractId, Long taskId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("Contract not found with id: " + contractId));
-
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found with id: " + taskId));
-
-        // Связываем задачу с контрактом
-        task.setContract(contract);
-
-        return taskRepository.save(task);
+        // Этот метод больше не используется
     }
 
     // Метод для получения задач без контракта
     public List<Task> findTasksWithoutContract() {
         return taskRepository.findByContractIsNull();
+    }
+    */
+
+    // НОВЫЙ метод для получения задач без договоров через связь many-to-many
+    public List<Task> findTasksWithoutContracts() {
+        // Используем TaskContractLinkService или напрямую TaskRepository
+        // Временно возвращаем пустой список, нужно реализовать в TaskContractLinkService
+        return Collections.emptyList();
     }
 }

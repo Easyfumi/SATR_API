@@ -1,12 +1,17 @@
 package backend_monolithic.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskResponse {
     private Long id;
     private String number;
@@ -17,16 +22,17 @@ public class TaskResponse {
     private String mark;
     private String typeName;
     private String processType;
-    private String representative;
-    private String createdBy;
-    private UserInfo assignedUser;
-    private String status;
     private String previousProcessType;
     private String previousNumber;
-    private LocalDateTime createdAt;
+    private String representative;
     private LocalDate decisionAt;
-    private Boolean paymentStatus;
-    private ContractInfo contract;
+    private LocalDateTime createdAt;
+    private String status;
+    private String createdBy;
+    private UserInfo assignedUser;
+
+    // Заменяем одиночный Contract на список
+    private List<ContractInfo> contracts = new ArrayList<>();
 }
 
 

@@ -25,13 +25,6 @@ public interface TaskService {
 
     PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
 
-    TaskWithContractDTO assignContractToTask(Long taskId, Long contractId);
-
-    TaskWithContractDTO removeContractFromTask(Long taskId);
-
-    TaskWithContractDTO getTaskWithContractInfo(Long taskId);
-
-    List<TaskWithContractDTO> getTasksByContract(Long contractId);
 
     TaskResponse updateTask(Long taskId, TaskRequest request);
 

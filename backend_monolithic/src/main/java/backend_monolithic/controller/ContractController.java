@@ -80,22 +80,22 @@ public class ContractController {
         }
     }
 
-    // Новый endpoint для связывания существующей задачи с контрактом
-    @PostMapping("/{contractId}/tasks/{taskId}")
-    public ResponseEntity<?> linkTaskToContract(
-            @PathVariable Long contractId,
-            @PathVariable Long taskId) {
-        try {
-            Task task = contractService.linkTaskToContract(contractId, taskId);
-            return ResponseEntity.ok(task);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    // Новый endpoint для получения задач без контракта
-    @GetMapping("/available-tasks")
-    public ResponseEntity<List<Task>> getAvailableTasks() {
-        return ResponseEntity.ok(contractService.findTasksWithoutContract());
-    }
+//    // Новый endpoint для связывания существующей задачи с контрактом
+//    @PostMapping("/{contractId}/tasks/{taskId}")
+//    public ResponseEntity<?> linkTaskToContract(
+//            @PathVariable Long contractId,
+//            @PathVariable Long taskId) {
+//        try {
+//            Task task = contractService.linkTaskToContract(contractId, taskId);
+//            return ResponseEntity.ok(task);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
+//
+//    // Новый endpoint для получения задач без контракта
+//    @GetMapping("/available-tasks")
+//    public ResponseEntity<List<Task>> getAvailableTasks() {
+//        return ResponseEntity.ok(contractService.findTasksWithoutContract());
+//    }
 }

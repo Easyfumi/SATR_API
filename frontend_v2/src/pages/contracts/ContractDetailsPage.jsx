@@ -9,11 +9,18 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TaskIcon from '@mui/icons-material/Assignment';
 import LinkIcon from '@mui/icons-material/Link';
+import UnlinkIcon from '@mui/icons-material/LinkOff';
 import {
     FormControl,
     Select,
     MenuItem,
-    Checkbox
+    Checkbox,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button as MuiButton
 } from '@mui/material';
 
 const ContractDetailsPage = () => {
@@ -35,6 +42,7 @@ const ContractDetailsPage = () => {
     const [linkTaskDialog, setLinkTaskDialog] = useState(false);
     const [availableTasks, setAvailableTasks] = useState([]);
     const [selectedTaskId, setSelectedTaskId] = useState('');
+    const [linkComment, setLinkComment] = useState('');
 
     // Статусы оплаты
     const paymentStatusOptions = [
@@ -44,25 +52,38 @@ const ContractDetailsPage = () => {
     ];
 
     useEffect(() => {
-        const fetchContract = async () => {
-            try {
-                const response = await api.get(`/api/contracts/${id}`);
-                setContract(response.data);
-                setError(null);
-                
-                // Если есть createdBy, загружаем информацию о создателе
-                if (response.data.createdBy) {
-                    fetchCreatorInfo(response.data.createdBy);
-                }
-            } catch (error) {
-                console.error('Error fetching contract:', error);
-                setError('Ошибка загрузки данных договора');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchContract();
+        fetchContractWithTasks();
     }, [id]);
+
+    // Функция для загрузки договора с задачами
+    const fetchContractWithTasks = async () => {
+        try {
+            setLoading(true);
+            // Загружаем основную информацию о договоре
+            const contractResponse = await api.get(`/api/contracts/${id}`);
+            setContract(contractResponse.data);
+            
+            // Загружаем связанные задачи через новый endpoint
+            const tasksResponse = await api.get(`/api/task-contract-links/contract/${id}/tasks`);
+            // Обновляем договор с информацией о задачах
+            setContract(prev => ({
+                ...prev,
+                taskLinks: tasksResponse.data
+            }));
+            
+            setError(null);
+            
+            // Если есть createdBy, загружаем информацию о создателе
+            if (contractResponse.data.createdBy) {
+                fetchCreatorInfo(contractResponse.data.createdBy);
+            }
+        } catch (error) {
+            console.error('Error fetching contract:', error);
+            setError('Ошибка загрузки данных договора');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Функция для загрузки информации о создателе договора
     const fetchCreatorInfo = async (userId) => {
@@ -76,23 +97,26 @@ const ContractDetailsPage = () => {
     };
 
     // Функция для загрузки доступных задач (без контракта)
-const fetchAvailableTasks = async () => {
-    try {
-        const response = await api.get('/api/contracts/available-tasks');
-        setAvailableTasks(response.data);
-    } catch (error) {
-        console.error('Error fetching available tasks:', error);
-        alert('Ошибка загрузки доступных задач: ' + (error.response?.data?.message || error.message));
-    }
-};
+    const fetchAvailableTasks = async () => {
+        try {
+            // Используем новый endpoint для получения задач без контрактов
+            const response = await api.get('/api/tasks/without-contracts');
+            setAvailableTasks(response.data);
+        } catch (error) {
+            console.error('Error fetching available tasks:', error);
+            alert('Ошибка загрузки доступных задач: ' + (error.response?.data?.message || error.message));
+        }
+    };
 
     // Функция для открытия диалога связывания
     const openLinkTaskDialog = () => {
         setLinkTaskDialog(true);
+        setSelectedTaskId('');
+        setLinkComment('');
         fetchAvailableTasks();
     };
 
-    // Функция для связывания задачи
+    // Функция для связывания задачи с договором
     const handleLinkTask = async () => {
         if (!selectedTaskId) {
             alert('Выберите задачу для связывания');
@@ -100,16 +124,41 @@ const fetchAvailableTasks = async () => {
         }
 
         try {
-            await api.post(`/api/contracts/${id}/tasks/${selectedTaskId}`);
-            // Обновляем данные контракта
-            const response = await api.get(`/api/contracts/${id}`);
-            setContract(response.data);
+            // Используем новый endpoint для связывания
+            await api.post('/api/task-contract-links/link', {
+                taskId: selectedTaskId,
+                contractId: id,
+                comment: linkComment
+            });
+            
+            // Обновляем данные
+            await fetchContractWithTasks();
             setLinkTaskDialog(false);
             setSelectedTaskId('');
+            setLinkComment('');
             alert('Задача успешно связана с договором');
         } catch (error) {
             console.error('Error linking task:', error);
             alert('Ошибка при связывании задачи: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    // Функция для отвязывания задачи от договора
+    const handleUnlinkTask = async (taskId) => {
+        if (!window.confirm('Вы уверены, что хотите отвязать задачу от договора?')) {
+            return;
+        }
+
+        try {
+            // Используем новый endpoint для отвязывания
+            await api.delete(`/api/task-contract-links/unlink/task/${taskId}/contract/${id}`);
+            
+            // Обновляем данные
+            await fetchContractWithTasks();
+            alert('Задача успешно отвязана от договора');
+        } catch (error) {
+            console.error('Error unlinking task:', error);
+            alert('Ошибка при отвязке задачи: ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -386,51 +435,56 @@ const fetchAvailableTasks = async () => {
                                 </div>
                             </div>
                             
-                            {contract.tasks && contract.tasks.length > 0 ? (
+                            {contract.taskLinks && contract.taskLinks.length > 0 ? (
                                 <div className="tasks-list">
-                                    {contract.tasks.map((task) => (
+                                    {contract.taskLinks.map((link) => (
                                         <div 
-                                            key={task.id}
-                                            className="task-item clickable"
-                                            onClick={() => handleTaskClick(task.id)}
+                                            key={link.id}
+                                            className="task-item"
                                         >
                                             <div className="task-header">
-                                                <span className="task-number">
-                                                    Задача #{task.number || task.id}
-                                                </span>
-                                                <span className={`task-status ${task.status?.toLowerCase()}`}>
-                                                    {task.status || 'Не указан'}
-                                                </span>
+                                                <div 
+                                                    className="task-main-info clickable"
+                                                    onClick={() => handleTaskClick(link.taskId)}
+                                                >
+                                                    <span className="task-number">
+                                                        Задача #{link.taskNumber || link.taskId}
+                                                    </span>
+                                                    <span className={`task-status ${link.taskStatus?.toLowerCase()}`}>
+                                                        {link.taskStatus || 'Не указан'}
+                                                    </span>
+                                                </div>
+                                                <button
+                                                    className="unlink-task-button"
+                                                    onClick={() => handleUnlinkTask(link.taskId)}
+                                                    title="Отвязать задачу"
+                                                >
+                                                    <UnlinkIcon />
+                                                </button>
                                             </div>
-                                            <div className="task-details">
+                                            <div 
+                                                className="task-details clickable"
+                                                onClick={() => handleTaskClick(link.taskId)}
+                                            >
                                                 <div className="task-detail">
                                                     <span className="task-label">Марка ТС:</span>
-                                                    <span className="task-value">{task.mark || 'Не указана'}</span>
+                                                    <span className="task-value">{link.mark || 'Не указана'}</span>
                                                 </div>
                                                 <div className="task-detail">
                                                     <span className="task-label">Тип ТС:</span>
-                                                    <span className="task-value">{task.typeName || 'Не указан'}</span>
+                                                    <span className="task-value">{link.typeName || 'Не указан'}</span>
                                                 </div>
-                                                <div className="task-detail">
-                                                    <span className="task-label">Заявитель:</span>
-                                                    <span className="task-value">
-                                                        {task.applicant ? (typeof task.applicant === 'object' ? task.applicant.name : task.applicant) : 'Не указан'}
-                                                    </span>
-                                                </div>
-                                                {task.assignedUser && (
+                                                {link.linkComment && (
                                                     <div className="task-detail">
-                                                        <span className="task-label">Эксперт:</span>
-                                                        <span className="task-value">
-                                                            {typeof task.assignedUser === 'object' ? 
-                                                                formatUserName(task.assignedUser) : task.assignedUser}
-                                                        </span>
+                                                        <span className="task-label">Комментарий связи:</span>
+                                                        <span className="task-value">{link.linkComment}</span>
                                                     </div>
                                                 )}
-                                                {task.createdAt && (
+                                                {link.linkedAt && (
                                                     <div className="task-detail">
-                                                        <span className="task-label">Дата создания:</span>
+                                                        <span className="task-label">Дата привязки:</span>
                                                         <span className="task-value">
-                                                            {formatDateTime(task.createdAt)}
+                                                            {formatDateTime(link.linkedAt)}
                                                         </span>
                                                     </div>
                                                 )}
@@ -542,11 +596,18 @@ const fetchAvailableTasks = async () => {
             </div>
 
             {/* Диалог для связывания задачи */}
-            {linkTaskDialog && (
-                <div className="dialog-overlay">
-                    <div className="dialog-content">
-                        <h3>Привязать существующую задачу</h3>
-                        <div className="dialog-body">
+            <Dialog 
+                open={linkTaskDialog} 
+                onClose={() => setLinkTaskDialog(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>
+                    Привязать существующую задачу
+                </DialogTitle>
+                <DialogContent>
+                    <div className="dialog-body">
+                        <FormControl fullWidth margin="normal">
                             <label>Выберите задачу:</label>
                             <select 
                                 value={selectedTaskId} 
@@ -560,30 +621,40 @@ const fetchAvailableTasks = async () => {
                                     </option>
                                 ))}
                             </select>
-                            {availableTasks.length === 0 && (
-                                <p className="no-tasks-available">
-                                    Нет доступных задач для привязки. Все задачи уже привязаны к договорам.
-                                </p>
-                            )}
-                        </div>
-                        <div className="dialog-actions">
-                            <button 
-                                onClick={handleLinkTask} 
-                                className="primary-button"
-                                disabled={!selectedTaskId}
-                            >
-                                Привязать
-                            </button>
-                            <button 
-                                onClick={() => setLinkTaskDialog(false)} 
-                                className="secondary-button"
-                            >
-                                Отмена
-                            </button>
-                        </div>
+                        </FormControl>
+                        
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Комментарий связи (необязательно)"
+                            value={linkComment}
+                            onChange={(e) => setLinkComment(e.target.value)}
+                            multiline
+                            rows={2}
+                        />
+                        
+                        {availableTasks.length === 0 && (
+                            <p className="no-tasks-available">
+                                Нет доступных задач для привязки. Все задачи уже привязаны к договорам.
+                            </p>
+                        )}
                     </div>
-                </div>
-            )}
+                </DialogContent>
+                <DialogActions>
+                    <MuiButton 
+                        onClick={() => setLinkTaskDialog(false)}
+                    >
+                        Отмена
+                    </MuiButton>
+                    <MuiButton 
+                        onClick={handleLinkTask}
+                        variant="contained"
+                        disabled={!selectedTaskId}
+                    >
+                        Привязать
+                    </MuiButton>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

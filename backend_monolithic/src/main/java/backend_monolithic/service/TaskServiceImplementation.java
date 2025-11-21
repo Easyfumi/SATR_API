@@ -37,7 +37,9 @@ public class TaskServiceImplementation implements TaskService {
     private final ManufacturerRepository manufacturerRepository;
     private final RepresentativeRepository representativeRepository;
     private final UserService userService;
-    private final ContractRepository contractRepository;
+    // УДАЛЯЕМ contractRepository
+    // private final ContractRepository contractRepository;
+    private final TaskContractLinkService taskContractLinkService;
 
     public TaskResponse createTask(TaskRequest request, String jwt) {
         User user = userService.getUserProfile(jwt);
@@ -270,17 +272,20 @@ public class TaskServiceImplementation implements TaskService {
                     + createdBy.get().getPatronymic().charAt(0) + ".");
         }
 
-        // Обновленный маппинг договора с новыми полями
-        if (task.getContract() != null) {
-            ContractInfo contractInfo = new ContractInfo();
-            contractInfo.setId(task.getContract().getId());
-            contractInfo.setNumber(task.getContract().getNumber());
-            contractInfo.setDate(task.getContract().getDate());
-            contractInfo.setPaymentStatus(task.getContract().getPaymentStatus());
-            contractInfo.setApplicant(task.getContract().getApplicant());
-
-            response.setContract(contractInfo);
-        }
+        // Маппинг нескольких договоров через связь many-to-many
+        List<ContractInfo> contractInfos = task.getTaskContracts().stream()
+                .map(TaskContract::getContract)
+                .map(contract -> {
+                    ContractInfo contractInfo = new ContractInfo();
+                    contractInfo.setId(contract.getId());
+                    contractInfo.setNumber(contract.getNumber());
+                    contractInfo.setDate(contract.getDate());
+                    contractInfo.setPaymentStatus(contract.getPaymentStatus());
+                    contractInfo.setApplicant(contract.getApplicant());
+                    return contractInfo;
+                })
+                .collect(Collectors.toList());
+        response.setContracts(contractInfos);
 
         return response;
     }
@@ -305,72 +310,11 @@ public class TaskServiceImplementation implements TaskService {
     }
 
 
-    public TaskWithContractDTO assignContractToTask(Long taskId, Long contractId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
 
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("Contract not found with id: " + contractId));
 
-        // Проверяем, что договор и задача принадлежат одному заявителю (опционально)
-        if (!task.getApplicant().getId().equals(contract.getApplicant().getId())) {
-            throw new BusinessException("Task and contract must belong to the same applicant");
-        }
 
-        task.setContract(contract);
-        Task savedTask = taskRepository.save(task);
 
-        return convertToTaskWithContractDTO(savedTask);
-    }
 
-    public TaskWithContractDTO removeContractFromTask(Long taskId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
-
-        task.setContract(null);
-        Task savedTask = taskRepository.save(task);
-
-        return convertToTaskWithContractDTO(savedTask);
-    }
-
-    public TaskWithContractDTO getTaskWithContractInfo(Long taskId) {
-        Task task = taskRepository.findByIdWithContract(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + taskId));
-
-        return convertToTaskWithContractDTO(task);
-    }
-
-    public List<TaskWithContractDTO> getTasksByContract(Long contractId) {
-        List<Task> tasks = taskRepository.findByContractId(contractId);
-        return tasks.stream()
-                .map(this::convertToTaskWithContractDTO)
-                .collect(Collectors.toList());
-    }
-
-    private TaskWithContractDTO convertToTaskWithContractDTO(Task task) {
-        TaskWithContractDTO dto = new TaskWithContractDTO();
-        dto.setId(task.getId());
-        dto.setNumber(task.getNumber());
-        dto.setDocType(task.getDocType());
-        dto.setMark(task.getMark());
-        dto.setTypeName(task.getTypeName());
-        dto.setStatus(task.getStatus());
-        dto.setCreatedAt(task.getCreatedAt());
-
-        if (task.getContract() != null) {
-            Contract contract = task.getContract();
-            TaskWithContractDTO.ContractInfoDTO contractInfo = new TaskWithContractDTO.ContractInfoDTO();
-            contractInfo.setId(contract.getId());
-            contractInfo.setNumber(contract.getNumber());
-            contractInfo.setDate(contract.getDate());
-            contractInfo.setPaymentStatus(contract.getPaymentStatus());
-            contractInfo.setApplicantName(contract.getApplicant() != null ? contract.getApplicant().getName() : null);
-
-            dto.setContract(contractInfo);
-        }
-
-        return dto;
-    }
 
 
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
