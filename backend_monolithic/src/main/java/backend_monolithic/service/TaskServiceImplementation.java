@@ -254,6 +254,7 @@ public class TaskServiceImplementation implements TaskService {
         response.setCategories(task.getCategories());
         response.setMark(task.getMark());
         response.setTypeName(task.getTypeName());
+        response.setProcessType(task.getProcessType());
         response.setPreviousProcessType(task.getPreviousProcessType());
         response.setPreviousNumber(task.getPreviousNumber());
         response.setRepresentative(task.getRepresentative().getName());
@@ -384,6 +385,9 @@ public class TaskServiceImplementation implements TaskService {
         task.setMark(request.getMark());
         task.setTypeName(request.getTypeName());
         task.setPreviousProcessType(request.getPreviousProcessType());
+        if (request.getPreviousProcessType().isEmpty()) {
+            task.setPreviousProcessType("Оформление нового");
+        }
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));

@@ -18,18 +18,37 @@
   margin-top: 4px;
 }
 
-.edit-form-control .MuiOutlinedInput-root {
+/* Явные стили для рамок */
+.edit-form-control .MuiOutlinedInput-root,
+.bordered-field .MuiOutlinedInput-root {
   border-radius: 8px;
+  border: 1px solid #c4c4c4 !important;
 }
 
-.edit-text-field .MuiOutlinedInput-root {
-  border-radius: 8px;
+.edit-form-control .MuiOutlinedInput-root:hover,
+.bordered-field .MuiOutlinedInput-root:hover {
+  border-color: #1976d2 !important;
+}
+
+.edit-form-control .MuiOutlinedInput-root.Mui-focused,
+.bordered-field .MuiOutlinedInput-root.Mui-focused {
+  border-color: #1976d2 !important;
+  border-width: 2px !important;
+}
+
+.edit-form-control .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline,
+.bordered-field .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border: none !important;
 }
 
 .edit-form-control .MuiSelect-select,
-.edit-text-field .MuiOutlinedInput-input {
-  padding: 12px 14px;
+.edit-form-control .MuiAutocomplete-inputRoot {
+  padding: 12px 14px !important;
   font-size: 0.95rem;
+}
+
+.bordered-field .MuiOutlinedInput-input {
+  padding: 12px 14px !important;
 }
 
 /* Стили для выбранных значений */
@@ -112,8 +131,7 @@
     margin-right: 0;
   }
 
-  .edit-form-control,
-  .edit-text-field {
+  .edit-form-control {
     width: 100%;
   }
 

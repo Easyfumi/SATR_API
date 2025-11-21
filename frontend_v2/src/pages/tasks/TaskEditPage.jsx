@@ -22,7 +22,6 @@ import {
     Chip,
     Autocomplete
 } from '@mui/material';
-import { VehicleCategories } from '../../constants/vehicleCategories';
 
 const TaskEditPage = () => {
     const { id } = useParams();
@@ -99,6 +98,13 @@ const TaskEditPage = () => {
         'Продление'
     ];
 
+    const vehicleCategories = [
+        'M1', 'M1G', 'M2', 'M2G', 'M3', 'M3G',
+        'N1', 'N1G', 'N2', 'N2G', 'N3', 'N3G',
+        'O1', 'O2', 'O3', 'O4',
+        'L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7'
+    ];
+
     const getCategoryLabel = (category) => {
         const labels = {
             M1: "M1 (Легковые)",
@@ -128,6 +134,54 @@ const TaskEditPage = () => {
         return labels[category] || category;
     };
 
+    // Функция для генерации номера по умолчанию
+    const generateDefaultNumber = (docType) => {
+        if (docType === 'ОТТС') {
+            return 'ТС RU E-XX.МТ02.00XXX.Р1И1П1';
+        } else if (docType === 'ОТШ') {
+            return 'ТС RU K-XX.МТ02.00XXX.Р1И1П1';
+        }
+        return '';
+    };
+
+    // Обработчик изменения типа процедуры
+    const handleProcedureChange = (value) => {
+        let newPreviousNumber = formData.previousNumber;
+
+        if (value !== 'Оформление нового') {
+            if (formData.previousNumber === '' || formData.previousNumber === 'Оформление нового') {
+                newPreviousNumber = generateDefaultNumber(formData.docType);
+            }
+        } else {
+            newPreviousNumber = '';
+        }
+
+        setFormData({
+            ...formData,
+            procedureType: value,
+            previousNumber: newPreviousNumber
+        });
+        setShowPreviousNumber(value !== 'Оформление нового');
+    };
+
+    // Обработчик изменения типа одобрения
+    const handleDocTypeChange = (newDocType) => {
+        let newPreviousNumber = formData.previousNumber;
+
+        if (formData.procedureType !== 'Оформление нового') {
+            const currentDefault = generateDefaultNumber(formData.docType);
+            if (formData.previousNumber === currentDefault || formData.previousNumber === '') {
+                newPreviousNumber = generateDefaultNumber(newDocType);
+            }
+        }
+
+        setFormData({
+            ...formData,
+            docType: newDocType,
+            previousNumber: newPreviousNumber
+        });
+    };
+
     // Загрузка данных
     useEffect(() => {
         const fetchData = async () => {
@@ -142,6 +196,7 @@ const TaskEditPage = () => {
 
                 // Заполняем форму данными задачи
                 const taskData = taskResponse.data;
+                
                 setFormData({
                     docType: taskData.docType || '',
                     applicantName: taskData.applicant || '',
@@ -213,51 +268,6 @@ const TaskEditPage = () => {
             ...prev,
             [field]: event.target.value
         }));
-    };
-
-    const handleDocTypeChange = (newDocType) => {
-        let newPreviousNumber = formData.previousNumber;
-
-        if (formData.procedureType !== 'Оформление нового') {
-            const currentDefault = generateDefaultNumber(formData.docType);
-            if (formData.previousNumber === currentDefault || formData.previousNumber === '') {
-                newPreviousNumber = generateDefaultNumber(newDocType);
-            }
-        }
-
-        setFormData({
-            ...formData,
-            docType: newDocType,
-            previousNumber: newPreviousNumber
-        });
-    };
-
-    const handleProcedureChange = (value) => {
-        let newPreviousNumber = formData.previousNumber;
-
-        if (value !== 'Оформление нового') {
-            if (formData.previousNumber === '' || formData.previousNumber === 'Оформление нового') {
-                newPreviousNumber = generateDefaultNumber(formData.docType);
-            }
-        } else {
-            newPreviousNumber = '';
-        }
-
-        setFormData({
-            ...formData,
-            procedureType: value,
-            previousNumber: newPreviousNumber
-        });
-        setShowPreviousNumber(value !== 'Оформление нового');
-    };
-
-    const generateDefaultNumber = (docType) => {
-        if (docType === 'ОТТС') {
-            return 'ТС RU E-XX.МТ02.00XXX.Р1И1П1';
-        } else if (docType === 'ОТШ') {
-            return 'ТС RU K-XX.МТ02.00XXX.Р1И1П1';
-        }
-        return '';
     };
 
     // Эффекты для синхронизации чекбоксов
@@ -385,7 +395,7 @@ const TaskEditPage = () => {
         }
     };
 
-    // Сохранение
+    // Сохранение - ИСПРАВЛЕННАЯ ЛОГИКА
     const handleSave = async () => {
         setSaving(true);
         try {
@@ -399,13 +409,11 @@ const TaskEditPage = () => {
                 processType: formData.processType,
                 representativeName: representativeAbsent ? '' : formData.representativeName,
                 assignedUserId: formData.assignedUserId,
-                previousProcessType: formData.procedureType !== 'Оформление нового'
-                    ? formData.procedureType
-                    : null,
-                previousNumber: formData.procedureType !== 'Оформление нового'
-                    ? formData.previousNumber
-                    : null
+                previousProcessType: formData.procedureType !== 'Оформление нового' ? formData.procedureType : '',
+                previousNumber: formData.procedureType !== 'Оформление нового' ? formData.previousNumber : ''
             };
+
+            console.log('Saving request:', request);
 
             const response = await api.put(`/api/tasks/${id}`, request);
             setTask(response.data);
@@ -487,7 +495,7 @@ const TaskEditPage = () => {
                     <div className="column left-column">
                         <div className="task-row">
                             <span className="task-label">Тип одобрения:</span>
-                            <FormControl fullWidth className="edit-form-control">
+                            <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     value={formData.docType}
                                     onChange={(e) => handleDocTypeChange(e.target.value)}
@@ -521,8 +529,36 @@ const TaskEditPage = () => {
                         </div>
 
                         <div className="task-row">
+                            <span className="task-label">Процедура:</span>
+                            <FormControl fullWidth className="edit-form-control" variant="outlined">
+                                <Select
+                                    value={formData.processType}
+                                    onChange={handleInputChange('processType')}
+                                    displayEmpty
+                                    renderValue={(selected) => (
+                                        <div className="selected-process">
+                                            {selected || <span className="placeholder-text">Выберите процедуру</span>}
+                                        </div>
+                                    )}
+                                >
+                                    {processOptions.map((option) => (
+                                        <MenuItem key={option} value={option} style={{ whiteSpace: 'normal' }}>
+                                            <div className="process-option">
+                                                <Checkbox
+                                                    checked={formData.processType === option}
+                                                    style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                                                />
+                                                <span>{option}</span>
+                                            </div>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </div>
+
+                        <div className="task-row">
                             <span className="task-label">Тип процедуры:</span>
-                            <FormControl fullWidth className="edit-form-control">
+                            <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     value={formData.procedureType}
                                     onChange={(e) => handleProcedureChange(e.target.value)}
@@ -551,13 +587,14 @@ const TaskEditPage = () => {
                         {showPreviousNumber && (
                             <div className="task-row">
                                 <span className="task-label">Номер предыдущего одобрения:</span>
-                                <TextField
-                                    fullWidth
-                                    value={formData.previousNumber}
-                                    onChange={handleInputChange('previousNumber')}
-                                    className="edit-text-field"
-                                    variant="outlined"
-                                />
+                                <FormControl fullWidth className="edit-form-control">
+                                    <TextField
+                                        value={formData.previousNumber}
+                                        onChange={handleInputChange('previousNumber')}
+                                        variant="outlined"
+                                        className="bordered-field"
+                                    />
+                                </FormControl>
                             </div>
                         )}
                     </div>
@@ -568,36 +605,8 @@ const TaskEditPage = () => {
                     {/* Правая колонка */}
                     <div className="column right-column">
                         <div className="task-row">
-                            <span className="task-label">Процедура:</span>
-                            <FormControl fullWidth className="edit-form-control">
-                                <Select
-                                    value={formData.processType}
-                                    onChange={handleInputChange('processType')}
-                                    displayEmpty
-                                    renderValue={(selected) => (
-                                        <div className="selected-process">
-                                            {selected || <span className="placeholder-text">Выберите процедуру</span>}
-                                        </div>
-                                    )}
-                                >
-                                    {processOptions.map((option) => (
-                                        <MenuItem key={option} value={option} style={{ whiteSpace: 'normal' }}>
-                                            <div className="process-option">
-                                                <Checkbox
-                                                    checked={formData.processType === option}
-                                                    style={{ padding: '0 10px 0 0', flexShrink: 0 }}
-                                                />
-                                                <span>{option}</span>
-                                            </div>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </div>
-
-                        <div className="task-row">
                             <span className="task-label">Эксперт:</span>
-                            <FormControl fullWidth className="edit-form-control">
+                            <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     value={formData.assignedUserId || ''}
                                     onChange={handleInputChange('assignedUserId')}
@@ -653,24 +662,26 @@ const TaskEditPage = () => {
                     <div className="column left-column">
                         <div className="task-row">
                             <span className="task-label">Марка:</span>
-                            <TextField
-                                fullWidth
-                                value={formData.mark}
-                                onChange={handleInputChange('mark')}
-                                className="edit-text-field"
-                                variant="outlined"
-                            />
+                            <FormControl fullWidth className="edit-form-control">
+                                <TextField
+                                    value={formData.mark}
+                                    onChange={handleInputChange('mark')}
+                                    variant="outlined"
+                                    className="bordered-field"
+                                />
+                            </FormControl>
                         </div>
 
                         <div className="task-row">
                             <span className="task-label">Тип:</span>
-                            <TextField
-                                fullWidth
-                                value={formData.typeName}
-                                onChange={handleInputChange('typeName')}
-                                className="edit-text-field"
-                                variant="outlined"
-                            />
+                            <FormControl fullWidth className="edit-form-control">
+                                <TextField
+                                    value={formData.typeName}
+                                    onChange={handleInputChange('typeName')}
+                                    variant="outlined"
+                                    className="bordered-field"
+                                />
+                            </FormControl>
                         </div>
                     </div>
 
@@ -681,7 +692,7 @@ const TaskEditPage = () => {
                     <div className="column right-column">
                         <div className="task-row">
                             <span className="task-label">Категории:</span>
-                            <FormControl fullWidth className="edit-form-control">
+                            <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     multiple
                                     value={formData.categories}
@@ -703,7 +714,7 @@ const TaskEditPage = () => {
                                         </div>
                                     )}
                                 >
-                                    {Object.values(VehicleCategories).map((category) => (
+                                    {vehicleCategories.map((category) => (
                                         <MenuItem key={category} value={category}>
                                             <Checkbox checked={formData.categories.includes(category)} />
                                             <ListItemText primary={getCategoryLabel(category)} />
@@ -723,7 +734,7 @@ const TaskEditPage = () => {
                     <div className="column left-column">
                         <div className="task-row">
                             <span className="task-label">Заявитель:</span>
-                            <FormControl fullWidth>
+                            <FormControl fullWidth className="edit-form-control">
                                 <Autocomplete
                                     freeSolo
                                     options={applicants}
@@ -737,7 +748,7 @@ const TaskEditPage = () => {
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            className="edit-text-field"
+                                            className="bordered-field"
                                         />
                                     )}
                                 />
@@ -752,7 +763,7 @@ const TaskEditPage = () => {
                     <div className="column right-column">
                         <div className="task-row">
                             <span className="task-label">Изготовитель:</span>
-                            <FormControl fullWidth>
+                            <FormControl fullWidth className="edit-form-control">
                                 <div className="checkbox-container">
                                     <Checkbox
                                         checked={manufacturerSameAsApplicant}
@@ -774,7 +785,7 @@ const TaskEditPage = () => {
                                         <TextField
                                             {...params}
                                             variant="outlined"
-                                            className="edit-text-field"
+                                            className="bordered-field"
                                         />
                                     )}
                                 />
@@ -784,7 +795,7 @@ const TaskEditPage = () => {
                         {!manufacturerSameAsApplicant && (
                             <div className="task-row">
                                 <span className="task-label">Представитель изготовителя:</span>
-                                <FormControl fullWidth>
+                                <FormControl fullWidth className="edit-form-control">
                                     <div className="checkbox-container">
                                         <Checkbox
                                             checked={representativeSameAsApplicant}
@@ -813,7 +824,7 @@ const TaskEditPage = () => {
                                             <TextField
                                                 {...params}
                                                 variant="outlined"
-                                                className="edit-text-field"
+                                                className="bordered-field"
                                             />
                                         )}
                                     />
@@ -824,6 +835,7 @@ const TaskEditPage = () => {
                 </div>
             </div>
 
+            {/* Остальные секции (Договор и Системная информация) остаются без изменений */}
             {/* Договор */}
             <div className="task-details-card">
                 <div className="task-row">
@@ -890,7 +902,7 @@ const TaskEditPage = () => {
                 >
                     <div className="contract-search-container">
                         <TextField
-                            className="contract-search-field"
+                            className="contract-search-field bordered-field"
                             placeholder="Поиск по номеру договора..."
                             value={contractSearch}
                             onChange={handleContractSearchChange}
