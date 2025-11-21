@@ -291,9 +291,7 @@ const TaskDetailsPage = () => {
             <div className="task-row">
               <span className="task-label">Тип процедуры:</span>
               <span className="task-value">
-                {task.previousProcessType === 'Оформление нового' || !task.previousProcessType 
-                  ? 'Оформление нового' 
-                  : `${task.previousProcessType} ${task.previousNumber || ''}`}
+                {task.previousProcessType} {task.previousNumber || ''}
               </span>
             </div>
           </div>

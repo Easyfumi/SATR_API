@@ -396,36 +396,36 @@ const TaskEditPage = () => {
     };
 
     // Сохранение - ИСПРАВЛЕННАЯ ЛОГИКА
-    const handleSave = async () => {
-        setSaving(true);
-        try {
-            const request = {
-                docType: formData.docType,
-                applicantName: formData.applicantName,
-                manufacturerName: formData.manufacturerName,
-                categories: formData.categories,
-                mark: formData.mark,
-                typeName: formData.typeName,
-                processType: formData.processType,
-                representativeName: representativeAbsent ? '' : formData.representativeName,
-                assignedUserId: formData.assignedUserId,
-                previousProcessType: formData.procedureType !== 'Оформление нового' ? formData.procedureType : '',
-                previousNumber: formData.procedureType !== 'Оформление нового' ? formData.previousNumber : ''
-            };
+const handleSave = async () => {
+    setSaving(true);
+    try {
+        const request = {
+            docType: formData.docType,
+            applicantName: formData.applicantName,
+            manufacturerName: formData.manufacturerName,
+            categories: formData.categories,
+            mark: formData.mark,
+            typeName: formData.typeName,
+            processType: formData.processType,
+            representativeName: representativeAbsent ? '' : formData.representativeName,
+            assignedUserId: formData.assignedUserId,
+            previousProcessType: formData.procedureType,
+            previousNumber: formData.previousNumber
+        };
 
-            console.log('Saving request:', request);
+        console.log('Saving request:', request);
 
-            const response = await api.put(`/api/tasks/${id}`, request);
-            setTask(response.data);
-            alert('Изменения успешно сохранены');
-            navigate(`/tasks/${id}`);
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-            alert(error.response?.data?.message || 'Произошла ошибка при сохранении');
-        } finally {
-            setSaving(false);
-        }
-    };
+        const response = await api.put(`/api/tasks/${id}`, request);
+        setTask(response.data);
+        alert('Изменения успешно сохранены');
+        navigate(`/tasks/${id}`);
+    } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        alert(error.response?.data?.message || 'Произошла ошибка при сохранении');
+    } finally {
+        setSaving(false);
+    }
+};
 
     const handleCancel = () => {
         navigate(`/tasks/${id}`);

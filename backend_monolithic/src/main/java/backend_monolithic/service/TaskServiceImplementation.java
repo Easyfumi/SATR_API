@@ -385,9 +385,6 @@ public class TaskServiceImplementation implements TaskService {
         task.setMark(request.getMark());
         task.setTypeName(request.getTypeName());
         task.setPreviousProcessType(request.getPreviousProcessType());
-        if (request.getPreviousProcessType().isEmpty()) {
-            task.setPreviousProcessType("Оформление нового");
-        }
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
