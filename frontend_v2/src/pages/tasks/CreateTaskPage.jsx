@@ -126,8 +126,7 @@ const CreateTaskPage = () => {
             // Сохраняем request на случай дубликатов
             setPendingRequest(request);
 
-            // Пытаемся создать заявку
-            const response = await api.post('/api/tasks/create', request);
+            await api.post('/api/tasks/create', request);
 
             // Если успешно - переходим к списку заявок
             navigate('/tasks');
