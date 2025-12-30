@@ -90,7 +90,6 @@ public class TaskSpecifications {
         };
     }
 
-
     public static Specification<Task> withAssignedUser(String assignedUser) {
         return (root, query, criteriaBuilder) -> {
             if (assignedUser == null || assignedUser.isEmpty()) {
@@ -186,6 +185,44 @@ public class TaskSpecifications {
         };
     }
 
+    // МЕТОД: Фильтрация по наличию договора
+    public static Specification<Task> withHasContract(Boolean hasContract) {
+        return (root, query, criteriaBuilder) -> {
+            if (hasContract == null) {
+                return criteriaBuilder.conjunction();
+            }
+
+            if (hasContract) {
+                // Задачи с договором (contract не null)
+                return criteriaBuilder.isNotNull(root.get("contract"));
+            } else {
+                // Задачи без договора (contract null)
+                return criteriaBuilder.isNull(root.get("contract"));
+            }
+        };
+    }
+
+    // МЕТОД: Фильтрация по номеру договора
+    public static Specification<Task> withContractNumber(String contractNumber) {
+        return (root, query, criteriaBuilder) -> {
+            if (contractNumber == null || contractNumber.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            String searchPattern = "%" + contractNumber.toLowerCase() + "%";
+
+            // Ищем по номеру договора (учитываем, что contract может быть null)
+            Predicate hasContract = criteriaBuilder.isNotNull(root.get("contract"));
+            Predicate numberMatches = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("contract").get("number")),
+                    searchPattern
+            );
+
+            // Только задачи с договором И с соответствующим номером
+            return criteriaBuilder.and(hasContract, numberMatches);
+        };
+    }
+
     public static Specification<Task> buildSpecification(TaskFilter filter) {
         Specification<Task> spec = Specification.where(null);
 
@@ -203,7 +240,9 @@ public class TaskSpecifications {
                     .and(withAssignedUser(filter.getAssignedUser()))
                     .and(withStatus(filter.getStatus()))
                     .and(withPaymentStatus(filter.getPaymentStatus()))
-                    .and(withCreatedAtBetween(filter.getCreatedAtFrom(), filter.getCreatedAtTo()));
+                    .and(withCreatedAtBetween(filter.getCreatedAtFrom(), filter.getCreatedAtTo()))
+                    .and(withHasContract(filter.getHasContract())) // Фильтр по наличию договора
+                    .and(withContractNumber(filter.getContractNumber())); // Фильтр по номеру договора
         }
 
         return spec;
@@ -217,7 +256,7 @@ public class TaskSpecifications {
 
             String searchPattern = "%" + quickSearch.toLowerCase() + "%";
 
-            // Условие для поиска по номеру
+            // Условие для поиска по номеру задачи
             Predicate numberPredicate = criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("number")),
                     searchPattern
@@ -247,8 +286,25 @@ public class TaskSpecifications {
                 assignedUserPredicate = criteriaBuilder.in(root.get("assignedUserId")).value(userSubquery);
             }
 
-            // Объединяем условия через OR
-            return criteriaBuilder.or(numberPredicate, assignedUserPredicate);
+            // Условие для поиска по номеру договора
+            Predicate contractNumberPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("contract").get("number")),
+                    searchPattern
+            );
+
+            // Условие для поиска по заявителю (через договор)
+            Predicate contractApplicantPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("contract").get("applicant").get("name")),
+                    searchPattern
+            );
+
+            // Объединяем все условия через OR
+            return criteriaBuilder.or(
+                    numberPredicate,
+                    assignedUserPredicate,
+                    contractNumberPredicate,
+                    contractApplicantPredicate
+            );
         };
     }
 }

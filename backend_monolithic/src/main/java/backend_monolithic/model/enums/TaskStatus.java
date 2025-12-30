@@ -1,30 +1,9 @@
 package backend_monolithic.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum TaskStatus {
-
-    // OLD
-
-
-//    RECEIVED("RECEIVED"),    // заявка получена
-//    REGISTERED("REGISTERED"),  // заявка зарегестрирована
-//    DECISION_DONE("DECISION_DONE"),  // написано решение по заявке
-//    DOCUMENTS_WAITING("DOCUMENTS_WAITING"),  // ожидание документов
-//    REJECTION("REJECTION"),  // отказ в проведение работ
-//    CANCELLED("CANCELLED"),  // аннулирована
-//    PROJECT("PROJECT"),  // переведено в проект
-//    SIGNED("SIGNED"),  // подписано
-//    FOR_REVISION("FOR_REVISION"), // возвращено на доработку
-//    COMPLETED("COMPLETED");  // заявка выполнена
-//
-//
-//    TaskStatus(String done) {
-//
-//    }
-
-
-
-    // NEW
-
     RECEIVED("Получена"),
     REGISTERED("Зарегистрирована"),
     DECISION_DONE("Решение подготовлено"),
@@ -44,5 +23,26 @@ public enum TaskStatus {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    @JsonValue
+    public String toValue() {
+        return this.name(); // Сериализуется как "RECEIVED"
+    }
+
+    @JsonCreator
+    public static TaskStatus fromValue(String value) {
+        // Принимает как "RECEIVED" (из БД), так и "Получена" (с фронтенда)
+        try {
+            return valueOf(value);
+        } catch (IllegalArgumentException e) {
+            // Если пришло значение на русском, конвертируем
+            for (TaskStatus status : values()) {
+                if (status.displayName.equals(value)) {
+                    return status;
+                }
+            }
+            throw new IllegalArgumentException("Unknown TaskStatus: " + value);
+        }
     }
 }

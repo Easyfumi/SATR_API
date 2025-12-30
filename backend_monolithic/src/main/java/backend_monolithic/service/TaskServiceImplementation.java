@@ -1,20 +1,22 @@
 package backend_monolithic.service;
 
-
 import backend_monolithic.config.TaskSpecifications;
 import backend_monolithic.error.BusinessException;
+import backend_monolithic.error.DuplicateNumberException;
+import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
-import backend_monolithic.model.enums.PaymentStatus;
+import backend_monolithic.model.enums.TaskStatus;
 import backend_monolithic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import backend_monolithic.error.DuplicateNumberException;
-import backend_monolithic.error.TaskNotFoundException;
-import backend_monolithic.model.enums.TaskStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,120 +24,65 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TaskServiceImplementation implements TaskService {
 
     private final TaskRepository taskRepository;
     private final ApplicantRepository applicantRepository;
     private final ManufacturerRepository manufacturerRepository;
     private final RepresentativeRepository representativeRepository;
+    private final ContractRepository contractRepository;
     private final UserService userService;
-    // УДАЛЯЕМ contractRepository
-    // private final ContractRepository contractRepository;
-    private final TaskContractLinkService taskContractLinkService;
 
+    @Override
+    @Transactional
     public TaskResponse createTask(TaskRequest request, String jwt) {
         User user = userService.getUserProfile(jwt);
-        UserInfo userInfo = new UserInfo(user);
         Task task = mapRequestToEntity(request);
 
-        task.setCreatedBy(userInfo.getId());
+        // Устанавливаем договор (One-to-Many)
+        if (request.getContractId() != null) {
+            Contract contract = contractRepository.findById(request.getContractId())
+                    .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+            task.setContract(contract);
+        }
+
+        task.setCreatedBy(user.getId());
         task.setCreatedAt(LocalDateTime.now());
-        task.setStatus(TaskStatus.RECEIVED);    // Default status
+        task.setStatus(TaskStatus.RECEIVED);
+
         Task savedTask = taskRepository.save(task);
         return mapEntityToResponse(savedTask);
     }
 
-    public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
-        // Получаем все заявки кроме завершенных
-        List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
-
-        // Маппим request в Task для сравнения
-        Task newTask = mapRequestToEntity(request);
-
-        // Ищем дубликаты путем прямого сравнения полей
-        return existingTasks.stream()
-                .filter(existingTask -> areTasksDuplicates(existingTask, newTask))
-                .map(existingTask -> new TaskDuplicateInfo(
-                        existingTask.getId(),
-                        getTaskDisplayIdentifier(existingTask), // Используем идентификатор для отображения
-                        existingTask.getStatus(),
-                        existingTask.getCreatedAt() // Добавим дату создания для информации
-                ))
-                .collect(Collectors.toList());
+    @Override
+    public TaskResponse getTaskById(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
+        return mapEntityToResponse(task);
     }
 
-    private boolean areTasksDuplicates(Task task1, Task task2) {
-        return Objects.equals(task1.getDocType(), task2.getDocType())
-                && Objects.equals(task1.getApplicant(), task2.getApplicant())
-                && Objects.equals(task1.getManufacturer(), task2.getManufacturer())
-                && Objects.equals(task1.getCategories(), task2.getCategories())
-                && Objects.equals(task1.getMark(), task2.getMark())
-                && Objects.equals(task1.getTypeName(), task2.getTypeName())
-                && Objects.equals(task1.getProcessType(), task2.getProcessType())
-                && Objects.equals(task1.getPreviousNumber(), task2.getPreviousNumber())
-                && Objects.equals(task1.getPreviousProcessType(), task2.getPreviousProcessType())
-                && Objects.equals(task1.getRepresentative(), task2.getRepresentative());
-    }
-
-    private String getTaskDisplayIdentifier(Task task) {
-        // Если есть номер - используем его, иначе используем ID и дату создания
-        if (task.getNumber() != null && !task.getNumber().trim().isEmpty()) {
-            return task.getNumber();
-        } else {
-            return String.format("ID: %d (%s)",
-                    task.getId(),
-                    task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        }
-    }
-
+    @Override
     public List<TaskResponse> getAllTasks(String jwt) {
-        // TODO добавить проверку токена
         return taskRepository.findAll().stream()
                 .sorted(Comparator.comparing(Task::getCreatedAt).reversed())
-                .map(task -> {
-                    TaskResponse taskResponse = mapEntityToResponse(task);
-                    if (task.getAssignedUserId() != null) {
-                        userService.getUserById(task.getAssignedUserId())
-                                .ifPresent(user -> taskResponse.setAssignedUser(new UserInfo(user)));
-                    }
-                    return taskResponse;
-                })
+                .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Новый метод для фильтрации задач
+    @Override
     public PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size) {
-        // TODO добавить проверку токена
-
         Specification<Task> spec = TaskSpecifications.buildSpecification(filter);
-
-        // Создаем Pageable для пагинации
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // Получаем страницу задач
         Page<Task> taskPage = taskRepository.findAll(spec, pageable);
 
-        // Преобразуем задачи в TaskResponse
         List<TaskResponse> taskResponses = taskPage.getContent().stream()
-                .map(task -> {
-                    TaskResponse taskResponse = mapEntityToResponse(task);
-                    if (task.getAssignedUserId() != null) {
-                        userService.getUserById(task.getAssignedUserId())
-                                .ifPresent(user -> taskResponse.setAssignedUser(new UserInfo(user)));
-                    }
-                    return taskResponse;
-                })
+                .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
 
-        // Создаем и возвращаем PageResponse
         PageResponse<TaskResponse> pageResponse = new PageResponse<>();
         pageResponse.setContent(taskResponses);
         pageResponse.setCurrentPage(taskPage.getNumber());
@@ -146,19 +93,48 @@ public class TaskServiceImplementation implements TaskService {
         return pageResponse;
     }
 
+    @Override
+    @Transactional
+    public TaskResponse updateTask(Long taskId, TaskRequest request) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
 
+        // Обновляем поля задачи
+        task.setDocType(request.getDocType());
+        task.setApplicant(getOrCreateApplicant(request.getApplicantName()));
+        task.setManufacturer(getOrCreateManufacturer(request.getManufacturerName()));
+        task.setCategories(request.getCategories());
+        task.setMark(request.getMark());
+        task.setTypeName(request.getTypeName());
+        task.setPreviousProcessType(request.getPreviousProcessType());
+        task.setPreviousNumber(request.getPreviousNumber());
+        task.setProcessType(request.getProcessType());
+        task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
+        task.setAssignedUserId(request.getAssignedUserId());
 
+        // Обновляем договор (One-to-Many)
+        if (request.getContractId() != null) {
+            Contract contract = contractRepository.findById(request.getContractId())
+                    .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+            task.setContract(contract);
+        } else {
+            task.setContract(null);
+        }
 
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
+    }
+
+    @Override
+    @Transactional
     public TaskResponse updateStatus(Long taskId, TaskStatus newStatus) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
 
-        // Дополнительные проверки при необходимости
         validateStatusTransition(task.getStatus(), newStatus);
 
         task.setStatus(newStatus);
 
-        // Если статус COMPLETED, можно установить дату завершения
         if (newStatus == TaskStatus.COMPLETED) {
             task.setDecisionAt(LocalDate.now());
         }
@@ -167,50 +143,37 @@ public class TaskServiceImplementation implements TaskService {
         return mapEntityToResponse(updatedTask);
     }
 
-    private void validateStatusTransition(TaskStatus currentStatus, TaskStatus newStatus) {
-        // Здесь можно добавить бизнес-логику валидации переходов статусов
-        // Например, запретить переход из COMPLETED в другие статусы
-        if (currentStatus == TaskStatus.COMPLETED) {
-            throw new IllegalStateException("Нельзя изменить статус завершенной заявки");
-        }
-
-        // Добавьте другие проверки согласно бизнес-правилам
-    }
-
-    public TaskResponse getTaskById(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-        return mapEntityToResponse(task);
-    }
-
+    @Override
+    @Transactional
     public TaskResponse setTaskNumber(Long taskId, String number) {
-        // Проверка существования номера
         if (taskRepository.existsByNumber(number)) {
             throw new DuplicateNumberException("Номер " + number + " уже существует");
         }
+
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
-        // Проверка что номер еще не установлен
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
+
         if (task.getNumber() != null) {
-            throw new IllegalStateException("Номер уже назначен");
+            throw new BusinessException("Номер уже назначен");
         }
+
         task.setNumber(number);
         task = taskRepository.save(task);
         return mapEntityToResponse(task);
     }
 
+    @Override
+    @Transactional
     public TaskResponse setDecisionDate(Long taskId, LocalDate decisionDate) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new TaskNotFoundException("Заявка не найдена"));
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
 
-        // Проверка что дата решения еще не установлена (опционально)
         if (task.getDecisionAt() != null) {
-            throw new IllegalStateException("Дата решения уже назначена");
+            throw new BusinessException("Дата решения уже назначена");
         }
 
-        // Дополнительные проверки даты (например, что дата не в будущем)
         if (decisionDate.isAfter(LocalDate.now())) {
-            throw new IllegalStateException("Дата решения не может быть в будущем");
+            throw new BusinessException("Дата решения не может быть в будущем");
         }
 
         task.setDecisionAt(decisionDate);
@@ -218,30 +181,53 @@ public class TaskServiceImplementation implements TaskService {
         return mapEntityToResponse(task);
     }
 
+    @Override
+    @Transactional
+    public TaskResponse updateTaskContract(Long taskId, Long contractId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
+
+        Contract contract = null;
+        if (contractId != null) {
+            contract = contractRepository.findById(contractId)
+                    .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+        }
+
+        task.setContract(contract);
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
+    }
+
+    @Override
+    public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
+        List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
+        Task newTask = mapRequestToEntity(request);
+
+        return existingTasks.stream()
+                .filter(existingTask -> areTasksDuplicates(existingTask, newTask))
+                .map(existingTask -> new TaskDuplicateInfo(
+                        existingTask.getId(),
+                        getTaskDisplayIdentifier(existingTask),
+                        existingTask.getStatus(),
+                        existingTask.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // Вспомогательные методы
+
     private Task mapRequestToEntity(TaskRequest request) {
         Task task = new Task();
         task.setDocType(request.getDocType());
-
-        // Обработка Applicant: найти или создать
         task.setApplicant(getOrCreateApplicant(request.getApplicantName()));
-
-        // Обработка Manufacturer: найти или создать
         task.setManufacturer(getOrCreateManufacturer(request.getManufacturerName()));
-
         task.setCategories(request.getCategories());
         task.setMark(request.getMark());
         task.setTypeName(request.getTypeName());
         task.setPreviousProcessType(request.getPreviousProcessType());
-
-        if (request.getPreviousNumber() != null) {
-            task.setPreviousNumber(request.getPreviousNumber());
-        }
-
+        task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
-
-        // Обработка Representative: найти или создать
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
-
         task.setAssignedUserId(request.getAssignedUserId());
         return task;
     }
@@ -267,75 +253,76 @@ public class TaskServiceImplementation implements TaskService {
         // Обработка createdBy
         Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
         if (createdBy.isPresent()) {
-            response.setCreatedBy(createdBy.get().getFirstName() + " "
-                    + createdBy.get().getSecondName().charAt(0) + "."
-                    + createdBy.get().getPatronymic().charAt(0) + ".");
+            User user = createdBy.get();
+            response.setCreatedBy(user.getFirstName() + " " +
+                    user.getSecondName().charAt(0) + "." +
+                    user.getPatronymic().charAt(0) + ".");
         }
 
-        // Маппинг нескольких договоров через связь many-to-many
-        List<ContractInfo> contractInfos = task.getTaskContracts().stream()
-                .map(TaskContract::getContract)
-                .map(contract -> {
-                    ContractInfo contractInfo = new ContractInfo();
-                    contractInfo.setId(contract.getId());
-                    contractInfo.setNumber(contract.getNumber());
-                    contractInfo.setDate(contract.getDate());
-                    contractInfo.setPaymentStatus(contract.getPaymentStatus());
-                    contractInfo.setApplicant(contract.getApplicant());
-                    return contractInfo;
-                })
-                .collect(Collectors.toList());
-        response.setContracts(contractInfos);
+        // Обработка assignedUser
+        if (task.getAssignedUserId() != null) {
+            userService.getUserById(task.getAssignedUserId())
+                    .ifPresent(user -> response.setAssignedUser(new UserInfo(user)));
+        }
+
+        // Обработка договора (One-to-Many)
+        if (task.getContract() != null) {
+            ContractSimple contractDTO = new ContractSimple();
+            contractDTO.setId(task.getContract().getId());
+            contractDTO.setNumber(task.getContract().getNumber());
+            contractDTO.setDate(task.getContract().getDate());
+            contractDTO.setPaymentStatus(task.getContract().getPaymentStatus());
+            if (task.getContract().getApplicant() != null) {
+                contractDTO.setApplicantName(task.getContract().getApplicant().getName());
+            }
+            response.setContract(contractDTO);
+        }
 
         return response;
     }
 
+    private boolean areTasksDuplicates(Task task1, Task task2) {
+        return Objects.equals(task1.getDocType(), task2.getDocType())
+                && Objects.equals(task1.getApplicant(), task2.getApplicant())
+                && Objects.equals(task1.getManufacturer(), task2.getManufacturer())
+                && Objects.equals(task1.getCategories(), task2.getCategories())
+                && Objects.equals(task1.getMark(), task2.getMark())
+                && Objects.equals(task1.getTypeName(), task2.getTypeName())
+                && Objects.equals(task1.getProcessType(), task2.getProcessType())
+                && Objects.equals(task1.getPreviousNumber(), task2.getPreviousNumber())
+                && Objects.equals(task1.getPreviousProcessType(), task2.getPreviousProcessType())
+                && Objects.equals(task1.getRepresentative(), task2.getRepresentative());
+    }
 
-    // Для Applicant
+    private String getTaskDisplayIdentifier(Task task) {
+        if (task.getNumber() != null && !task.getNumber().trim().isEmpty()) {
+            return task.getNumber();
+        } else {
+            return String.format("ID: %d (%s)",
+                    task.getId(),
+                    task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        }
+    }
+
+    private void validateStatusTransition(TaskStatus currentStatus, TaskStatus newStatus) {
+        if (currentStatus == TaskStatus.COMPLETED) {
+            throw new BusinessException("Нельзя изменить статус завершенной задачи");
+        }
+    }
+
     private Applicant getOrCreateApplicant(String name) {
         return applicantRepository.findByName(name)
                 .orElseGet(() -> applicantRepository.save(new Applicant(name)));
     }
 
-    // Для Manufacturer (аналогично)
     private Manufacturer getOrCreateManufacturer(String name) {
         return manufacturerRepository.findByName(name)
                 .orElseGet(() -> manufacturerRepository.save(new Manufacturer(name)));
     }
 
-    // Для Representative (аналогично)
     private Representative getOrCreateRepresentative(String name) {
         return representativeRepository.findByName(name)
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
-    }
-
-
-
-
-
-
-
-
-
-    public TaskResponse updateTask(Long taskId, TaskRequest request) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-
-        // Обновляем только разрешенные поля
-        task.setDocType(request.getDocType());
-        task.setApplicant(getOrCreateApplicant(request.getApplicantName()));
-        task.setManufacturer(getOrCreateManufacturer(request.getManufacturerName()));
-        task.setCategories(request.getCategories());
-        task.setMark(request.getMark());
-        task.setTypeName(request.getTypeName());
-        task.setPreviousProcessType(request.getPreviousProcessType());
-        task.setPreviousNumber(request.getPreviousNumber());
-        task.setProcessType(request.getProcessType());
-        task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
-        task.setAssignedUserId(request.getAssignedUserId());
-
-        Task updatedTask = taskRepository.save(task);
-        return mapEntityToResponse(updatedTask);
     }
 }
 

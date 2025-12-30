@@ -20,4 +20,6 @@ public class TaskFilter {
     private LocalDate createdAtFrom;
     private LocalDate createdAtTo;
     private String quickSearch;
+    private Boolean hasContract;
+    private String contractNumber;
 }

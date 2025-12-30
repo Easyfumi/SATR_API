@@ -5,6 +5,7 @@ import backend_monolithic.model.Task;
 import backend_monolithic.model.dto.ContractRequest;
 import backend_monolithic.model.enums.PaymentStatus;
 import backend_monolithic.service.ContractService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,21 +33,26 @@ public class ContractController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createContract(@RequestBody ContractRequest request,
-                                            @RequestHeader("Authorization") String jwt) {
+    public ResponseEntity<?> createContract(
+            @Valid @RequestBody ContractRequest request,
+            @RequestHeader("Authorization") String jwt) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(contractService.save(request, jwt));
+            Contract contract = contractService.save(request, jwt);
+            return ResponseEntity.status(HttpStatus.CREATED).body(contract);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContract(@PathVariable Long id, @RequestBody ContractRequest request) {
+    public ResponseEntity<?> updateContract(
+            @PathVariable Long id,
+            @Valid @RequestBody ContractRequest request) {
         try {
-            return ResponseEntity.ok(contractService.update(id, request));
+            Contract contract = contractService.update(id, request);
+            return ResponseEntity.ok(contract);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -61,41 +67,58 @@ public class ContractController {
     }
 
     @PatchMapping("/{id}/comments")
-    public ResponseEntity<?> updateComments(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> updateComments(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
         try {
             String comments = request.get("comments");
-            return ResponseEntity.ok(contractService.updateComments(id, comments));
+            Contract contract = contractService.updateComments(id, comments);
+            return ResponseEntity.ok(contract);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
     @PatchMapping("/{id}/payment-status")
-    public ResponseEntity<?> updatePaymentStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> updatePaymentStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
         try {
             PaymentStatus paymentStatus = PaymentStatus.valueOf(request.get("paymentStatus"));
-            return ResponseEntity.ok(contractService.updatePaymentStatus(id, paymentStatus));
+            Contract contract = contractService.updatePaymentStatus(id, paymentStatus);
+            return ResponseEntity.ok(contract);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 
-//    // Новый endpoint для связывания существующей задачи с контрактом
-//    @PostMapping("/{contractId}/tasks/{taskId}")
-//    public ResponseEntity<?> linkTaskToContract(
-//            @PathVariable Long contractId,
-//            @PathVariable Long taskId) {
-//        try {
-//            Task task = contractService.linkTaskToContract(contractId, taskId);
-//            return ResponseEntity.ok(task);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-//
-//    // Новый endpoint для получения задач без контракта
-//    @GetMapping("/available-tasks")
-//    public ResponseEntity<List<Task>> getAvailableTasks() {
-//        return ResponseEntity.ok(contractService.findTasksWithoutContract());
-//    }
+    @GetMapping("/available-tasks")
+    public ResponseEntity<List<Task>> getAvailableTasks() {
+        List<Task> tasks = contractService.findTasksWithoutContract();
+        return ResponseEntity.ok(tasks);
+    }
+
+    @PostMapping("/{id}/tasks")
+    public ResponseEntity<?> addTasksToContract(
+            @PathVariable Long id,
+            @RequestBody List<Long> taskIds) {
+        try {
+            contractService.addTasksToContract(id, taskIds);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}/tasks")
+    public ResponseEntity<?> removeTasksFromContract(
+            @PathVariable Long id,
+            @RequestBody List<Long> taskIds) {
+        try {
+            contractService.removeTasksFromContract(id, taskIds);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

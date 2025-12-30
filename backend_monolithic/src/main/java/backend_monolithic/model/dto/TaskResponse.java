@@ -1,5 +1,6 @@
 package backend_monolithic.model.dto;
 
+import backend_monolithic.model.Contract;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,8 +32,21 @@ public class TaskResponse {
     private String createdBy;
     private UserInfo assignedUser;
 
-    // Заменяем одиночный Contract на список
-    private List<ContractInfo> contracts = new ArrayList<>();
+    // ТЕПЕРЬ ТОЛЬКО ОДИН ДОГОВОР вместо списка!
+    private ContractSimple contract;
+
+    // Метод для установки информации о договоре
+    public void setContractFromEntity(Contract contract) {
+        if (contract != null) {
+            this.contract = new ContractSimple();
+            this.contract.setId(contract.getId());
+            this.contract.setNumber(contract.getNumber());
+            this.contract.setDate(contract.getDate());
+            this.contract.setPaymentStatus(contract.getPaymentStatus());
+            this.contract.setApplicantName(contract.getApplicant() != null ?
+                    contract.getApplicant().getName() : null);
+        }
+    }
 }
 
 

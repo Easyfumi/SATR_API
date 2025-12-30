@@ -14,13 +14,12 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     Optional<Contract> findByNumber(String number);
     boolean existsByNumber(String number);
 
-    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.taskContracts tc LEFT JOIN FETCH tc.task WHERE c.id = :id")
+    // Загружаем договор с задачами (One-to-Many)
+    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.tasks WHERE c.id = :id")
     Optional<Contract> findByIdWithTasks(@Param("id") Long id);
 
     // Стандартный метод с EntityGraph
     @Override
     @EntityGraph(attributePaths = {"tasks"})
     Optional<Contract> findById(Long id);
-
-
 }

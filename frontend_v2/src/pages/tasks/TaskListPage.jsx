@@ -12,6 +12,8 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import BusinessIcon from '@mui/icons-material/Business';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const TaskListPage = () => {
     const navigate = useNavigate();
@@ -41,7 +43,9 @@ const TaskListPage = () => {
         status: '',
         paymentStatus: '',
         createdAtFrom: '',
-        createdAtTo: ''
+        createdAtTo: '',
+        hasContract: '', // Новое поле: наличие договора
+        contractNumber: '' // Новое поле: номер договора
     });
 
     // Навигационные кнопки
@@ -87,6 +91,13 @@ const TaskListPage = () => {
         { value: 'false', label: 'Ожидает оплаты' }
     ];
 
+    // Опции для фильтрации по договору
+    const contractOptions = [
+        { value: '', label: 'Все задачи' },
+        { value: 'true', label: 'С договором' },
+        { value: 'false', label: 'Без договора' }
+    ];
+
     // Опции для выбора количества элементов на странице
     const pageSizeOptions = [10, 25, 50];
 
@@ -96,12 +107,27 @@ const TaskListPage = () => {
         try {
             // Удаляем пустые поля из фильтров
             const cleanFilters = Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => value !== '' && value != null)
+                Object.entries(searchFilters).filter(([_, value]) => {
+                    if (value === '' || value == null) return false;
+                    // Преобразуем булевые значения в строки
+                    if (typeof value === 'boolean') return true;
+                    return value !== '';
+                })
             );
+
+            // Преобразуем булевые значения в строки для query параметров
+            const preparedFilters = {};
+            Object.entries(cleanFilters).forEach(([key, value]) => {
+                if (typeof value === 'boolean') {
+                    preparedFilters[key] = value.toString();
+                } else {
+                    preparedFilters[key] = value;
+                }
+            });
 
             const response = await api.get('/api/tasks/search', {
                 params: {
-                    ...cleanFilters,
+                    ...preparedFilters,
                     page,
                     size
                 }
@@ -194,7 +220,17 @@ const TaskListPage = () => {
         const filtersWithoutQuickSearch = { ...filters };
         delete filtersWithoutQuickSearch.quickSearch;
 
-        fetchTasks(filtersWithoutQuickSearch, 0);
+        // Преобразуем строковые значения в булевы для hasContract
+        const preparedFilters = { ...filtersWithoutQuickSearch };
+        if (preparedFilters.hasContract === 'true') {
+            preparedFilters.hasContract = true;
+        } else if (preparedFilters.hasContract === 'false') {
+            preparedFilters.hasContract = false;
+        } else if (preparedFilters.hasContract === '') {
+            delete preparedFilters.hasContract;
+        }
+
+        fetchTasks(preparedFilters, 0);
     };
 
     // Сбросить фильтры
@@ -211,7 +247,9 @@ const TaskListPage = () => {
             status: '',
             paymentStatus: '',
             createdAtFrom: '',
-            createdAtTo: ''
+            createdAtTo: '',
+            hasContract: '',
+            contractNumber: ''
         };
         setFilters(resetFilters);
         setPagination(prev => ({ ...prev, currentPage: 0 }));
@@ -237,6 +275,14 @@ const TaskListPage = () => {
             label: 'Оплата',
             value: paymentStatusOptions.find(p => p.value === filters.paymentStatus)?.label
         });
+        if (filters.hasContract) activeFilters.push({
+            label: 'Договор',
+            value: contractOptions.find(c => c.value === filters.hasContract)?.label
+        });
+        if (filters.contractNumber) activeFilters.push({
+            label: 'Номер договора',
+            value: filters.contractNumber
+        });
         if (filters.createdAtFrom || filters.createdAtTo) {
             activeFilters.push({
                 label: 'Дата создания',
@@ -253,19 +299,28 @@ const TaskListPage = () => {
             setPagination(prev => ({ ...prev, currentPage: newPage }));
 
             // Если есть активные фильтры, делаем запрос с пагинацией
-            const hasActiveFilters = Object.values(filters).some(value => value !== '');
+            const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
             if (hasActiveFilters) {
                 const filtersWithoutQuickSearch = { ...filters };
                 delete filtersWithoutQuickSearch.quickSearch;
 
+                // Преобразуем строковые значения в булевы для hasContract
+                const preparedFilters = { ...filtersWithoutQuickSearch };
+                if (preparedFilters.hasContract === 'true') {
+                    preparedFilters.hasContract = true;
+                } else if (preparedFilters.hasContract === 'false') {
+                    preparedFilters.hasContract = false;
+                } else if (preparedFilters.hasContract === '') {
+                    delete preparedFilters.hasContract;
+                }
+
                 if (filters.quickSearch) {
                     fetchTasks({ quickSearch: filters.quickSearch }, newPage);
                 } else {
-                    fetchTasks(filtersWithoutQuickSearch, newPage);
+                    fetchTasks(preparedFilters, newPage);
                 }
             } else {
                 // Для простоты, если нет фильтров, используем клиентскую пагинацию
-                // В реальном приложении лучше всегда делать запрос к серверу
                 fetchAllTasks();
             }
         }
@@ -280,15 +335,25 @@ const TaskListPage = () => {
         }));
 
         // Перезагружаем данные с новым размером страницы
-        const hasActiveFilters = Object.values(filters).some(value => value !== '');
+        const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
         if (hasActiveFilters) {
             const filtersWithoutQuickSearch = { ...filters };
             delete filtersWithoutQuickSearch.quickSearch;
 
+            // Преобразуем строковые значения в булевы для hasContract
+            const preparedFilters = { ...filtersWithoutQuickSearch };
+            if (preparedFilters.hasContract === 'true') {
+                preparedFilters.hasContract = true;
+            } else if (preparedFilters.hasContract === 'false') {
+                preparedFilters.hasContract = false;
+            } else if (preparedFilters.hasContract === '') {
+                delete preparedFilters.hasContract;
+            }
+
             if (filters.quickSearch) {
                 fetchTasks({ quickSearch: filters.quickSearch }, 0, newSize);
             } else {
-                fetchTasks(filtersWithoutQuickSearch, 0, newSize);
+                fetchTasks(preparedFilters, 0, newSize);
             }
         }
     };
@@ -335,6 +400,13 @@ const TaskListPage = () => {
         return pages;
     };
 
+    // Форматирование даты договора
+    const formatContractDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU');
+    };
+
     return (
         <div className="content-container">
             <div className="tasks-header">
@@ -369,7 +441,7 @@ const TaskListPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру заявки или эксперту..."
+                            placeholder="Поиск по номеру заявки, эксперту или номеру договора..."
                             className="search-input"
                             value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
@@ -492,6 +564,31 @@ const TaskListPage = () => {
                                 </select>
                             </div>
 
+                            {/* НОВЫЕ ФИЛЬТРЫ ПО ДОГОВОРУ */}
+                            <div className="filter-group">
+                                <label>Договор</label>
+                                <select
+                                    value={filters.hasContract}
+                                    onChange={(e) => handleFilterChange('hasContract', e.target.value)}
+                                >
+                                    {contractOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="filter-group">
+                                <label>Номер договора</label>
+                                <input
+                                    type="text"
+                                    value={filters.contractNumber}
+                                    onChange={(e) => handleFilterChange('contractNumber', e.target.value)}
+                                    placeholder="Введите номер договора"
+                                />
+                            </div>
+
                             <div className="filter-group date-filter">
                                 <label>Дата создания с</label>
                                 <input
@@ -525,16 +622,16 @@ const TaskListPage = () => {
             </div>
 
             {/* Информация о примененных фильтрах */}
-     {getActiveFilters().length > 0 && (
-    <div className="active-filters-info">
-        <span>Применены фильтры: </span>
-        {getActiveFilters().map((filter, index) => (
-            <span key={index} className="filter-tag">
-                {filter.label}: {filter.value}
-            </span>
-        ))}
-    </div>
-)}
+            {getActiveFilters().length > 0 && (
+                <div className="active-filters-info">
+                    <span>Применены фильтры: </span>
+                    {getActiveFilters().map((filter, index) => (
+                        <span key={index} className="filter-tag">
+                            {filter.label}: {filter.value}
+                        </span>
+                    ))}
+                </div>
+            )}
 
             {/* Панель информации о результатах */}
             <div className="results-info-panel">
@@ -627,7 +724,7 @@ const TaskListPage = () => {
                                             </span>
                                         </div>
 
-                                        {/* Статус оплаты перенесен сюда */}
+                                        {/* Статус оплаты */}
                                         <div className="info-row">
                                             <span className="info-label">Оплата:</span>
                                             <span className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
@@ -635,6 +732,63 @@ const TaskListPage = () => {
                                             </span>
                                         </div>
                                     </div>
+
+                                    {/* НОВАЯ СЕКЦИЯ: Информация о договоре */}
+                                    {task.contract && (
+                                        <div className="contract-info-section">
+                                            <div className="contract-header">
+                                                <BusinessIcon className="contract-icon" />
+                                                <span className="contract-title">Договор:</span>
+                                            </div>
+                                            <div className="contract-details">
+                                                <div className="contract-row">
+                                                    <span className="contract-label">Номер:</span>
+                                                    <span className="contract-value contract-number">
+                                                        {task.contract.number}
+                                                    </span>
+                                                </div>
+                                                <div className="contract-row">
+                                                    <span className="contract-label">Дата:</span>
+                                                    <span className="contract-value">
+                                                        {formatContractDate(task.contract.date)}
+                                                    </span>
+                                                </div>
+                                                {task.contract.applicantName && (
+                                                    <div className="contract-row">
+                                                        <span className="contract-label">Заявитель:</span>
+                                                        <span className="contract-value">
+                                                            {task.contract.applicantName}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="contract-row">
+                                                    <span className="contract-label">Статус оплаты:</span>
+                                                    <span className={`contract-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' : 
+                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
+                                                        {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
+                                                            task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Отображение для задач без договора */}
+                                    {!task.contract && (
+                                        <div className="contract-info-section no-contract">
+                                            <div className="contract-header">
+                                                <AssignmentIcon className="contract-icon" />
+                                                <span className="contract-title">Договор:</span>
+                                            </div>
+                                            <div className="contract-details">
+                                                <div className="contract-row">
+                                                    <span className="contract-value no-contract-text">
+                                                        Не привязан
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))
                         )}

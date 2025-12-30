@@ -1,12 +1,12 @@
 package backend_monolithic.repository;
 
+import backend_monolithic.model.Task;
 import backend_monolithic.model.enums.TaskStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import backend_monolithic.model.Task;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,33 +15,47 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    Boolean existsByNumber(String number);
+    boolean existsByNumber(String number);
+
     List<Task> findByStatusNot(TaskStatus status);
+
+    // Находим задачи без договора (One-to-Many)
+    List<Task> findByContractIsNull();
+
+    // Находим задачи по договору (One-to-Many)
+    List<Task> findByContractId(Long contractId);
 
     // Метод для фильтрации с использованием спецификаций и пагинации
     Page<Task> findAll(Specification<Task> spec, Pageable pageable);
 
-    // Остальные методы остаются
+    // Методы для фильтрации со спецификациями
     List<Task> findAll(Specification<Task> spec);
     List<Task> findAll(Specification<Task> spec, Sort sort);
 
-    // УДАЛЯЕМ старые методы, которые используют прямую связь с contract
-    // @Query("SELECT t FROM Task t LEFT JOIN FETCH t.contract WHERE t.id = :taskId")
-    // Optional<Task> findByIdWithContract(@Param("taskId") Long taskId);
+    // Загружаем задачу с договором (One-to-Many)
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.contract WHERE t.id = :id")
+    Optional<Task> findByIdWithContract(@Param("id") Long id);
 
-    // List<Task> findByContractId(Long contractId);
+    // Находим задачи по нескольким ID
+    List<Task> findByIdIn(List<Long> ids);
 
-    // УДАЛЯЕМ старый метод для поиска задач без привязанного контракта
-    // List<Task> findByContractIsNull();
+    // Находим задачи по заявителю
+    @Query("SELECT t FROM Task t WHERE t.applicant.id = :applicantId")
+    List<Task> findByApplicantId(@Param("applicantId") Long applicantId);
 
-    // НОВЫЕ методы для работы с many-to-many связью
-    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.taskContracts tc LEFT JOIN FETCH tc.contract WHERE t.id = :id")
-    Optional<Task> findByIdWithContracts(@Param("id") Long id);
+    // Находим задачи по производителю
+    @Query("SELECT t FROM Task t WHERE t.manufacturer.id = :manufacturerId")
+    List<Task> findByManufacturerId(@Param("manufacturerId") Long manufacturerId);
 
-    @Query("SELECT t FROM Task t WHERE t.id NOT IN (SELECT tc.task.id FROM TaskContract tc)")
-    List<Task> findTasksWithoutContracts();
+    // Находим задачи по статусу
+    List<Task> findByStatus(TaskStatus status);
 
-    // Метод для поиска задач по ID договора через связь many-to-many
-    @Query("SELECT t FROM Task t JOIN t.taskContracts tc WHERE tc.contract.id = :contractId")
-    List<Task> findByContractId(@Param("contractId") Long contractId);
+    // Находим задачи, созданные после указанной даты
+    List<Task> findByCreatedAtAfter(java.time.LocalDateTime date);
+
+    // Находим задачи, созданные до указанной даты
+    List<Task> findByCreatedAtBefore(java.time.LocalDateTime date);
+
+    // Находим задачи по диапазону дат создания
+    List<Task> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
 }

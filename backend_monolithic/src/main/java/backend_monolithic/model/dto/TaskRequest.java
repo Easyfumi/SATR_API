@@ -17,4 +17,5 @@ public class TaskRequest {
     private String previousProcessType;
     private String representativeName;
     private Long assignedUserId;
+    private Long contractId;
 }

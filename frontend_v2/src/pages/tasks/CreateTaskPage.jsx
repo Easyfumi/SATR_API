@@ -1,3 +1,4 @@
+// CreateTaskPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
@@ -59,6 +60,7 @@ const CreateTaskPage = () => {
         previousNumber: '', // Новое поле
         representativeName: '',
         assignedUserId: null
+        // Убрано contractId - договор будет привязываться позже
     });
 
     const processOptions = [
@@ -79,7 +81,7 @@ const CreateTaskPage = () => {
             N1G: "N1G (Внедорожные грузовые)",
             N2: "N2 (Грузовые средние)",
             N2G: "N2G (Внедорожные грузовые)",
-            N3: "N2G (Грузовые крупные)",
+            N3: "N3 (Грузовые крупные)",
             N3G: "N3G (Внедорожные грузовые)",
             O1: "O1 (Прицепы легкие)",
             O2: "O2 (Прицепы средние)",
@@ -112,12 +114,13 @@ const CreateTaskPage = () => {
                 // Если установлена галочка "отсутствует", отправляем пустую строку
                 representativeName: representativeAbsent ? '' : formData.representativeName,
                 assignedUserId: formData.assignedUserId,
-                previousProcessType: formData.procedureType !== 'оформление нового'
+                previousProcessType: formData.procedureType !== 'Оформление нового'
                     ? formData.procedureType
                     : null,
-                previousNumber: formData.procedureType !== 'оформление нового'
+                previousNumber: formData.procedureType !== 'Оформление нового'
                     ? formData.previousNumber
                     : null
+                // Убрано contractId - договор будет привязываться позже
             };
 
             // Сохраняем request на случай дубликатов
@@ -198,7 +201,7 @@ const CreateTaskPage = () => {
     const handleDocTypeChange = (newDocType) => {
         let newPreviousNumber = formData.previousNumber;
 
-        if (formData.procedureType !== 'оформление нового') {
+        if (formData.procedureType !== 'Оформление нового') {
             const currentDefault = generateDefaultNumber(formData.docType);
             if (formData.previousNumber === currentDefault || formData.previousNumber === '') {
                 newPreviousNumber = generateDefaultNumber(newDocType);
@@ -321,34 +324,17 @@ const CreateTaskPage = () => {
         }
     }, [representativeAbsent]);
 
-    // Добавляем стили для анимации загрузки
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-            .loading-spinner {
-                border: 4px solid #f3f3f3;
-                border-top: 4px solid #3498db;
-                border-radius: 50%;
-                width: 40px;
-                height: 40px;
-                animation: spin 2s linear infinite;
-            }
-        `;
-        document.head.appendChild(style);
-
-        return () => {
-            document.head.removeChild(style);
-        };
-    }, []);
-
     return (
         <div className="content-container">
             <div className="create-task-form">
                 <h2 className="page-title">Создание новой заявки</h2>
+                
+                <div className="create-task-info">
+                    <p className="info-text">
+                        <strong>Примечание:</strong> Договор можно будет привязать к заявке позже 
+                        через страницу редактирования заявки или через страницу договоров.
+                    </p>
+                </div>
 
                 {/* Модальное окно проверки дубликатов */}
                 <DuplicateCheckModal

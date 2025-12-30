@@ -23,7 +23,4 @@ public class ContractResponse {
     private String comments;
     private Long createdBy;
     private LocalDateTime createdAt;
-
-    // Добавляем список связанных заявок
-    private List<TaskInfo> tasks = new ArrayList<>();
 }

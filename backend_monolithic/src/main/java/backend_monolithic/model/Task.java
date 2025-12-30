@@ -31,10 +31,12 @@ public class Task {
 
     private String docType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id")
     private Applicant applicant;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
 
     @ElementCollection
@@ -46,47 +48,46 @@ public class Task {
     private String previousNumber;
     private String previousProcessType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "representative_id")
     private Representative representative;
+
+    // СВЯЗЬ ONE-TO-MANY: У задачи может быть только один договор
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id") // Внешний ключ в таблице tasks
+    private Contract contract;
 
     private Long createdBy;
     private Long assignedUserId;
+
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
     private LocalDateTime createdAt;
     private LocalDate decisionAt;
 
-    // Убираем прямую связь с Contract, заменяем на связь через TaskContract
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference("task-contract")
-    private List<TaskContract> taskContracts = new ArrayList<>();
+    // Убираем TaskContract, так как теперь связь прямая
+    // @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<TaskContract> taskContracts = new ArrayList<>();
 
-    // Хелпер-методы для работы со связями
-    public void addContract(Contract contract, Long linkedBy, String comment) {
-        TaskContract taskContract = new TaskContract();
-        taskContract.setTask(this);
-        taskContract.setContract(contract);
-        taskContract.setLinkedBy(linkedBy);
-        taskContract.setLinkComment(comment);
-        this.taskContracts.add(taskContract);
-        contract.getTaskContracts().add(taskContract);
-    }
+    // Хелпер-методы для работы со связью с Contract
+    public void setContract(Contract contract) {
+        // Отвязываем от старого договора
+        if (this.contract != null) {
+            this.contract.getTasks().remove(this);
+        }
 
-    public void removeContract(Contract contract) {
-        TaskContract taskContract = this.taskContracts.stream()
-                .filter(tc -> tc.getContract().equals(contract))
-                .findFirst()
-                .orElse(null);
-        if (taskContract != null) {
-            this.taskContracts.remove(taskContract);
-            contract.getTaskContracts().remove(taskContract);
-            taskContract.setTask(null);
-            taskContract.setContract(null);
+        // Устанавливаем новую связь
+        this.contract = contract;
+        if (contract != null && !contract.getTasks().contains(this)) {
+            contract.getTasks().add(this);
         }
     }
 
-    public List<Contract> getContracts() {
-        return this.taskContracts.stream()
-                .map(TaskContract::getContract)
-                .collect(Collectors.toList());
+    // Метод для удобного получения информации о договоре
+    public String getContractInfo() {
+        return contract != null ?
+                String.format("%s от %s", contract.getNumber(), contract.getDate()) :
+                "Договор не назначен";
     }
 }
