@@ -1,35 +1,66 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import './ContractListPage.css';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
+import {
+  Button,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  IconButton,
+  CircularProgress
+} from '@mui/material';
+import TaskIcon from '@mui/icons-material/Task';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CloseIcon from '@mui/icons-material/Close';
 
 const ContractListPage = () => {
     const navigate = useNavigate();
-    const location = useLocation();
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
+    const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
+    const [selectedContractTasks, setSelectedContractTasks] = useState([]);
+    const [selectedContractName, setSelectedContractName] = useState('');
+    const [loadingTasks, setLoadingTasks] = useState(false);
 
     // Состояния для фильтров
     const [filters, setFilters] = useState({
         quickSearch: '',
         number: '',
         paymentStatus: '',
-        comments: ''
+        applicantName: ''
     });
-
-
 
     // Маппинг статусов оплаты
     const paymentStatusLabels = {
         PAIDFOR: 'Оплачен',
         PARTIALLYPAIDFOR: 'Оплачен частично',
         NOTPAIDFOR: 'Не оплачен'
+    };
+
+    const taskStatusLabels = {
+        RECEIVED: 'Заявка получена',
+        REGISTERED: 'Заявка зарегистрирована',
+        DECISION_DONE: 'Решение по заявке готово',
+        DOCUMENTS_WAITING: 'Ожидание документов',
+        REJECTION: 'Отказ в проведении работ',
+        CANCELLED: 'Аннулирована',
+        PROJECT: 'Переведено в проект',
+        SIGNED: 'Подписано',
+        FOR_REVISION: 'Возвращено на доработку',
+        COMPLETED: 'Заявка выполнена'
     };
 
     // Статусы оплаты для фильтра
@@ -40,7 +71,7 @@ const ContractListPage = () => {
         { value: 'NOTPAIDFOR', label: 'Не оплачен' }
     ];
 
-    // Загрузка договоров
+    // Загрузка договоров (теперь получаем ContractSimple)
     const fetchContracts = useCallback(async () => {
         setLoading(true);
         try {
@@ -61,6 +92,31 @@ const ContractListPage = () => {
         fetchContracts();
     }, [fetchContracts]);
 
+    // Функция для загрузки задач договора
+    const handleShowTasks = async (contractId, contractNumber, event) => {
+        if (event) event.stopPropagation();
+        
+        setSelectedContractName(contractNumber || 'Договор');
+        setTasksDialogOpen(true);
+        setLoadingTasks(true);
+        
+        try {
+            const response = await api.get(`/api/contracts/${contractId}/tasks`);
+            setSelectedContractTasks(response.data || []);
+        } catch (error) {
+            console.error('Error loading tasks for contract:', error);
+            setSelectedContractTasks([]);
+        } finally {
+            setLoadingTasks(false);
+        }
+    };
+
+    // Функция для перехода к задаче
+    const handleGoToTask = (taskId) => {
+        setTasksDialogOpen(false);
+        navigate(`/tasks/${taskId}`);
+    };
+
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
         setFilters(prev => ({
@@ -79,8 +135,6 @@ const ContractListPage = () => {
 
     // Применить фильтры
     const handleApplyFilters = () => {
-        // Здесь будет логика применения фильтров к API
-        // Пока просто перезагружаем все данные
         fetchContracts();
     };
 
@@ -90,13 +144,13 @@ const ContractListPage = () => {
             quickSearch: '',
             number: '',
             paymentStatus: '',
-            comments: ''
+            applicantName: ''
         };
         setFilters(resetFilters);
         fetchContracts();
     };
 
-    // Фильтрация договоров на клиенте (временное решение)
+    // Фильтрация договоров на клиенте
     const getFilteredContracts = () => {
         let filtered = contracts;
 
@@ -104,7 +158,7 @@ const ContractListPage = () => {
             const searchTerm = filters.quickSearch.toLowerCase();
             filtered = filtered.filter(contract =>
                 contract.number?.toLowerCase().includes(searchTerm) ||
-                contract.comments?.toLowerCase().includes(searchTerm)
+                contract.applicantName?.toLowerCase().includes(searchTerm)
             );
         }
 
@@ -120,9 +174,9 @@ const ContractListPage = () => {
             );
         }
 
-        if (filters.comments) {
+        if (filters.applicantName) {
             filtered = filtered.filter(contract =>
-                contract.comments?.toLowerCase().includes(filters.comments.toLowerCase())
+                contract.applicantName?.toLowerCase().includes(filters.applicantName.toLowerCase())
             );
         }
 
@@ -140,7 +194,7 @@ const ContractListPage = () => {
             label: 'Статус оплаты',
             value: paymentStatusOptions.find(p => p.value === filters.paymentStatus)?.label
         });
-        if (filters.comments) activeFilters.push({ label: 'Комментарий', value: filters.comments });
+        if (filters.applicantName) activeFilters.push({ label: 'Заявитель', value: filters.applicantName });
 
         return activeFilters;
     };
@@ -154,11 +208,23 @@ const ContractListPage = () => {
         }
     };
 
+    const formatDate = (date) => {
+        if (!date) return 'Не указана';
+        return new Date(date).toLocaleDateString('ru-RU');
+    };
+
+    const getTaskStatusColor = (status) => {
+        switch (status) {
+            case 'COMPLETED': return 'success';
+            case 'CANCELLED': return 'error';
+            case 'REJECTION': return 'warning';
+            default: return 'default';
+        }
+    };
+
     return (
         <div className="content-container">
             <div className="contracts-header">
-
-
                 <h2 className="page-title">Раздел договоров</h2>
 
                 <Link
@@ -177,7 +243,7 @@ const ContractListPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру договора или комментарию..."
+                            placeholder="Поиск по номеру договора или заявителю..."
                             className="search-input"
                             value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
@@ -227,12 +293,12 @@ const ContractListPage = () => {
                             </div>
 
                             <div className="filter-group">
-                                <label>Комментарий</label>
+                                <label>Заявитель</label>
                                 <input
                                     type="text"
-                                    value={filters.comments}
-                                    onChange={(e) => handleFilterChange('comments', e.target.value)}
-                                    placeholder="Поиск в комментариях"
+                                    value={filters.applicantName}
+                                    onChange={(e) => handleFilterChange('applicantName', e.target.value)}
+                                    placeholder="Поиск по заявителю"
                                 />
                             </div>
                         </div>
@@ -295,6 +361,14 @@ const ContractListPage = () => {
                                         <div className="contract-number">
                                             {contract.number || 'Номер не указан'}
                                         </div>
+                                        <Chip
+                                            icon={<TaskIcon />}
+                                            label="Задачи"
+                                            size="small"
+                                            color="primary"
+                                            onClick={(e) => handleShowTasks(contract.id, contract.number, e)}
+                                            className="tasks-chip"
+                                        />
                                     </div>
 
                                     {/* Статус оплаты */}
@@ -310,36 +384,103 @@ const ContractListPage = () => {
                                     <div className="info-row">
                                         <span className="info-label">Дата:</span>
                                         <span className="info-value">
-                                            {contract.date ? new Date(contract.date).toLocaleDateString('ru-RU') : 'Не указана'}
+                                            {formatDate(contract.date)}
                                         </span>
                                     </div>
                                     <div className="info-row">
                                         <span className="info-label">Заявитель:</span>
                                         <span className="info-value">
-                                            {contract.applicant ? contract.applicant.name : 'Не указан'}
+                                            {contract.applicantName || 'Не указан'}
                                         </span>
                                     </div>
-                                    <div className="info-row">
-                                        <span className="info-label">Связанная задача:</span>
-                                        <span className="info-value">
-                                            {contract.tasks ? `Задача #${contract.tasks.id}` : 'Не привязана'}
-                                        </span>
-                                    </div>
-
-                                    {contract.comments && (
-                                        <div className="info-row">
-                                            <span className="info-label">Комментарий:</span>
-                                            <span className="info-value comments">
-                                                {contract.comments}
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
             )}
+
+            {/* Диалог для просмотра задач договора */}
+            <Dialog
+                open={tasksDialogOpen}
+                onClose={() => setTasksDialogOpen(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h6">
+                            Задачи договора: {selectedContractName}
+                        </Typography>
+                        <IconButton onClick={() => setTasksDialogOpen(false)} size="small">
+                            <CloseIcon />
+                        </IconButton>
+                    </div>
+                </DialogTitle>
+                <DialogContent>
+                    {loadingTasks ? (
+                        <div style={{ textAlign: 'center', padding: '40px' }}>
+                            <CircularProgress />
+                            <Typography variant="body2" style={{ marginTop: '16px' }}>
+                                Загрузка задач...
+                            </Typography>
+                        </div>
+                    ) : selectedContractTasks.length === 0 ? (
+                        <Typography variant="body1" style={{ padding: '20px', textAlign: 'center' }}>
+                            Нет привязанных задач
+                        </Typography>
+                    ) : (
+                        <List>
+                            {selectedContractTasks.map((task) => (
+                                <ListItem
+                                    key={task.id}
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            onClick={() => handleGoToTask(task.id)}
+                                        >
+                                            <ArrowForwardIcon />
+                                        </IconButton>
+                                    }
+                                    style={{ borderBottom: '1px solid #eee' }}
+                                >
+                                    <ListItemText
+                                        primary={
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <Typography variant="subtitle1">
+                                                    {task.number || `ID: ${task.id}`}
+                                                </Typography>
+                                                <Chip
+                                                    label={taskStatusLabels[task.status] || task.status}
+                                                    size="small"
+                                                    color={getTaskStatusColor(task.status)}
+                                                    variant="outlined"
+                                                />
+                                            </div>
+                                        }
+                                        secondary={
+                                            <React.Fragment>
+                                                <Typography variant="body2" component="span">
+                                                    {task.docType}
+                                                </Typography>
+                                                <br />
+                                                <Typography variant="body2" color="textSecondary">
+                                                    Создана: {task.createdAt ? new Date(task.createdAt).toLocaleDateString('ru-RU') : 'Не указана'}
+                                                </Typography>
+                                            </React.Fragment>
+                                        }
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setTasksDialogOpen(false)}>
+                        Закрыть
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

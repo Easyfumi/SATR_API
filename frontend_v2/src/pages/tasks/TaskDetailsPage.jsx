@@ -40,18 +40,14 @@ const TaskDetailsPage = () => {
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  // Состояния для управления договорами (many-to-many)
+  // Состояния для управления договором (one-to-many)
   const [contracts, setContracts] = useState([]);
   const [filteredContracts, setFilteredContracts] = useState([]);
-  const [contractLinks, setContractLinks] = useState([]);
   const [contractAnchorEl, setContractAnchorEl] = useState(null);
   const [isLoadingContracts, setIsLoadingContracts] = useState(false);
   const [contractError, setContractError] = useState(null);
   const [isUpdatingContract, setIsUpdatingContract] = useState(false);
   const [contractSearch, setContractSearch] = useState('');
-  const [linkComment, setLinkComment] = useState('');
-  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
-  const [selectedContractId, setSelectedContractId] = useState('');
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -73,22 +69,16 @@ const TaskDetailsPage = () => {
   };
 
   useEffect(() => {
-    fetchTaskWithContracts();
+    fetchTask();
   }, [id]);
 
-  // Функция для загрузки задачи с договорами
-  const fetchTaskWithContracts = async () => {
+  // Функция для загрузки задачи
+  const fetchTask = async () => {
     try {
       setLoading(true);
-      // Загружаем основную информацию о задаче
-      const taskResponse = await api.get(`/api/tasks/${id}`);
-      setTask(taskResponse.data);
-      setSelectedStatus(taskResponse.data.status);
-      
-      // Загружаем связанные договоры через новый endpoint
-      const contractsResponse = await api.get(`/api/task-contract-links/task/${id}/contracts`);
-      setContractLinks(contractsResponse.data);
-      
+      const response = await api.get(`/api/tasks/${id}`);
+      setTask(response.data);
+      setSelectedStatus(response.data.status);
       setError(null);
     } catch (err) {
       console.error('Ошибка загрузки задачи:', err);
@@ -120,7 +110,7 @@ const TaskDetailsPage = () => {
       setFilteredContracts(contracts);
     } else {
       const filtered = contracts.filter(contract =>
-        contract.number.toLowerCase().includes(searchText.toLowerCase())
+        contract.number?.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredContracts(filtered);
     }
@@ -129,8 +119,6 @@ const TaskDetailsPage = () => {
   const handleContractButtonClick = async (event) => {
     setContractAnchorEl(event.currentTarget);
     setContractSearch('');
-    setSelectedContractId('');
-    setLinkComment('');
     await fetchAllContracts();
   };
 
@@ -150,32 +138,14 @@ const TaskDetailsPage = () => {
     setFilteredContracts(contracts);
   };
 
-  const handleContractSelect = (contractId) => {
-    setSelectedContractId(contractId);
-    setContractAnchorEl(null);
-    setLinkDialogOpen(true);
-  };
-
   // Функция для привязки договора к задаче
-  const handleLinkContract = async () => {
-    if (!selectedContractId) {
-      alert('Выберите договор для привязки');
-      return;
-    }
-
+  const handleLinkContract = async (contractId) => {
     setIsUpdatingContract(true);
     try {
-      await api.post('/api/task-contract-links/link', {
-        taskId: id,
-        contractId: selectedContractId,
-        comment: linkComment
-      });
-      
-      // Обновляем данные
-      await fetchTaskWithContracts();
-      setLinkDialogOpen(false);
-      setSelectedContractId('');
-      setLinkComment('');
+      await api.put(`/api/tasks/${id}/contract`, { contractId });
+      // Обновляем данные задачи
+      await fetchTask();
+      setContractAnchorEl(null);
       alert('Договор успешно привязан к задаче');
     } catch (error) {
       console.error('Ошибка привязки договора:', error);
@@ -186,17 +156,16 @@ const TaskDetailsPage = () => {
   };
 
   // Функция для отвязки договора от задачи
-  const handleUnlinkContract = async (contractId) => {
+  const handleUnlinkContract = async () => {
     if (!window.confirm('Вы уверены, что хотите отвязать договор от задачи?')) {
       return;
     }
 
     setIsUpdatingContract(true);
     try {
-      await api.delete(`/api/task-contract-links/unlink/task/${id}/contract/${contractId}`);
-      
-      // Обновляем данные
-      await fetchTaskWithContracts();
+      await api.put(`/api/tasks/${id}/contract`, { contractId: null });
+      // Обновляем данные задачи
+      await fetchTask();
       alert('Договор успешно отвязан от задачи');
     } catch (error) {
       console.error('Ошибка отвязки договора:', error);
@@ -510,72 +479,64 @@ const TaskDetailsPage = () => {
         </div>
       </div>
 
-      {/* Блок договоров (many-to-many) */}
+      {/* Блок договора (one-to-many) */}
       <div className="task-details-card">
         <div className="task-row contract-section">
-          <span className="task-label">Договоры</span>
+          <span className="task-label">Договор</span>
           <div className="contracts-container">
             <div className="contracts-header">
               <Button
-                variant="outlined"
+                variant={task.contract ? "outlined" : "contained"}
                 onClick={handleContractButtonClick}
                 disabled={isUpdatingContract}
-                startIcon={<LinkIcon />}
+                startIcon={task.contract ? <LinkIcon /> : <LinkIcon />}
                 endIcon={<ArrowDropDownIcon />}
               >
-                Привязать договор
+                {task.contract ? 'Изменить договор' : 'Привязать договор'}
               </Button>
             </div>
 
-            {contractLinks.length > 0 ? (
+            {task.contract ? (
               <div className="contracts-list">
-                {contractLinks.map((link) => (
-                  <div key={link.id} className="contract-item">
-                    <div className="contract-info">
-                      <div className="contract-number">
-                        {link.contractNumber}
-                      </div>
-                      <div className="contract-details">
-                        <div className="contract-detail">
-                          <span className="contract-detail-label">Дата:</span>
-                          <span className="contract-detail-value">{formatDate(link.contractDate)}</span>
-                        </div>
-                        <div className="contract-detail">
-                          <span className="contract-detail-label">Статус оплаты:</span>
-                          <span className={`contract-detail-value payment-status-${link.paymentStatus?.toLowerCase()}`}>
-                            {getPaymentStatusLabel(link.paymentStatus)}
-                          </span>
-                        </div>
-                        {link.linkComment && (
-                          <div className="contract-detail">
-                            <span className="contract-detail-label">Комментарий:</span>
-                            <span className="contract-detail-value">{link.linkComment}</span>
-                          </div>
-                        )}
-                        {link.linkedAt && (
-                          <div className="contract-detail">
-                            <span className="contract-detail-label">Привязан:</span>
-                            <span className="contract-detail-value">{formatDateTime(link.linkedAt)}</span>
-                          </div>
-                        )}
-                      </div>
+                <div className="contract-item">
+                  <div className="contract-info">
+                    <div className="contract-number">
+                      {task.contract.number}
                     </div>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      startIcon={<UnlinkIcon />}
-                      onClick={() => handleUnlinkContract(link.contractId)}
-                      disabled={isUpdatingContract}
-                    >
-                      Отвязать
-                    </Button>
+                    <div className="contract-details">
+                      <div className="contract-detail">
+                        <span className="contract-detail-label">Дата:</span>
+                        <span className="contract-detail-value">{formatDate(task.contract.date)}</span>
+                      </div>
+                      <div className="contract-detail">
+                        <span className="contract-detail-label">Статус оплаты:</span>
+                        <span className={`contract-detail-value payment-status-${task.contract.paymentStatus?.toLowerCase()}`}>
+                          {getPaymentStatusLabel(task.contract.paymentStatus)}
+                        </span>
+                      </div>
+                      {task.contract.applicantName && (
+                        <div className="contract-detail">
+                          <span className="contract-detail-label">Заявитель:</span>
+                          <span className="contract-detail-value">{task.contract.applicantName}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ))}
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    size="small"
+                    startIcon={<UnlinkIcon />}
+                    onClick={handleUnlinkContract}
+                    disabled={isUpdatingContract}
+                  >
+                    Отвязать
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="no-contracts-message">
-                <p>Нет привязанных договоров</p>
+                <p>Нет привязанного договора</p>
               </div>
             )}
           </div>
@@ -652,12 +613,16 @@ const TaskDetailsPage = () => {
           filteredContracts.map((contract) => (
             <MenuItem
               key={contract.id}
-              onClick={() => handleContractSelect(contract.id)}
+              onClick={() => handleLinkContract(contract.id)}
               className="contract-menu-item"
+              selected={task.contract?.id === contract.id}
             >
               <div className="contract-item-details">
                 <div className="contract-item-number">
                   {contract.number}
+                  {task.contract?.id === contract.id && (
+                    <Chip label="Текущий" size="small" color="primary" sx={{ ml: 1 }} />
+                  )}
                 </div>
                 <div className="contract-item-info">
                   <span>от {formatDate(contract.date)}</span>
@@ -673,41 +638,6 @@ const TaskDetailsPage = () => {
           ))
         )}
       </Menu>
-
-      {/* Диалог привязки договора */}
-      <Dialog 
-        open={linkDialogOpen} 
-        onClose={() => setLinkDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          Привязать договор к задаче
-        </DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Комментарий связи (необязательно)"
-            value={linkComment}
-            onChange={(e) => setLinkComment(e.target.value)}
-            multiline
-            rows={3}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLinkDialogOpen(false)}>
-            Отмена
-          </Button>
-          <Button 
-            onClick={handleLinkContract}
-            variant="contained"
-            disabled={isUpdatingContract}
-          >
-            {isUpdatingContract ? <CircularProgress size={24} /> : 'Привязать'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </div>
   );
 };

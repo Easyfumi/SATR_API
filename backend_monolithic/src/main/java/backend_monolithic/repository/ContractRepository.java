@@ -1,7 +1,6 @@
 package backend_monolithic.repository;
 
 import backend_monolithic.model.Contract;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,12 +13,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long> {
     Optional<Contract> findByNumber(String number);
     boolean existsByNumber(String number);
 
-    // Загружаем договор с задачами (One-to-Many)
-    @Query("SELECT c FROM Contract c LEFT JOIN FETCH c.tasks WHERE c.id = :id")
+    @Query("SELECT DISTINCT c FROM Contract c LEFT JOIN FETCH c.tasks WHERE c.id = :id")
     Optional<Contract> findByIdWithTasks(@Param("id") Long id);
 
-    // Стандартный метод с EntityGraph
-    @Override
-    @EntityGraph(attributePaths = {"tasks"})
-    Optional<Contract> findById(Long id);
+    @Query("SELECT DISTINCT c FROM Contract c LEFT JOIN FETCH c.applicant WHERE c.id = :id")
+    Optional<Contract> findByIdWithApplicant(@Param("id") Long id);
 }

@@ -1,15 +1,10 @@
 package backend_monolithic.service;
 
 import backend_monolithic.error.BusinessException;
-import backend_monolithic.model.Applicant;
-import backend_monolithic.model.Contract;
-import backend_monolithic.model.Task;
-import backend_monolithic.model.User;
-import backend_monolithic.model.dto.ContractRequest;
+import backend_monolithic.model.dto.*;
+import backend_monolithic.model.*;
 import backend_monolithic.model.enums.PaymentStatus;
-import backend_monolithic.repository.ApplicantRepository;
-import backend_monolithic.repository.ContractRepository;
-import backend_monolithic.repository.TaskRepository;
+import backend_monolithic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,23 +21,36 @@ import java.util.Optional;
 public class ContractServiceImplementation implements ContractService {
 
     private final ContractRepository contractRepository;
-    private final TaskRepository taskRepository;
     private final ApplicantRepository applicantRepository;
     private final UserService userService;
 
     @Override
-    public List<Contract> findAll() {
-        return contractRepository.findAll();
+    public List<ContractSimple> findAllSimple() {
+        List<Contract> contracts = contractRepository.findAll();
+        return contracts.stream()
+                .map(this::convertToContractSimple)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Contract> findById(Long id) {
-        return contractRepository.findByIdWithTasks(id);
+    public ContractResponse findById(Long id) {
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+        return convertToContractResponse(contract);
+    }
+
+    @Override
+    public List<TaskSimple> findContractTasks(Long id) {
+        Contract contract = contractRepository.findByIdWithTasks(id)
+                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+        return contract.getTasks().stream()
+                .map(this::convertToTaskSimple)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public Contract save(ContractRequest request, String jwt) {
+    public ContractResponse save(ContractRequest request, String jwt) {
         if (contractRepository.existsByNumber(request.getNumber())) {
             throw new BusinessException("Договор с номером " + request.getNumber() + " уже существует");
         }
@@ -61,117 +70,105 @@ public class ContractServiceImplementation implements ContractService {
             contract.setApplicant(applicant);
         }
 
-        return contractRepository.save(contract);
+        Contract savedContract = contractRepository.save(contract);
+        return convertToContractResponse(savedContract);
     }
 
     @Override
     @Transactional
-    public Contract update(Long id, ContractRequest contractDetails) {
+    public ContractResponse update(Long id, ContractRequest request) {
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
 
-        if (!contract.getNumber().equals(contractDetails.getNumber()) &&
-                contractRepository.existsByNumber(contractDetails.getNumber())) {
-            throw new BusinessException("Договор с номером " + contractDetails.getNumber() + " уже существует");
+        if (!contract.getNumber().equals(request.getNumber())
+                && contractRepository.existsByNumber(request.getNumber())) {
+            throw new BusinessException("Договор с номером " + request.getNumber() + " уже существует");
         }
 
-        contract.setNumber(contractDetails.getNumber());
-        contract.setDate(contractDetails.getDate());
-        contract.setPaymentStatus(contractDetails.getPaymentStatus());
-        contract.setComments(contractDetails.getComments());
+        contract.setNumber(request.getNumber());
+        contract.setDate(request.getDate());
+        contract.setPaymentStatus(request.getPaymentStatus());
+        contract.setComments(request.getComments());
 
-        if (contractDetails.getApplicantName() != null && !contractDetails.getApplicantName().isEmpty()) {
-            Applicant applicant = getOrCreateApplicant(contractDetails.getApplicantName());
+        if (request.getApplicantName() != null && !request.getApplicantName().isEmpty()) {
+            Applicant applicant = getOrCreateApplicant(request.getApplicantName());
             contract.setApplicant(applicant);
         } else {
             contract.setApplicant(null);
         }
 
-        return contractRepository.save(contract);
+        Contract updatedContract = contractRepository.save(contract);
+        return convertToContractResponse(updatedContract);
     }
 
     @Override
     @Transactional
     public void deleteById(Long id) {
-        Contract contract = contractRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
-
-        // Отвязываем все задачи от этого договора
-        for (Task task : contract.getTasks()) {
-            task.setContract(null);
+        if (!contractRepository.existsById(id)) {
+            throw new EntityNotFoundException("Договор не найден");
         }
-
-        contractRepository.delete(contract);
+        contractRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public Contract updateComments(Long id, String comments) {
+    public ContractResponse updateComments(Long id, String comments) {
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
         contract.setComments(comments);
-        return contractRepository.save(contract);
+        Contract updatedContract = contractRepository.save(contract);
+        return convertToContractResponse(updatedContract);
     }
+
 
     @Override
     @Transactional
-    public Contract updatePaymentStatus(Long id, PaymentStatus paymentStatus) {
+    public ContractResponse updatePaymentStatus(Long id, PaymentStatus paymentStatus) {
         Contract contract = contractRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
         contract.setPaymentStatus(paymentStatus);
-        return contractRepository.save(contract);
+        Contract updatedContract = contractRepository.save(contract);
+        return convertToContractResponse(updatedContract);
     }
 
-    @Override
-    public List<Task> findTasksWithoutContract() {
-        return taskRepository.findByContractIsNull();
+    // Вспомогательные методы конвертации
+    private ContractSimple convertToContractSimple(Contract contract) {
+        ContractSimple dto = new ContractSimple();
+        dto.setId(contract.getId());
+        dto.setNumber(contract.getNumber());
+        dto.setDate(contract.getDate());
+        dto.setPaymentStatus(contract.getPaymentStatus());
+        dto.setApplicantName(contract.getApplicant() != null ?
+                contract.getApplicant().getName() : null);
+        return dto;
     }
 
-    @Override
-    @Transactional
-    public void addTasksToContract(Long contractId, List<Long> taskIds) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
-
-        List<Task> tasks = taskRepository.findAllById(taskIds);
-
-        if (tasks.size() != taskIds.size()) {
-            throw new EntityNotFoundException("Некоторые задачи не найдены");
-        }
-
-        // Устанавливаем договор для каждой задачи
-        for (Task task : tasks) {
-            task.setContract(contract);
-        }
-
-        taskRepository.saveAll(tasks);
+    private ContractResponse convertToContractResponse(Contract contract) {
+        ContractResponse dto = new ContractResponse();
+        dto.setId(contract.getId());
+        dto.setNumber(contract.getNumber());
+        dto.setDate(contract.getDate());
+        dto.setApplicantName(contract.getApplicant() != null ?
+                contract.getApplicant().getName() : null);
+        dto.setPaymentStatus(contract.getPaymentStatus());
+        dto.setComments(contract.getComments());
+        dto.setCreatedBy(contract.getCreatedBy());
+        dto.setCreatedAt(contract.getCreatedAt());
+        return dto;
     }
 
-    @Override
-    @Transactional
-    public void removeTasksFromContract(Long contractId, List<Long> taskIds) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
-
-        List<Task> tasks = taskRepository.findAllById(taskIds);
-
-        // Удаляем связь только если задача привязана к этому договору
-        for (Task task : tasks) {
-            if (contract.equals(task.getContract())) {
-                task.setContract(null);
-            }
-        }
-
-        taskRepository.saveAll(tasks);
+    private TaskSimple convertToTaskSimple(Task task) {
+        TaskSimple dto = new TaskSimple();
+        dto.setId(task.getId());
+        dto.setNumber(task.getNumber());
+        dto.setDocType(task.getDocType());
+        dto.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
+        dto.setCreatedAt(task.getCreatedAt());
+        return dto;
     }
 
-    // Вспомогательные методы
-
-    private Applicant getOrCreateApplicant(String applicantName) {
-        return applicantRepository.findByName(applicantName)
-                .orElseGet(() -> {
-                    Applicant newApplicant = new Applicant(applicantName);
-                    return applicantRepository.save(newApplicant);
-                });
+    private Applicant getOrCreateApplicant(String name) {
+        return applicantRepository.findByName(name)
+                .orElseGet(() -> applicantRepository.save(new Applicant(name)));
     }
 }
