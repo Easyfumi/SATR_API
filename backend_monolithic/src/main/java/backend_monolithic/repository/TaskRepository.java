@@ -33,7 +33,7 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
     List<Task> findAll(Specification<Task> spec, Sort sort);
 
     // Загружаем задачу с договором (One-to-Many)
-    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.contract WHERE t.id = :id")
+    @Query("SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.contract WHERE t.id = :id")
     Optional<Task> findByIdWithContract(@Param("id") Long id);
 
     // Находим задачи по нескольким ID

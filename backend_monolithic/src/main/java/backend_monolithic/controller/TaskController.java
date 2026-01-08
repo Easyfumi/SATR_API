@@ -125,9 +125,9 @@ public class TaskController {
     @PutMapping("/{id}/contract")
     public ResponseEntity<?> updateTaskContract(
             @PathVariable Long id,
-            @RequestParam(required = false) Long contractId) {
+            @RequestBody TaskContractUpdateRequest request) {
         try {
-            TaskResponse response = taskService.updateTaskContract(id, contractId);
+            TaskResponse response = taskService.updateTaskContract(id, request.getContractId());
             return ResponseEntity.ok(response);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -192,8 +192,3 @@ public class TaskController {
         return ResponseEntity.ok(duplicates);
     }
 }
-
-
-
-
-

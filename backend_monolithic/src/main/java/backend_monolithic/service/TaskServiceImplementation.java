@@ -59,7 +59,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public TaskResponse getTaskById(Long id) {
-        Task task = taskRepository.findById(id)
+        Task task = taskRepository.findByIdWithContract(id)
                 .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
         return mapEntityToResponse(task);
     }
@@ -191,6 +191,13 @@ public class TaskServiceImplementation implements TaskService {
         if (contractId != null) {
             contract = contractRepository.findById(contractId)
                     .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+
+            // Проверяем, не привязан ли уже этот договор к другой задаче
+            List<Task> tasksWithSameContract = taskRepository.findByContractId(contractId);
+            if (!tasksWithSameContract.isEmpty() &&
+                    !tasksWithSameContract.stream().anyMatch(t -> t.getId().equals(taskId))) {
+                throw new BusinessException("Этот договор уже привязан к другой задаче");
+            }
         }
 
         task.setContract(contract);
@@ -325,4 +332,3 @@ public class TaskServiceImplementation implements TaskService {
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
     }
 }
-

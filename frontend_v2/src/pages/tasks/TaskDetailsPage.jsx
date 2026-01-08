@@ -15,7 +15,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Alert
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -48,6 +49,7 @@ const TaskDetailsPage = () => {
   const [contractError, setContractError] = useState(null);
   const [isUpdatingContract, setIsUpdatingContract] = useState(false);
   const [contractSearch, setContractSearch] = useState('');
+  const [alertMessage, setAlertMessage] = useState(null);
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -146,10 +148,17 @@ const TaskDetailsPage = () => {
       // Обновляем данные задачи
       await fetchTask();
       setContractAnchorEl(null);
-      alert('Договор успешно привязан к задаче');
+      setAlertMessage({
+        type: 'success',
+        text: 'Договор успешно привязан к задаче'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка привязки договора:', error);
-      alert(error.response?.data?.message || 'Произошла ошибка при привязке договора');
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка при привязке договора'
+      });
     } finally {
       setIsUpdatingContract(false);
     }
@@ -166,10 +175,17 @@ const TaskDetailsPage = () => {
       await api.put(`/api/tasks/${id}/contract`, { contractId: null });
       // Обновляем данные задачи
       await fetchTask();
-      alert('Договор успешно отвязан от задачи');
+      setAlertMessage({
+        type: 'success',
+        text: 'Договор успешно отвязан от задачи'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка отвязки договора:', error);
-      alert(error.response?.data?.message || 'Произошла ошибка при отвязке договора');
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка при отвязке договора'
+      });
     } finally {
       setIsUpdatingContract(false);
     }
@@ -183,10 +199,17 @@ const TaskDetailsPage = () => {
       const response = await api.put(`/api/tasks/${id}/number`, { number: newNumber });
       setTask({ ...task, number: newNumber });
       setNewNumber('');
-      alert('Номер успешно присвоен');
+      setAlertMessage({
+        type: 'success',
+        text: 'Номер успешно присвоен'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка присвоения номера:', error);
-      alert(error.response?.data?.message || 'Произошла ошибка');
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка'
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -202,10 +225,17 @@ const TaskDetailsPage = () => {
       });
       setTask(response.data);
       setNewDecisionDate('');
-      alert('Дата решения успешно установлена');
+      setAlertMessage({
+        type: 'success',
+        text: 'Дата решения успешно установлена'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка установки даты решения:', error);
-      alert(error.response?.data?.message || 'Произошла ошибка');
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка'
+      });
     } finally {
       setIsUpdatingDecisionDate(false);
     }
@@ -236,10 +266,17 @@ const TaskDetailsPage = () => {
       });
       setTask(response.data);
       setIsStatusChanged(false);
-      alert('Статус успешно обновлен');
+      setAlertMessage({
+        type: 'success',
+        text: 'Статус успешно обновлен'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
-      alert(error.response?.data?.message || 'Произошла ошибка');
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка'
+      });
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -284,6 +321,16 @@ const TaskDetailsPage = () => {
 
   return (
     <div className="content-container">
+      {alertMessage && (
+        <Alert 
+          severity={alertMessage.type} 
+          onClose={() => setAlertMessage(null)}
+          sx={{ mb: 2 }}
+        >
+          {alertMessage.text}
+        </Alert>
+      )}
+
       <div>
         <Link to="/tasks" className="back-button">
           <ArrowBackIcon />
@@ -489,7 +536,7 @@ const TaskDetailsPage = () => {
                 variant={task.contract ? "outlined" : "contained"}
                 onClick={handleContractButtonClick}
                 disabled={isUpdatingContract}
-                startIcon={task.contract ? <LinkIcon /> : <LinkIcon />}
+                startIcon={<LinkIcon />}
                 endIcon={<ArrowDropDownIcon />}
               >
                 {task.contract ? 'Изменить договор' : 'Привязать договор'}
@@ -628,11 +675,9 @@ const TaskDetailsPage = () => {
                   <span>от {formatDate(contract.date)}</span>
                   <span>{getPaymentStatusLabel(contract.paymentStatus)}</span>
                 </div>
-                {contract.applicant && (
-                  <div className="contract-applicant">
-                    Заявитель: {contract.applicant.name || contract.applicant}
-                  </div>
-                )}
+                <div className="contract-applicant">
+                  Заявитель: {contract.applicantName || 'Не указан'}
+                </div>
               </div>
             </MenuItem>
           ))
