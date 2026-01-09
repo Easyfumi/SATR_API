@@ -112,6 +112,7 @@ const CreateTaskPage = () => {
                 typeName: formData.typeName,
                 processType: formData.processType,
                 // Если установлена галочка "отсутствует", отправляем пустую строку
+                // Бекенд корректно обработает это как null или создаст представителя "отсутствует"
                 representativeName: representativeAbsent ? '' : formData.representativeName,
                 assignedUserId: formData.assignedUserId,
                 previousProcessType: formData.procedureType !== 'Оформление нового'
@@ -528,7 +529,8 @@ const CreateTaskPage = () => {
                                                     <span className="placeholder-text">Выберите или введите представителя</span>
                                                 )
                                             }}
-                                            required={!manufacturerSameAsApplicant && !representativeAbsent}
+                                            // Поле не обязательно, если представитель отсутствует
+                                            required={!representativeAbsent}
                                         />
                                     )}
                                 />
