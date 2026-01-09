@@ -34,7 +34,7 @@
 
 .results-info-panel {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between !important; /* Этот стиль сам по себе распределит элементы по краям */
     align-items: center;
     padding: 15px 20px;
     background: #f8fafc;
