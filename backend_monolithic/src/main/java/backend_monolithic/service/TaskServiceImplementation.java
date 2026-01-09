@@ -292,16 +292,43 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     private boolean areTasksDuplicates(Task task1, Task task2) {
-        return Objects.equals(task1.getDocType(), task2.getDocType())
-                && Objects.equals(task1.getApplicant(), task2.getApplicant())
-                && Objects.equals(task1.getManufacturer(), task2.getManufacturer())
-                && Objects.equals(task1.getCategories(), task2.getCategories())
-                && Objects.equals(task1.getMark(), task2.getMark())
-                && Objects.equals(task1.getTypeName(), task2.getTypeName())
-                && Objects.equals(task1.getProcessType(), task2.getProcessType())
-                && Objects.equals(task1.getPreviousNumber(), task2.getPreviousNumber())
-                && Objects.equals(task1.getPreviousProcessType(), task2.getPreviousProcessType())
-                && Objects.equals(task1.getRepresentative(), task2.getRepresentative());
+        // Сравниваем основные поля
+        if (!Objects.equals(task1.getDocType(), task2.getDocType())) return false;
+        if (!Objects.equals(task1.getMark(), task2.getMark())) return false;
+        if (!Objects.equals(task1.getTypeName(), task2.getTypeName())) return false;
+        if (!Objects.equals(task1.getProcessType(), task2.getProcessType())) return false;
+
+        // Сравниваем имена заявителей
+        String applicant1 = task1.getApplicant() != null ? task1.getApplicant().getName() : null;
+        String applicant2 = task2.getApplicant() != null ? task2.getApplicant().getName() : null;
+        if (!Objects.equals(applicant1, applicant2)) return false;
+
+        // Сравниваем имена производителей
+        String manufacturer1 = task1.getManufacturer() != null ? task1.getManufacturer().getName() : null;
+        String manufacturer2 = task2.getManufacturer() != null ? task2.getManufacturer().getName() : null;
+        if (!Objects.equals(manufacturer1, manufacturer2)) return false;
+
+        // Сравниваем категории (учитывая null)
+        if (task1.getCategories() == null && task2.getCategories() != null) return false;
+        if (task1.getCategories() != null && task2.getCategories() == null) return false;
+        if (task1.getCategories() != null && task2.getCategories() != null) {
+            if (!new HashSet<>(task1.getCategories()).equals(new HashSet<>(task2.getCategories()))) {
+                return false;
+            }
+        }
+
+        // Сравниваем представителей (null и пустая строка считаются равными)
+        String rep1 = task1.getRepresentative() != null ? task1.getRepresentative().getName() : null;
+        String rep2 = task2.getRepresentative() != null ? task2.getRepresentative().getName() : null;
+        if (rep1 == null) rep1 = "";
+        if (rep2 == null) rep2 = "";
+        if (!Objects.equals(rep1, rep2)) return false;
+
+        // Сравниваем предыдущие данные
+        if (!Objects.equals(task1.getPreviousNumber(), task2.getPreviousNumber())) return false;
+        if (!Objects.equals(task1.getPreviousProcessType(), task2.getPreviousProcessType())) return false;
+
+        return true;
     }
 
     private String getTaskDisplayIdentifier(Task task) {
