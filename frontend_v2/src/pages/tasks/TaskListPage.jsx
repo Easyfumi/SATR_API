@@ -1,4 +1,4 @@
-// TaskListPage.jsx
+// TaskListPage.jsx (исправленная версия)
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -12,8 +12,6 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import BusinessIcon from '@mui/icons-material/Business';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const TaskListPage = () => {
     const navigate = useNavigate();
@@ -44,8 +42,8 @@ const TaskListPage = () => {
         paymentStatus: '',
         createdAtFrom: '',
         createdAtTo: '',
-        hasContract: '', // Новое поле: наличие договора
-        contractNumber: '' // Новое поле: номер договора
+        hasContract: '',
+        contractNumber: ''
     });
 
     // Навигационные кнопки
@@ -109,13 +107,12 @@ const TaskListPage = () => {
             const cleanFilters = Object.fromEntries(
                 Object.entries(searchFilters).filter(([_, value]) => {
                     if (value === '' || value == null) return false;
-                    // Преобразуем булевые значения в строки
                     if (typeof value === 'boolean') return true;
                     return value !== '';
                 })
             );
 
-            // Преобразуем булевые значения в строки для query параметров
+            // Преобразуем булевые значения в строки
             const preparedFilters = {};
             Object.entries(cleanFilters).forEach(([key, value]) => {
                 if (typeof value === 'boolean') {
@@ -133,13 +130,14 @@ const TaskListPage = () => {
                 }
             });
 
-            // Предполагаем, что бэкенд возвращает структуру с пагинацией
+            // Логируем ответ для отладки
+            console.log('Ответ от бэкенда:', response.data);
+            
             const data = response.data.content || response.data || [];
             const paginationData = response.data;
 
             setTasks(data);
 
-            // Обновляем пагинацию
             if (paginationData) {
                 setPagination(prev => ({
                     ...prev,
@@ -166,9 +164,9 @@ const TaskListPage = () => {
         try {
             const response = await api.get('/api/tasks');
             const data = Array.isArray(response.data) ? response.data : [];
+            console.log('Все задачи:', data);
             setTasks(data);
 
-            // Для клиентской пагинации (если бэкенд не поддерживает)
             setPagination(prev => ({
                 ...prev,
                 totalPages: Math.ceil(data.length / prev.pageSize),
@@ -188,6 +186,15 @@ const TaskListPage = () => {
     useEffect(() => {
         fetchAllTasks();
     }, [fetchAllTasks]);
+
+    // useEffect для отладки
+    useEffect(() => {
+        if (tasks.length > 0) {
+            console.log('Первая задача в состоянии:', tasks[0]);
+            console.log('decisionAt первой задачи:', tasks[0].decisionAt);
+            console.log('Все поля задачи:', Object.keys(tasks[0]));
+        }
+    }, [tasks]);
 
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
@@ -220,7 +227,6 @@ const TaskListPage = () => {
         const filtersWithoutQuickSearch = { ...filters };
         delete filtersWithoutQuickSearch.quickSearch;
 
-        // Преобразуем строковые значения в булевы для hasContract
         const preparedFilters = { ...filtersWithoutQuickSearch };
         if (preparedFilters.hasContract === 'true') {
             preparedFilters.hasContract = true;
@@ -298,13 +304,11 @@ const TaskListPage = () => {
         if (newPage >= 0 && newPage < pagination.totalPages) {
             setPagination(prev => ({ ...prev, currentPage: newPage }));
 
-            // Если есть активные фильтры, делаем запрос с пагинацией
             const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
             if (hasActiveFilters) {
                 const filtersWithoutQuickSearch = { ...filters };
                 delete filtersWithoutQuickSearch.quickSearch;
 
-                // Преобразуем строковые значения в булевы для hasContract
                 const preparedFilters = { ...filtersWithoutQuickSearch };
                 if (preparedFilters.hasContract === 'true') {
                     preparedFilters.hasContract = true;
@@ -320,7 +324,6 @@ const TaskListPage = () => {
                     fetchTasks(preparedFilters, newPage);
                 }
             } else {
-                // Для простоты, если нет фильтров, используем клиентскую пагинацию
                 fetchAllTasks();
             }
         }
@@ -334,13 +337,11 @@ const TaskListPage = () => {
             totalPages: Math.ceil(prev.totalElements / newSize)
         }));
 
-        // Перезагружаем данные с новым размером страницы
         const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
         if (hasActiveFilters) {
             const filtersWithoutQuickSearch = { ...filters };
             delete filtersWithoutQuickSearch.quickSearch;
 
-            // Преобразуем строковые значения в булевы для hasContract
             const preparedFilters = { ...filtersWithoutQuickSearch };
             if (preparedFilters.hasContract === 'true') {
                 preparedFilters.hasContract = true;
@@ -368,7 +369,7 @@ const TaskListPage = () => {
         }
     };
 
-    // Получаем задачи для текущей страницы (клиентская пагинация)
+    // Получаем задачи для текущей страницы
     const getCurrentPageTasks = () => {
         if (tasks.length <= pagination.pageSize) {
             return tasks;
@@ -400,8 +401,8 @@ const TaskListPage = () => {
         return pages;
     };
 
-    // Форматирование даты договора
-    const formatContractDate = (dateString) => {
+    // Форматирование даты
+    const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('ru-RU');
@@ -674,9 +675,12 @@ const TaskListPage = () => {
                                 >
                                     {/* Верхняя строка с номером и статусом */}
                                     <div className="task-card-header">
-                                        <div className="status-container">
+                                        <div className="left-header-section">
                                             <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
                                                 {task.number || 'Не зарегистрирована'}
+                                            </div>
+                                            <div className="decision-date">
+                                                Решение по заявке: {task.decisionAt ? formatDate(task.decisionAt) : 'отсутствует'}
                                             </div>
                                         </div>
 
@@ -714,8 +718,9 @@ const TaskListPage = () => {
                                         </div>
                                     </div>
 
-                                    <div className="applicant-expert-container">
-                                        <div className={`info-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
+                                    {/* Информация об эксперте, договоре и оплате */}
+                                    <div className="expert-contract-section">
+                                        <div className={`expert-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
                                             <span className="info-label">Эксперт:</span>
                                             <span className="info-value">
                                                 {task.assignedUser
@@ -724,71 +729,24 @@ const TaskListPage = () => {
                                             </span>
                                         </div>
 
-                                        {/* Статус оплаты */}
-                                        <div className="info-row">
-                                            <span className="info-label">Оплата:</span>
-                                            <span className={`payment-status ${task.paymentStatus ? 'paid' : 'unpaid'}`}>
-                                                {task.paymentStatus ? 'Оплачено' : 'Ожидает оплаты'}
+                                        <div className="contract-row">
+                                            <span className="info-label">Номер договора:</span>
+                                            <span className="info-value">
+                                                {task.contract ? task.contract.number : 'Договор не привязан'}
                                             </span>
                                         </div>
+
+                                        {task.contract && (
+                                            <div className="payment-row">
+                                                <span className="info-label">Статус оплаты:</span>
+                                                <span className={`payment-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' :
+                                                    task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
+                                                    {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
+                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
-
-                                    {/* НОВАЯ СЕКЦИЯ: Информация о договоре */}
-                                    {task.contract && (
-                                        <div className="contract-info-section">
-                                            <div className="contract-header">
-                                                <BusinessIcon className="contract-icon" />
-                                                <span className="contract-title">Договор:</span>
-                                            </div>
-                                            <div className="contract-details">
-                                                <div className="contract-row">
-                                                    <span className="contract-label">Номер:</span>
-                                                    <span className="contract-value contract-number">
-                                                        {task.contract.number}
-                                                    </span>
-                                                </div>
-                                                <div className="contract-row">
-                                                    <span className="contract-label">Дата:</span>
-                                                    <span className="contract-value">
-                                                        {formatContractDate(task.contract.date)}
-                                                    </span>
-                                                </div>
-                                                {task.contract.applicantName && (
-                                                    <div className="contract-row">
-                                                        <span className="contract-label">Заявитель:</span>
-                                                        <span className="contract-value">
-                                                            {task.contract.applicantName}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                <div className="contract-row">
-                                                    <span className="contract-label">Статус оплаты:</span>
-                                                    <span className={`contract-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' : 
-                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
-                                                        {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
-                                                            task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Отображение для задач без договора */}
-                                    {!task.contract && (
-                                        <div className="contract-info-section no-contract">
-                                            <div className="contract-header">
-                                                <AssignmentIcon className="contract-icon" />
-                                                <span className="contract-title">Договор:</span>
-                                            </div>
-                                            <div className="contract-details">
-                                                <div className="contract-row">
-                                                    <span className="contract-value no-contract-text">
-                                                        Не привязан
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             ))
                         )}
