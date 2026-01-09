@@ -77,7 +77,7 @@ public class TaskController {
         }
     }
 
-    @PatchMapping("/{id}/number")
+    @PutMapping("/{id}/number")  // Changed from PATCH to PUT
     public ResponseEntity<?> setTaskNumber(
             @PathVariable Long id,
             @Valid @RequestBody TaskNumberRequest request) {
@@ -94,7 +94,7 @@ public class TaskController {
         }
     }
 
-    @PatchMapping("/{id}/decision-date")
+    @PutMapping("/{id}/decision-date")  // Changed from PATCH to PUT
     public ResponseEntity<?> setDecisionDate(
             @PathVariable Long id,
             @Valid @RequestBody TaskDecisionDateRequest request) {
@@ -108,10 +108,10 @@ public class TaskController {
         }
     }
 
-    @PatchMapping("/{id}/status")
+    @PutMapping("/{id}/status")  // Changed from PATCH to PUT
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
-            @Valid @RequestBody TaskStatusRequest request) {
+            @Valid @RequestBody TaskStatusUpdateRequest request) {
         try {
             TaskResponse response = taskService.updateStatus(id, request.getStatus());
             return ResponseEntity.ok(response);

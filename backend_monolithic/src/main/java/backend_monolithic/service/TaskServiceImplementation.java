@@ -244,26 +244,28 @@ public class TaskServiceImplementation implements TaskService {
         response.setId(task.getId());
         response.setNumber(task.getNumber());
         response.setDocType(task.getDocType());
-        response.setApplicant(task.getApplicant().getName());
-        response.setManufacturer(task.getManufacturer().getName());
+        response.setApplicant(task.getApplicant() != null ? task.getApplicant().getName() : null);
+        response.setManufacturer(task.getManufacturer() != null ? task.getManufacturer().getName() : null);
         response.setCategories(task.getCategories());
         response.setMark(task.getMark());
         response.setTypeName(task.getTypeName());
         response.setProcessType(task.getProcessType());
         response.setPreviousProcessType(task.getPreviousProcessType());
         response.setPreviousNumber(task.getPreviousNumber());
-        response.setRepresentative(task.getRepresentative().getName());
+        response.setRepresentative(task.getRepresentative() != null ? task.getRepresentative().getName() : null);
         response.setDecisionAt(task.getDecisionAt());
         response.setCreatedAt(task.getCreatedAt());
-        response.setStatus(task.getStatus().name());
+        response.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
 
         // Обработка createdBy
-        Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
-        if (createdBy.isPresent()) {
-            User user = createdBy.get();
-            response.setCreatedBy(user.getFirstName() + " " +
-                    user.getSecondName().charAt(0) + "." +
-                    user.getPatronymic().charAt(0) + ".");
+        if (task.getCreatedBy() != null) {
+            Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
+            if (createdBy.isPresent()) {
+                User user = createdBy.get();
+                response.setCreatedBy(user.getFirstName() + " " +
+                        user.getSecondName().charAt(0) + "." +
+                        (user.getPatronymic() != null ? user.getPatronymic().charAt(0) + "." : ""));
+            }
         }
 
         // Обработка assignedUser
@@ -318,16 +320,25 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     private Applicant getOrCreateApplicant(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new BusinessException("Имя заявителя обязательно");
+        }
         return applicantRepository.findByName(name)
                 .orElseGet(() -> applicantRepository.save(new Applicant(name)));
     }
 
     private Manufacturer getOrCreateManufacturer(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new BusinessException("Имя производителя обязательно");
+        }
         return manufacturerRepository.findByName(name)
                 .orElseGet(() -> manufacturerRepository.save(new Manufacturer(name)));
     }
 
     private Representative getOrCreateRepresentative(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new BusinessException("Имя представителя обязательно");
+        }
         return representativeRepository.findByName(name)
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
     }

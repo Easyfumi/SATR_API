@@ -12,10 +12,6 @@ import {
   InputAdornment,
   IconButton,
   Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -220,8 +216,11 @@ const TaskDetailsPage = () => {
 
     setIsUpdatingDecisionDate(true);
     try {
+      // Преобразуем дату в формат YYYY-MM-DD
+      const formattedDate = new Date(newDecisionDate).toISOString().split('T')[0];
+      
       const response = await api.put(`/api/tasks/${id}/decision-date`, {
-        decisionDate: newDecisionDate
+        decisionDate: formattedDate
       });
       setTask(response.data);
       setNewDecisionDate('');
@@ -318,6 +317,7 @@ const TaskDetailsPage = () => {
 
   if (loading) return <div className="loading">Загрузка...</div>;
   if (error) return <div className="error-message">{error}</div>;
+  if (!task) return <div className="error-message">Задача не найдена</div>;
 
   return (
     <div className="content-container">
@@ -498,17 +498,17 @@ const TaskDetailsPage = () => {
           <div className="column right-column">
             <div className="task-row">
               <span className="task-label">Заявитель</span>
-              <span className="task-value">{task.applicant?.name || task.applicant}</span>
+              <span className="task-value">{task.applicant || 'Не указан'}</span>
             </div>
 
             <div className="task-row">
               <span className="task-label">Изготовитель</span>
-              <span className="task-value">{task.manufacturer?.name || task.manufacturer}</span>
+              <span className="task-value">{task.manufacturer || 'Не указан'}</span>
             </div>
 
             <div className="task-row">
               <span className="task-label">Представитель</span>
-              <span className="task-value">{task.representative?.name || task.representative}</span>
+              <span className="task-value">{task.representative || 'Не указан'}</span>
             </div>
           </div>
         </div>
@@ -522,7 +522,7 @@ const TaskDetailsPage = () => {
 
         <div className="task-row">
           <span className="task-label">Заявка создана</span>
-          <span className="task-value">{task.createdBy}</span>
+          <span className="task-value">{task.createdBy || 'Не указано'}</span>
         </div>
       </div>
 
