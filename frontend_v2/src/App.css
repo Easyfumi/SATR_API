@@ -28,6 +28,7 @@
   border-bottom: 2px solid var(--silver-accent);
   padding-bottom: 15px;
   margin-bottom: 25px;
+  margin-top: 15px;
   font-size: 1.8rem;
   font-weight: 600;
 }
