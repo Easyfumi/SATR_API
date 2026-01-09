@@ -327,13 +327,6 @@ const CreateTaskPage = () => {
         <div className="content-container">
             <div className="create-task-form">
                 <h2 className="page-title">Создание новой заявки</h2>
-                
-                <div className="create-task-info">
-                    <p className="info-text">
-                        <strong>Примечание:</strong> Договор можно будет привязать к заявке позже 
-                        через страницу редактирования заявки или через страницу договоров.
-                    </p>
-                </div>
 
                 {/* Модальное окно проверки дубликатов */}
                 <DuplicateCheckModal
