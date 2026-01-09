@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -335,10 +337,10 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     private Representative getOrCreateRepresentative(String name) {
-//        // Если имя пустое или null, возвращаем null (представитель отсутствует)
-//        if (name == null || name.trim().isEmpty()) {
-//            return null;
-//        }
+        // Если имя пустое или null, возвращаем null (представитель отсутствует)
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
 
         // Для пустого имени создаем специального представителя "отсутствует"
         // Это позволит ссылаться на одну и ту же запись для всех задач без представителя

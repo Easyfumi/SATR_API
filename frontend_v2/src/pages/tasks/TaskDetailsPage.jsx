@@ -218,7 +218,7 @@ const TaskDetailsPage = () => {
     try {
       // Преобразуем дату в формат YYYY-MM-DD
       const formattedDate = new Date(newDecisionDate).toISOString().split('T')[0];
-      
+
       const response = await api.put(`/api/tasks/${id}/decision-date`, {
         decisionDate: formattedDate
       });
@@ -322,8 +322,8 @@ const TaskDetailsPage = () => {
   return (
     <div className="content-container">
       {alertMessage && (
-        <Alert 
-          severity={alertMessage.type} 
+        <Alert
+          severity={alertMessage.type}
           onClose={() => setAlertMessage(null)}
           sx={{ mb: 2 }}
         >
@@ -355,9 +355,17 @@ const TaskDetailsPage = () => {
             <div className="task-row">
               <span className="task-label">Тип процедуры:</span>
               <span className="task-value">
-                {task.previousProcessType} {task.previousNumber || ''}
+                {task.previousProcessType}
               </span>
             </div>
+
+            {/* Отображаем номер предыдущего одобрения, если он есть и тип процедуры не "Оформление нового" */}
+            {task.previousProcessType && task.previousProcessType !== 'Оформление нового' && task.previousNumber && (
+              <div className="task-row">
+                <span className="task-label">Номер предыдущего одобрения:</span>
+                <span className="task-value">{task.previousNumber}</span>
+              </div>
+            )}
           </div>
 
           {/* Вертикальная разделительная линия*/}

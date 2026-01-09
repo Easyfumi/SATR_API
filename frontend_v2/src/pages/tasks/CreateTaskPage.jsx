@@ -99,51 +99,47 @@ const CreateTaskPage = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsCheckingDuplicates(true);
+    e.preventDefault();
+    setIsCheckingDuplicates(true);
 
-        try {
-            const request = {
-                docType: formData.docType,
-                applicantName: formData.applicantName,
-                manufacturerName: formData.manufacturerName,
-                categories: formData.categories,
-                mark: formData.mark,
-                typeName: formData.typeName,
-                processType: formData.processType,
-                // Если установлена галочка "отсутствует", отправляем пустую строку
-                // Бекенд корректно обработает это как null или создаст представителя "отсутствует"
-                representativeName: representativeAbsent ? '' : formData.representativeName,
-                assignedUserId: formData.assignedUserId,
-                previousProcessType: formData.procedureType !== 'Оформление нового'
-                    ? formData.procedureType
-                    : null,
-                previousNumber: formData.procedureType !== 'Оформление нового'
-                    ? formData.previousNumber
-                    : null
-                // Убрано contractId - договор будет привязываться позже
-            };
+    try {
+        const request = {
+            docType: formData.docType,
+            applicantName: formData.applicantName,
+            manufacturerName: formData.manufacturerName,
+            categories: formData.categories,
+            mark: formData.mark,
+            typeName: formData.typeName,
+            processType: formData.processType,
+            // Если установлена галочка "отсутствует", отправляем пустую строку
+            representativeName: representativeAbsent ? '' : formData.representativeName,
+            assignedUserId: formData.assignedUserId,
+            // ИСПРАВЛЕНО: отправляем "Оформление нового" как строку, а не null
+            previousProcessType: formData.procedureType,
+            previousNumber: formData.previousNumber
+            // Убрано contractId - договор будет привязываться позже
+        };
 
-            // Сохраняем request на случай дубликатов
-            setPendingRequest(request);
+        // Сохраняем request на случай дубликатов
+        setPendingRequest(request);
 
-            await api.post('/api/tasks/create', request);
+        await api.post('/api/tasks/create', request);
 
-            // Если успешно - переходим к списку заявок
-            navigate('/tasks');
-        } catch (error) {
-            if (error.response && error.response.status === 409) {
-                // Найдены дубликаты
-                setDuplicates(error.response.data.duplicates);
-                setShowDuplicateModal(true);
-            } else {
-                console.error('Error creating task:', error);
-                alert('Ошибка при создании заявки: ' + (error.response?.data?.message || error.message));
-            }
-        } finally {
-            setIsCheckingDuplicates(false);
+        // Если успешно - переходим к списку заявок
+        navigate('/tasks');
+    } catch (error) {
+        if (error.response && error.response.status === 409) {
+            // Найдены дубликаты
+            setDuplicates(error.response.data.duplicates);
+            setShowDuplicateModal(true);
+        } else {
+            console.error('Error creating task:', error);
+            alert('Ошибка при создании заявки: ' + (error.response?.data?.message || error.message));
         }
-    };
+    } finally {
+        setIsCheckingDuplicates(false);
+    }
+};
 
     const handleForceCreate = async () => {
         if (!pendingRequest) return;
