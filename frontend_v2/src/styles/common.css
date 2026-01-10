@@ -1,0 +1,607 @@
+/* ============================================
+   ОБЩИЕ CSS ПЕРЕМЕННЫЕ (унифицированные)
+   ============================================ */
+:root {
+  --deep-frost: #2E4A62;
+  --ice-blue: #ecf0f1;
+  --glacial-shadow: rgba(46, 74, 98, 0.2);
+  --silver-accent: #C0C9D1;
+  --cold-steel: #A3B8CC;
+  --deep-frost-rgb: 46, 74, 98;
+  --cold-steel-rgb: 163, 184, 204;
+  
+  /* Дополнительные цвета */
+  --success-color: #2e7d32;
+  --success-bg: #e8f5e9;
+  --warning-color: #ef6c00;
+  --warning-bg: #fff3e0;
+  --error-color: #c62828;
+  --error-bg: #ffebee;
+  --info-color: #1976d2;
+  --info-bg: #e3f2fd;
+  
+  /* Оттенки серого */
+  --gray-light: #f8fafc;
+  --gray-border: #e2e8f0;
+  --gray-text: #64748b;
+  --gray-dark: #475569;
+}
+
+/* ============================================
+   ОБЩИЕ СТИЛИ КОМПОНЕНТОВ
+   ============================================ */
+
+/* Сообщения о загрузке и ошибках */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--deep-frost);
+  font-size: 1.1rem;
+}
+
+.error-message {
+  text-align: center;
+  padding: 40px;
+  color: #dc2626;
+  font-size: 1.1rem;
+  background: #fef2f2;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+}
+
+/* Кнопки */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--deep-frost);
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  background: var(--gray-light);
+  transform: translateX(-3px);
+}
+
+.edit-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--ice-blue);
+  color: var(--deep-frost);
+  border: 1px solid var(--silver-accent);
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: var(--cold-steel);
+  color: white;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--error-bg);
+  color: var(--error-color);
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.delete-button:hover {
+  background: #ffcdd2;
+}
+
+/* Бейджи статусов задач */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.status-badge.received { background: var(--info-bg); color: var(--info-color); }
+.status-badge.registered { background: var(--warning-bg); color: var(--warning-color); }
+.status-badge.decision_done { background: var(--success-bg); color: var(--success-color); }
+.status-badge.documents_waiting { background: #fff9c4; color: #f57f17; }
+.status-badge.rejection { background: var(--error-bg); color: var(--error-color); }
+.status-badge.cancelled { background: #f5f5f5; color: #616161; }
+.status-badge.project { background: #e1bee7; color: #6a1b9a; }
+.status-badge.signed { background: #c8e6c9; color: var(--success-color); }
+.status-badge.for_revision { background: var(--warning-bg); color: var(--warning-color); }
+.status-badge.completed { background: #dcedc8; color: #689f38; }
+
+/* Бейджи статусов оплаты */
+.payment-status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.payment-status-badge.paid,
+.payment-status-paidfor {
+  background: var(--success-bg);
+  color: var(--success-color);
+}
+
+.payment-status-badge.partially-paid,
+.payment-status-partiallypaidfor {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+}
+
+.payment-status-badge.not-paid,
+.payment-status-notpaidfor {
+  background: var(--error-bg);
+  color: var(--error-color);
+}
+
+.payment-status-badge.editable {
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.payment-status-badge.editable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Контейнеры карточек */
+.task-details-card {
+  background: #fff;
+  border: 1px solid #dde4ec;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.card-content {
+  display: flex;
+  gap: 25px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.left-column {
+  /* Левая колонка */
+}
+
+.right-column {
+  /* Правая колонка */
+}
+
+.vertical-divider {
+  width: 1px;
+  background-color: #f0f4f8;
+  margin: 0 10px;
+}
+
+.task-row {
+  display: flex;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.task-row:last-child {
+  border-bottom: none;
+}
+
+.task-label {
+  color: #6b7c93;
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-width: 160px;
+  margin-right: 15px;
+}
+
+.task-value {
+  color: #1a2a3a;
+  font-size: 1rem;
+  font-weight: 500;
+  flex-grow: 1;
+}
+
+/* Категории */
+.categories-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-tag {
+  background: #f0f4f8;
+  color: var(--deep-frost);
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Контейнеры ввода */
+.input-action-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.input-action-container .MuiTextField-root {
+  flex-grow: 1;
+}
+
+.input-action-container button {
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+/* Поле даты */
+.modern-date-field {
+  position: relative;
+}
+
+.modern-date-field input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  position: relative;
+  min-height: 40px;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modern-date-field input[type="date"]:focus {
+  outline: none;
+  border-color: var(--info-color);
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.modern-date-field::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+  background-size: contain;
+  pointer-events: none;
+}
+
+/* Контейнеры договоров */
+.contract-selection {
+  width: 100%;
+}
+
+.contract-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px;
+  background: var(--gray-light);
+  border-radius: 6px;
+  border: 1px solid var(--gray-border);
+}
+
+.contract-info {
+  flex: 1;
+}
+
+.contract-number {
+  font-weight: 600;
+  color: var(--deep-frost);
+  margin-bottom: 8px;
+}
+
+.contract-details {
+  margin-top: 8px;
+  padding: 8px;
+  background: var(--gray-light);
+  border-radius: 4px;
+  border-left: 3px solid var(--info-color);
+}
+
+.contract-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.contract-detail:last-child {
+  margin-bottom: 0;
+}
+
+.contract-detail-label {
+  color: var(--gray-dark);
+  font-weight: 500;
+  min-width: 100px;
+}
+
+.contract-detail-value {
+  color: #495057;
+  text-align: right;
+  flex: 1;
+}
+
+.contract-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Меню договора */
+.contract-menu {
+  max-height: 300px;
+  width: 400px;
+}
+
+.contract-menu-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.contract-menu-item:hover {
+  background-color: #f5f5f5;
+}
+
+.contract-menu-item:last-child {
+  border-bottom: none;
+}
+
+.contract-item-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.contract-item-number {
+  font-weight: 600;
+  color: var(--deep-frost);
+  margin-bottom: 4px;
+}
+
+.contract-item-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--gray-text);
+}
+
+.contract-search-container {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contract-search-field {
+  width: 100%;
+}
+
+.contracts-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gray-text);
+  padding: 16px;
+}
+
+.no-contracts-message {
+  padding: 16px;
+  text-align: center;
+  color: var(--gray-text);
+  font-style: italic;
+}
+
+.contract-applicant {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Управление статусом */
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dropdown-button {
+  min-width: auto !important;
+  padding: 4px !important;
+}
+
+.status-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.save-status-button {
+  /* Стили применяются через Material-UI Button */
+}
+
+.status-menu {
+  /* Стили применяются через Material-UI Menu */
+}
+
+.status-display-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Инлайн редактирование */
+.inline-edit-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.save-inline-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: var(--deep-frost);
+  color: white;
+}
+
+.save-inline-btn:hover:not(:disabled) {
+  background: var(--cold-steel);
+}
+
+.save-inline-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-inline-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--gray-light);
+  color: var(--gray-text);
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.cancel-inline-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.cancel-inline-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .card-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .vertical-divider {
+    display: none;
+  }
+  
+  .task-row {
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 0;
+  }
+  
+  .task-label {
+    min-width: auto;
+    margin-right: 0;
+    font-size: 0.85rem;
+  }
+  
+  .task-value {
+    font-size: 0.9rem;
+  }
+  
+  .input-action-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .input-action-container .MuiTextField-root {
+    width: 100%;
+  }
+  
+  .input-action-container button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+  
+  .contract-display {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .contract-actions {
+    align-self: flex-end;
+  }
+  
+  .contract-detail {
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .contract-detail-label {
+    min-width: auto;
+  }
+  
+  .contract-detail-value {
+    text-align: left;
+  }
+  
+  .contract-menu {
+    width: 100%;
+    max-width: 100vw;
+    margin: 0 8px;
+  }
+  
+  .status-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
