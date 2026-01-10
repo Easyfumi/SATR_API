@@ -159,6 +159,7 @@ public class TaskServiceImplementation implements TaskService {
         }
 
         task.setNumber(number);
+        task.setStatus(TaskStatus.REGISTERED);
         task = taskRepository.save(task);
         return mapEntityToResponse(task);
     }
@@ -178,6 +179,7 @@ public class TaskServiceImplementation implements TaskService {
         }
 
         task.setDecisionAt(decisionDate);
+        task.setStatus(TaskStatus.DECISION_DONE);
         task = taskRepository.save(task);
         return mapEntityToResponse(task);
     }

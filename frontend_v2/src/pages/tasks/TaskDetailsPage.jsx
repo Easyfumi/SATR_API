@@ -192,9 +192,10 @@ const TaskDetailsPage = () => {
 
     setIsUpdating(true);
     try {
-      const response = await api.put(`/api/tasks/${id}/number`, { number: newNumber });
-      setTask({ ...task, number: newNumber });
+      await api.put(`/api/tasks/${id}/number`, { number: newNumber });
       setNewNumber('');
+      // Обновляем данные задачи для получения актуального статуса
+      await fetchTask();
       setAlertMessage({
         type: 'success',
         text: 'Номер успешно присвоен'
@@ -219,11 +220,12 @@ const TaskDetailsPage = () => {
       // Преобразуем дату в формат YYYY-MM-DD
       const formattedDate = new Date(newDecisionDate).toISOString().split('T')[0];
 
-      const response = await api.put(`/api/tasks/${id}/decision-date`, {
+      await api.put(`/api/tasks/${id}/decision-date`, {
         decisionDate: formattedDate
       });
-      setTask(response.data);
       setNewDecisionDate('');
+      // Обновляем данные задачи для получения актуального статуса
+      await fetchTask();
       setAlertMessage({
         type: 'success',
         text: 'Дата решения успешно установлена'
@@ -612,15 +614,17 @@ const TaskDetailsPage = () => {
         onClose={handleStatusMenuClose}
         className="status-menu"
       >
-        {Object.entries(statusLabels).map(([key, label]) => (
-          <MenuItem
-            key={key}
-            onClick={() => handleStatusSelect(key)}
-            selected={selectedStatus === key}
-          >
-            {label}
-          </MenuItem>
-        ))}
+        {Object.entries(statusLabels)
+          .filter(([key]) => !['RECEIVED', 'REGISTERED', 'DECISION_DONE'].includes(key))
+          .map(([key, label]) => (
+            <MenuItem
+              key={key}
+              onClick={() => handleStatusSelect(key)}
+              selected={selectedStatus === key}
+            >
+              {label}
+            </MenuItem>
+          ))}
       </Menu>
 
       {/* Меню выбора договора с поиском */}
