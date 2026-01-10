@@ -12,6 +12,7 @@ import {
     FormControl,
     Select,
     MenuItem,
+    Menu,
     Checkbox,
     Dialog,
     DialogTitle,
@@ -19,13 +20,16 @@ import {
     DialogActions,
     TextField,
     Button as MuiButton,
+    Button,
     CircularProgress,
     Chip,
     IconButton,
-    Typography
+    Typography,
+    Alert
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const ContractDetailsPage = () => {
     const { id } = useParams();
@@ -38,10 +42,15 @@ const ContractDetailsPage = () => {
     
     // Состояния для inline-редактирования
     const [editingComments, setEditingComments] = useState(false);
-    const [editingPaymentStatus, setEditingPaymentStatus] = useState(false);
     const [tempComments, setTempComments] = useState('');
-    const [tempPaymentStatus, setTempPaymentStatus] = useState('');
     const [saving, setSaving] = useState(false);
+
+    // Состояния для управления статусом оплаты
+    const [paymentStatusAnchorEl, setPaymentStatusAnchorEl] = useState(null);
+    const [selectedPaymentStatus, setSelectedPaymentStatus] = useState(null);
+    const [isPaymentStatusChanged, setIsPaymentStatusChanged] = useState(false);
+    const [isUpdatingPaymentStatus, setIsUpdatingPaymentStatus] = useState(false);
+    const [alertMessage, setAlertMessage] = useState(null);
 
     // Статусы оплаты
     const paymentStatusOptions = [
@@ -67,6 +76,13 @@ const ContractDetailsPage = () => {
         fetchContract();
         fetchContractTasks();
     }, [id]);
+
+    // Устанавливаем выбранный статус оплаты при загрузке договора
+    useEffect(() => {
+        if (contract) {
+            setSelectedPaymentStatus(contract.paymentStatus);
+        }
+    }, [contract]);
 
     // Функция для загрузки информации о договоре
     const fetchContract = async () => {
@@ -141,30 +157,50 @@ const ContractDetailsPage = () => {
     };
 
     // Функции для статуса оплаты
-    const startEditingPaymentStatus = () => {
-        setTempPaymentStatus(contract.paymentStatus);
-        setEditingPaymentStatus(true);
+    const handlePaymentStatusButtonClick = (event) => {
+        setPaymentStatusAnchorEl(event.currentTarget);
     };
 
-    const cancelEditingPaymentStatus = () => {
-        setEditingPaymentStatus(false);
-        setTempPaymentStatus('');
+    const handlePaymentStatusMenuClose = () => {
+        setPaymentStatusAnchorEl(null);
     };
 
-    const savePaymentStatus = async () => {
-        setSaving(true);
+    const handlePaymentStatusSelect = (status) => {
+        setSelectedPaymentStatus(status);
+        setIsPaymentStatusChanged(true);
+        handlePaymentStatusMenuClose();
+    };
+
+    const handleSavePaymentStatus = async () => {
+        if (!selectedPaymentStatus || !isPaymentStatusChanged) return;
+
+        setIsUpdatingPaymentStatus(true);
         try {
-            const response = await api.patch(`/api/contracts/${id}/payment-status`, {
-                paymentStatus: tempPaymentStatus
+            await api.patch(`/api/contracts/${id}/payment-status`, {
+                paymentStatus: selectedPaymentStatus
             });
-            setContract(response.data);
-            setEditingPaymentStatus(false);
+            // Обновляем данные договора для получения актуального статуса
+            await fetchContract();
+            setIsPaymentStatusChanged(false);
+            setAlertMessage({
+                type: 'success',
+                text: 'Статус оплаты успешно обновлен'
+            });
+            setTimeout(() => setAlertMessage(null), 3000);
         } catch (error) {
-            console.error('Error updating payment status:', error);
-            alert('Ошибка при обновлении статуса оплаты: ' + (error.response?.data?.message || error.message));
+            console.error('Ошибка обновления статуса оплаты:', error);
+            setAlertMessage({
+                type: 'error',
+                text: error.response?.data?.message || 'Произошла ошибка'
+            });
         } finally {
-            setSaving(false);
+            setIsUpdatingPaymentStatus(false);
         }
+    };
+
+    const handleCancelPaymentStatusChange = () => {
+        setSelectedPaymentStatus(contract.paymentStatus);
+        setIsPaymentStatusChanged(false);
     };
 
     const formatDate = (dateString) => {
@@ -210,6 +246,16 @@ const ContractDetailsPage = () => {
 
     return (
         <div className="content-container">
+            {alertMessage && (
+                <Alert
+                    severity={alertMessage.type}
+                    onClose={() => setAlertMessage(null)}
+                    sx={{ mb: 2 }}
+                >
+                    {alertMessage.text}
+                </Alert>
+            )}
+
             <div className="contract-details">
                 {/* Хедер с навигацией и действиями */}
                 <div className="details-header">
@@ -247,50 +293,42 @@ const ContractDetailsPage = () => {
                         <h1 className="contract-title">Договор № {contract.number}</h1>
                         
                         <div className="status-badge-container">
-                            {editingPaymentStatus ? (
-                                <div className="status-edit-container">
-                                    <FormControl className="status-select">
-                                        <Select
-                                            value={tempPaymentStatus}
-                                            onChange={(e) => setTempPaymentStatus(e.target.value)}
-                                            displayEmpty
-                                        >
-                                            {paymentStatusOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                    <div className="inline-edit-actions">
-                                        <button 
-                                            onClick={savePaymentStatus}
-                                            className="save-inline-btn"
-                                            disabled={saving}
-                                        >
-                                            {saving ? <CircularProgress size={20} /> : <SaveIcon />}
-                                            {saving ? 'Сохранение...' : 'Сохранить'}
-                                        </button>
-                                        <button 
-                                            onClick={cancelEditingPaymentStatus}
-                                            className="cancel-inline-btn"
-                                            disabled={saving}
-                                        >
-                                            <CancelIcon />
-                                            Отмена
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="status-display-container">
-                                    <span 
-                                        className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)} editable`}
-                                        onClick={startEditingPaymentStatus}
-                                    >
-                                        {getPaymentStatusLabel(contract.paymentStatus)}
+                            <div className="status-display-container">
+                                <div className="status-display">
+                                    <span className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)}`}>
+                                        {getPaymentStatusLabel(selectedPaymentStatus || contract.paymentStatus)}
                                     </span>
+                                    <Button
+                                        className="status-dropdown-button"
+                                        onClick={handlePaymentStatusButtonClick}
+                                        size="small"
+                                    >
+                                        <ArrowDropDownIcon />
+                                    </Button>
                                 </div>
-                            )}
+
+                                {isPaymentStatusChanged && (
+                                    <div className="status-actions">
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            onClick={handleSavePaymentStatus}
+                                            disabled={isUpdatingPaymentStatus}
+                                            className="save-status-button"
+                                        >
+                                            {isUpdatingPaymentStatus ? <CircularProgress size={20} /> : 'Сохранить'}
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={handleCancelPaymentStatusChange}
+                                            disabled={isUpdatingPaymentStatus}
+                                        >
+                                            Отмена
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -472,6 +510,24 @@ const ContractDetailsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Меню выбора статуса оплаты */}
+            <Menu
+                anchorEl={paymentStatusAnchorEl}
+                open={Boolean(paymentStatusAnchorEl)}
+                onClose={handlePaymentStatusMenuClose}
+                className="status-menu"
+            >
+                {paymentStatusOptions.map((option) => (
+                    <MenuItem
+                        key={option.value}
+                        onClick={() => handlePaymentStatusSelect(option.value)}
+                        selected={selectedPaymentStatus === option.value}
+                    >
+                        {option.label}
+                    </MenuItem>
+                ))}
+            </Menu>
         </div>
     );
 };
