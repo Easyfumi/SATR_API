@@ -1,12 +1,4 @@
-:root {
-  --deep-frost: #2E4A62;
-  --ice-blue: #ecf0f1;
-  --glacial-shadow: rgba(46, 74, 98, 0.2);
-  --silver-accent: #C0C9D1;
-  --cold-steel: #A3B8CC;
-  --deep-frost-rgb: 46, 74, 98;
-  --cold-steel-rgb: 163, 184, 204;
-}
+/* CSS переменные вынесены в common.css */
 
 .content-container {
   background: white;
@@ -33,23 +25,7 @@
   font-weight: 600;
 }
 
-/* .primary-btn {
-  background: var(--deep-frost);
-  color: white;
-  padding: 10px 25px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-}
-
-.secondary-btn {
-  background: #f0f2f5;
-  color: var(--deep-frost);
-  padding: 10px 25px;
-  border-radius: 6px;
-  border: 1px solid var(--silver-accent);
-  cursor: pointer;
-} */
+/* Общие стили кнопок вынесены в common.css */
 
 /* Адаптивность */
 @media (max-width: 768px) {

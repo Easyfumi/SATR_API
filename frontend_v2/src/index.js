@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import CssBaseline from '@mui/material/CssBaseline';
 import App from './App';
+import './styles/common.css';
 import './App.css';
 
 const root = createRoot(document.getElementById('root'));

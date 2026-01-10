@@ -1,366 +1,39 @@
+/* TaskDetailsPage - специфичные стили */
+/* Общие стили вынесены в common.css */
+
 .task-details-container {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-  }
-  
-  .back-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #2a4a68;
-    text-decoration: none;
+}
+
+.back-button {
     margin-bottom: 25px;
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-  
-  .back-button:hover {
-    background: #f0f4f8;
-    transform: translateX(-3px);
-  }
-  
-  .task-details-card {
-    background: #fff;
-    border: 1px solid #dde4ec;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.task-details-card {
     margin-top: 25px;
-  }
-  
-  .card-content {
-    display: flex;
-    gap: 25px;
-  }
-  
-  .column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .vertical-divider {
-    width: 1px;
-    background-color: #f0f4f8;
-    margin: 0 10px;
-  }
-  
-  .task-row {
-    display: flex;
-    align-items: baseline;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f4f8;
-  }
-  
-  .task-row:last-child {
-    border-bottom: none;
-  }
-  
-  .task-label {
-    color: #6b7c93;
-    font-size: 0.95rem;
-    font-weight: 500;
-min-width: 160px; /* Уменьшено с 200px */
-    margin-right: 15px; /* Уменьшено с 25px */
-  }
-  
-  .task-value {
-    color: #1a2a3a;
-    font-size: 1rem;
-    font-weight: 500;
-    flex-grow: 1;
-  }
-  
-  .status-badge {
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .status-badge.received { background: #e3f2fd; color: #1976d2; }
-  .status-badge.registered { background: #fff3e0; color: #ef6c00; }
-  .status-badge.decision_done { background: #e8f5e9; color: #2e7d32; }
-  .status-badge.documents_waiting { background: #fff9c4; color: #f57f17; }
-  .status-badge.rejection { background: #ffcdd2; color: #c62828; }
-  .status-badge.cancelled { background: #f5f5f5; color: #616161; }
-  .status-badge.project { background: #e1bee7; color: #6a1b9a; }
-  .status-badge.signed { background: #c8e6c9; color: #2e7d32; }
-  .status-badge.for_revision { background: #ffe0b2; color: #ef6c00; }
-  .status-badge.completed { background: #dcedc8; color: #689f38; }
-  
-  .details-payment-status {
+}
+
+.details-payment-status {
     padding: 6px 12px;
     border-radius: 16px;
     font-weight: 600;
     font-size: 0.9rem;
-  }
-  
-/* Стили для статусов оплаты договора */
-.payment-status-paidfor {
-  color: #28a745;
-  font-weight: 600;
 }
 
-.payment-status-partiallypaidfor {
-  color: #ffc107;
-  font-weight: 600;
-}
-
-.payment-status-notpaidfor {
-  color: #dc3545;
-  font-weight: 600;
-}
-  
-  .categories-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .category-tag {
-    background: #f0f4f8;
-    color: #2a4a68;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  .number-input-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-
-  .number-input-container .MuiTextField-root {
-    flex-grow: 1;
-  }
-
-  /* Общие стили для контейнеров с полями ввода и кнопками */
-.input-action-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 10px;
-}
-
-.input-action-container .MuiTextField-root {
-  flex-grow: 1;
-}
-
-.input-action-container button {
-  min-width: 140px;
-  flex-shrink: 0;
-}
-
-/* Современный стиль для поля ввода даты */
-.modern-date-field {
-  position: relative;
-}
-
-.modern-date-field input[type="date"] {
-  appearance: none;
-  -webkit-appearance: none;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  background-color: white;
-  position: relative;
-  min-height: 40px;
-  width: 100%;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.modern-date-field input[type="date"]:focus {
-  outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
-}
-
-/* Кастомная иконка календаря */
-.modern-date-field::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
-  background-size: contain;
-  pointer-events: none;
-}
-
-/* Стиль для Material UI TextField чтобы соответствовать современному виду */
+/* Специфичные стили для Material UI */
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root {
-  border-radius: 8px;
+    border-radius: 8px;
 }
 
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #1976d2;
+    border-color: #1976d2;
 }
 
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #1976d2;
-  border-width: 2px;
-}
-
-/* Стили для выбора договора */
-.contract-selection {
-  width: 100%;
-}
-
-.contract-display {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-}
-
-.contract-info {
-  flex: 1;
-}
-
-.contract-number {
-  font-weight: 600;
-  color: #2a4a68;
-}
-
-.contract-details {
-  margin-top: 8px;
-  padding: 8px;
-  background: #f8f9fa;
-  border-radius: 4px;
-  border-left: 3px solid #007bff;
-}
-
-.contract-detail {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  font-size: 0.85rem;
-}
-
-.contract-detail:last-child {
-  margin-bottom: 0;
-}
-.contract-detail-label {
-  color: #6c757d;
-  font-weight: 500;
-  min-width: 100px;
-}
-.contract-actions {
-  display: flex;
-  gap: 8px;
-}
-.contract-detail-value {
-  color: #495057;
-  text-align: right;
-  flex: 1;
-}
-
-.no-contract-message {
-  color: #666;
-  font-style: italic;
-}
-
-.contracts-loading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #666;
-}
-
-.contract-menu {
-  max-height: 300px;
-  width: 400px;
-}
-
-.contract-menu-item {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.contract-menu-item:hover {
-  background-color: #f5f5f5;
-}
-
-.contract-menu-item:last-child {
-  border-bottom: none;
-}
-
-.contract-item-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.contract-item-number {
-  font-weight: 600;
-  color: #2a4a68;
-  margin-bottom: 4px;
-}
-
-.contract-item-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.contract-search-container {
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.contract-search-field {
-  width: 100%;
-}
-
-.no-contracts-message {
-  padding: 16px;
-  text-align: center;
-  color: #666;
-  font-style: italic;
-}
-
-.contract-applicant {
-  font-size: 0.75rem;
-  color: #888;
-  margin-top: 2px;
-}
-
-
-
-.edit-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: var(--ice-blue);
-  color: var(--deep-frost);
-  border: 1px solid var(--silver-accent);
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.edit-button:hover {
-  background: var(--cold-steel);
-  color: white;
+    border-color: #1976d2;
+    border-width: 2px;
 }
 
 /* Секция даты решения */
@@ -418,109 +91,14 @@ min-width: 160px; /* Уменьшено с 200px */
 .date-dialog-content .MuiTextField-root {
   width: 100%;
 }
-  
-  @media (max-width: 768px) {
+/* Адаптивность - специфичная для TaskDetailsPage */
+@media (max-width: 768px) {
     .task-details-container {
-      padding: 15px;
-    }
-  
-    .card-content {
-      flex-direction: column;
-      gap: 15px;
+        padding: 15px;
     }
     
-    .vertical-divider {
-      display: none;
-    }
-  
-    .task-label {
-      min-width: 150px;
-      font-size: 0.9rem;
-    }
-  
-    .task-value {
-      font-size: 0.95rem;
-    }
-  
     .back-button {
-      font-size: 0.9rem;
-      padding: 8px 12px;
+        font-size: 0.9rem;
+        padding: 8px 12px;
     }
-  
-    .number-input-container {
-      flex-direction: column;
-      gap: 10px;
-    }
-    
-    .number-input-container .MuiTextField-root {
-      width: 100%;
-    }
-    
-    .number-input-container button {
-      width: 100%;
-      margin-left: 0 !important;
-    }
- 
-    .task-row {
-      flex-direction: column;
-      gap: 5px;
-      padding: 12px 0;
-    }
-  
-    .task-label {
-      min-width: auto;
-      margin-right: 0;
-      font-size: 0.85rem;
-    }
-  
-    .task-value {
-      font-size: 0.9rem;
-    }
-
-.input-action-container {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .input-action-container .MuiTextField-root {
-    width: 100%;
-  }
-  
-  .input-action-container button {
-    width: 100%;
-    margin-left: 0 !important;
-  }
-
-  /* Адаптивность для контейнера договора */
-  .contract-display {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .contract-actions {
-    align-self: flex-end;
-  }
-  
-  .contract-detail {
-    flex-direction: column;
-    gap: 2px;
-  }
-  
-  .contract-detail-label {
-    min-width: auto;
-  }
-  
-  .contract-detail-value {
-    text-align: left;
-  }
-  
-  .contract-actions button {
-    flex: 1;
-  }
-
-  .contract-menu {
-    width: 100%;
-    max-width: 100vw;
-    margin: 0 8px;
-  }
-  }
+}

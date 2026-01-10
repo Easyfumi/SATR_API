@@ -321,27 +321,8 @@
 }
 
 .payment-status-badge {
-    padding: 6px 12px;
-    border-radius: 16px;
     font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.payment-status-badge.paid {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.payment-status-badge.partially-paid {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.payment-status-badge.not-paid {
-    background: #ffebee;
-    color: #c62828;
+    padding: 6px 12px;
 }
 
 /* Основная информация договора */
@@ -370,23 +351,7 @@
     flex: 1;
 }
 
-/* Сообщения */
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--deep-frost);
-    font-size: 1.1rem;
-}
-
-.error-message {
-    text-align: center;
-    padding: 40px;
-    color: #dc2626;
-    font-size: 1.1rem;
-    background: #fef2f2;
-    border-radius: 10px;
-    border: 1px solid #fecaca;
-}
+/* Сообщения вынесены в common.css */
 
 .no-contracts-message {
     text-align: center;
@@ -474,11 +439,5 @@
     }
 }
 
-/* Переменные CSS (если их нет в основном файле) */
-:root {
-    --deep-frost: #1e40af;
-    --silver-accent: #cbd5e1;
-    --ice-blue: #a3b8cc;
-    --cold-steel: #475569;
-    --glacial-shadow: rgba(163, 184, 204, 0.15);
-}
+/* ContractListPage.css - специфичные стили */
+/* CSS переменные и общие стили вынесены в common.css */

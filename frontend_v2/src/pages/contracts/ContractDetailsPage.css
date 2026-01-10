@@ -1,4 +1,5 @@
-/* ContractDetailsPage.css */
+/* ContractDetailsPage.css - специфичные стили */
+/* Общие стили вынесены в common.css */
 
 .content-container {
     max-width: 1200px;
@@ -24,22 +25,10 @@
 }
 
 .header-navigation .back-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     padding: 8px 16px;
     background: white;
     border: 1px solid var(--silver-accent);
-    border-radius: 6px;
-    color: var(--deep-frost);
-    cursor: pointer;
-    transition: all 0.3s ease;
     font-size: 0.9rem;
-}
-
-.header-navigation .back-button:hover {
-    background: #f0f4f8;
-    border-color: var(--cold-steel);
 }
 
 .header-actions {
@@ -47,40 +36,7 @@
     gap: 12px;
 }
 
-.edit-button, .delete-button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.edit-button {
-    background: var(--ice-blue);
-    color: var(--deep-frost);
-    border: 1px solid var(--silver-accent);
-}
-
-.edit-button:hover {
-    background: var(--cold-steel);
-    color: white;
-}
-
-.delete-button {
-    background: #ffebee;
-    color: #c62828;
-    border: 1px solid #ffcdd2;
-}
-
-.delete-button:hover {
-    background: #ffcdd2;
-}
+/* Стили кнопок вынесены в common.css */
 
 .details-content {
     padding: 25px;
@@ -111,35 +67,6 @@
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    white-space: nowrap;
-    transition: all 0.3s ease;
-}
-
-.payment-status-badge.paid {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.payment-status-badge.partially-paid {
-    background: #fff3e0;
-    color: #ef6c00;
-}
-
-.payment-status-badge.not-paid {
-    background: #ffebee;
-    color: #c62828;
-}
-
-.payment-status-badge.editable {
-    cursor: pointer;
-    position: relative;
-}
-
-.payment-status-badge.editable:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .status-display-container {
@@ -437,23 +364,7 @@
     cursor: not-allowed;
 }
 
-/* Сообщения */
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--deep-frost);
-    font-size: 1.1rem;
-}
-
-.error-message {
-    text-align: center;
-    padding: 40px;
-    color: #dc2626;
-    font-size: 1.1rem;
-    background: #fef2f2;
-    border-radius: 10px;
-    border: 1px solid #fecaca;
-}
+/* Сообщения вынесены в common.css */
 
 /* Адаптивность */
 @media (max-width: 768px) {
@@ -550,11 +461,4 @@
     }
 }
 
-/* Переменные CSS */
-:root {
-    --deep-frost: #1e40af;
-    --silver-accent: #cbd5e1;
-    --ice-blue: #a3b8cc;
-    --cold-steel: #475569;
-    --glacial-shadow: rgba(163, 184, 204, 0.15);
-}
+/* CSS переменные вынесены в common.css */
