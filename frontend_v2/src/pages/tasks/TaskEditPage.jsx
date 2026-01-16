@@ -962,18 +962,24 @@ const handleSave = async () => {
                                 className="contract-menu-item"
                             >
                                 <div className="contract-item-details">
-                                    <div className="contract-item-number">
-                                        {contract.number}
-                                    </div>
-                                    <div className="contract-item-info">
-                                        <span>от {formatDate(contract.date)}</span>
-                                        <span>{getPaymentStatusLabel(contract.paymentStatus)}</span>
-                                    </div>
-                                    {contract.applicant && (
-                                        <div className="contract-applicant">
-                                            Заявитель: {contract.applicant.name || contract.applicant}
+                                    <div className="contract-item-top">
+                                        <div className="contract-item-number">
+                                            {contract.number}
                                         </div>
-                                    )}
+                                        <div className="contract-item-date">от {formatDate(contract.date)}</div>
+                                    </div>
+                                    <div className="contract-item-middle">
+                                        <span className="contract-item-label">Заявитель:</span>
+                                        <span className="contract-item-value">
+                                            {contract.applicant?.name || contract.applicant || 'Не указан'}
+                                        </span>
+                                    </div>
+                                    <div className="contract-item-bottom">
+                                        <span className="contract-item-label">Оплата:</span>
+                                        <span className={`contract-item-value payment-status-badge payment-status-${contract.paymentStatus?.toLowerCase()}`}>
+                                            {getPaymentStatusLabel(contract.paymentStatus)}
+                                        </span>
+                                    </div>
                                 </div>
                             </MenuItem>
                         ))
