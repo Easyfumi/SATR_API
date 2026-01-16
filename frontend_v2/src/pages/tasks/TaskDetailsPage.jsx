@@ -412,37 +412,6 @@ const TaskDetailsPage = () => {
           {/* Левая колонка */}
           <div className="column left-column">
             <div className="task-row">
-              <span className="task-label">Тип одобрения:</span>
-              <span className="task-value">{task.docType}</span>
-            </div>
-
-            <div className="task-row">
-              <span className="task-label">Процедура:</span>
-              <span className="task-value">{task.processType || 'Не указана'}</span>
-            </div>
-
-            <div className="task-row">
-              <span className="task-label">Тип процедуры:</span>
-              <span className="task-value">
-                {task.previousProcessType}
-              </span>
-            </div>
-
-            {/* Отображаем номер предыдущего одобрения, если он есть и тип процедуры не "Оформление нового" */}
-            {task.previousProcessType && task.previousProcessType !== 'Оформление нового' && task.previousNumber && (
-              <div className="task-row">
-                <span className="task-label">Номер предыдущего одобрения:</span>
-                <span className="task-value">{task.previousNumber}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Вертикальная разделительная линия*/}
-          <div className="vertical-divider"></div>
-
-          {/* Правая колонка */}
-          <div className="column right-column">
-            <div className="task-row">
               <span className="task-label">Статус</span>
               <div className="status-container">
                 <div className="status-display">
@@ -664,6 +633,37 @@ const TaskDetailsPage = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Вертикальная разделительная линия*/}
+          <div className="vertical-divider"></div>
+
+          {/* Правая колонка */}
+          <div className="column right-column">
+            <div className="task-row">
+              <span className="task-label">Тип одобрения:</span>
+              <span className="task-value">{task.docType}</span>
+            </div>
+
+            <div className="task-row">
+              <span className="task-label">Процедура:</span>
+              <span className="task-value">{task.processType || 'Не указана'}</span>
+            </div>
+
+            <div className="task-row">
+              <span className="task-label">Тип процедуры:</span>
+              <span className="task-value">
+                {task.previousProcessType}
+              </span>
+            </div>
+
+            {/* Отображаем номер предыдущего одобрения, если он есть и тип процедуры не "Оформление нового" */}
+            {task.previousProcessType && task.previousProcessType !== 'Оформление нового' && task.previousNumber && (
+              <div className="task-row">
+                <span className="task-label">Номер предыдущего одобрения:</span>
+                <span className="task-value">{task.previousNumber}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
