@@ -12,7 +12,10 @@ import {
   InputAdornment,
   IconButton,
   Chip,
-  Alert
+  Alert,
+  FormControl,
+  Select,
+  Checkbox
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -36,6 +39,10 @@ const TaskDetailsPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [experts, setExperts] = useState([]);
+  const [selectedExpertId, setSelectedExpertId] = useState('');
+  const [isExpertChanged, setIsExpertChanged] = useState(false);
+  const [isUpdatingExpert, setIsUpdatingExpert] = useState(false);
 
   // Состояния для управления договором (one-to-many)
   const [contracts, setContracts] = useState([]);
@@ -68,6 +75,7 @@ const TaskDetailsPage = () => {
 
   useEffect(() => {
     fetchTask();
+    fetchExperts();
   }, [id]);
 
   // Функция для загрузки задачи
@@ -77,12 +85,25 @@ const TaskDetailsPage = () => {
       const response = await api.get(`/api/tasks/${id}`);
       setTask(response.data);
       setSelectedStatus(response.data.status);
+      setSelectedExpertId(
+        response.data.assignedUserId ?? response.data.assignedUser?.id ?? ''
+      );
+      setIsExpertChanged(false);
       setError(null);
     } catch (err) {
       console.error('Ошибка загрузки задачи:', err);
       setError('Не удалось загрузить данные задачи');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExperts = async () => {
+    try {
+      const response = await api.get('/api/users/experts');
+      setExperts(response.data);
+    } catch (err) {
+      console.error('Ошибка загрузки экспертов:', err);
     }
   };
 
@@ -288,6 +309,40 @@ const TaskDetailsPage = () => {
     setIsStatusChanged(false);
   };
 
+  const handleExpertChange = (event) => {
+    setSelectedExpertId(event.target.value);
+    setIsExpertChanged(true);
+  };
+
+  const handleSaveExpert = async () => {
+    if (!isExpertChanged || !task) return;
+
+    setIsUpdatingExpert(true);
+    try {
+      const response = await api.put(`/api/tasks/${id}/expert`, {
+        assignedUserId: selectedExpertId || null
+      });
+      setTask(response.data);
+      setSelectedExpertId(
+        response.data.assignedUserId ?? response.data.assignedUser?.id ?? ''
+      );
+      setIsExpertChanged(false);
+      setAlertMessage({
+        type: 'success',
+        text: 'Эксперт успешно обновлен'
+      });
+      setTimeout(() => setAlertMessage(null), 3000);
+    } catch (error) {
+      console.error('Ошибка обновления эксперта:', error);
+      setAlertMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Произошла ошибка'
+      });
+    } finally {
+      setIsUpdatingExpert(false);
+    }
+  };
+
   const formatDateTime = (dateTime) => {
     if (!dateTime) return 'Не указана';
     return new Date(dateTime).toLocaleString('ru-RU');
@@ -315,6 +370,14 @@ const TaskDetailsPage = () => {
   // Функция для получения метки статуса оплаты
   const getPaymentStatusLabel = (status) => {
     return paymentStatusLabels[status] || status;
+  };
+
+  const formatExpertName = (expert) => {
+    if (!expert) return '';
+    const initials = expert.patronymic
+      ? `${expert.secondName} ${expert.firstName[0]}.${expert.patronymic[0]}.`
+      : `${expert.secondName} ${expert.firstName[0]}.`;
+    return initials;
   };
 
   if (loading) return <div className="loading">Загрузка...</div>;
@@ -413,6 +476,97 @@ const TaskDetailsPage = () => {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="task-row">
+              <span className="task-label">Эксперт</span>
+              {task.assignedUserId || task.assignedUser?.id ? (
+                <span className="task-value">
+                  {formatExpertName(
+                    task.assignedUser ||
+                      experts.find((expert) => expert.id === task.assignedUserId)
+                  )}
+                </span>
+              ) : (
+                <div className="status-container">
+                  <FormControl size="small" className="expert-select-control">
+                    <Select
+                      value={selectedExpertId}
+                      onChange={handleExpertChange}
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected) {
+                          return (
+                            <div className="selected-process">
+                              <span className="placeholder-text">Не назначен</span>
+                            </div>
+                          );
+                        }
+                        const selectedExpert = experts.find((e) => e.id === selected);
+                        return (
+                          <div className="selected-process">
+                            {formatExpertName(selectedExpert)}
+                          </div>
+                        );
+                      }}
+                      MenuProps={{
+                        className: 'expert-menu'
+                      }}
+                    >
+                      <MenuItem value="" style={{ whiteSpace: 'normal' }}>
+                        <div className="process-option">
+                          <Checkbox
+                            checked={false}
+                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                            disabled
+                          />
+                          <span style={{ fontStyle: 'italic' }}>Не назначен</span>
+                        </div>
+                      </MenuItem>
+                      {experts.map((expert) => (
+                        <MenuItem
+                          key={expert.id}
+                          value={expert.id}
+                          style={{ whiteSpace: 'normal' }}
+                        >
+                          <div className="process-option">
+                            <Checkbox
+                              checked={selectedExpertId === expert.id}
+                              style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                            />
+                            <span>{formatExpertName(expert)}</span>
+                          </div>
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  {isExpertChanged && (
+                    <div className="status-actions">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleSaveExpert}
+                        disabled={isUpdatingExpert}
+                        className="save-status-button"
+                      >
+                        {isUpdatingExpert ? <CircularProgress size={20} /> : 'Сохранить'}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => {
+                          setSelectedExpertId('');
+                          setIsExpertChanged(false);
+                        }}
+                        disabled={isUpdatingExpert}
+                      >
+                        Отмена
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="task-row">

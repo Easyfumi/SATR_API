@@ -16,5 +16,6 @@ public interface TaskService {
     TaskResponse setTaskNumber(Long taskId, String number);
     TaskResponse setDecisionDate(Long taskId, LocalDate decisionDate);
     TaskResponse updateTaskContract(Long taskId, Long contractId);
+    TaskResponse updateTaskExpert(Long taskId, Long assignedUserId);
     List<TaskDuplicateInfo> checkDuplicates(TaskRequest request);
 }

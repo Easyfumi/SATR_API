@@ -30,6 +30,7 @@ public class TaskResponse {
     private LocalDateTime createdAt;
     private String status;
     private String createdBy;
+    private Long assignedUserId;
     private UserInfo assignedUser;
 
     // ТЕПЕРЬ ТОЛЬКО ОДИН ДОГОВОР вместо списка!

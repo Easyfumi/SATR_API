@@ -208,7 +208,7 @@ const TaskEditPage = () => {
                     procedureType: taskData.previousProcessType || 'Оформление нового',
                     previousNumber: taskData.previousNumber || '',
                     representativeName: taskData.representative || '',
-                    assignedUserId: taskData.assignedUserId || null
+                    assignedUserId: taskData.assignedUserId ?? taskData.assignedUser?.id ?? null
                 });
 
                 // Показываем поле предыдущего номера если нужно

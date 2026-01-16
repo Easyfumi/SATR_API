@@ -22,6 +22,36 @@
     font-size: 0.9rem;
 }
 
+/* Стили для выбора эксперта */
+.selected-process {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+.placeholder-text {
+  color: #999;
+  font-style: italic;
+}
+
+.process-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 0;
+}
+
+/* Компактная ширина селекта эксперта */
+.expert-select-control {
+  width: 240px;
+}
+
+/* Фиксированная ширина выпадающих списков */
+.status-menu .MuiPaper-root,
+.expert-menu .MuiPaper-root {
+  width: 240px;
+}
+
 /* Специфичные стили для Material UI */
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root {
     border-radius: 8px;

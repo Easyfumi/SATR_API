@@ -136,6 +136,20 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/{id}/expert")
+    public ResponseEntity<?> updateTaskExpert(
+            @PathVariable Long id,
+            @RequestBody TaskExpertUpdateRequest request) {
+        try {
+            TaskResponse response = taskService.updateTaskExpert(id, request.getAssignedUserId());
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<PageResponse<TaskResponse>> searchTasks(
             @RequestHeader("Authorization") String jwt,

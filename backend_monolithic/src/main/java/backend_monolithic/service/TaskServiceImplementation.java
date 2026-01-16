@@ -7,6 +7,7 @@ import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
 import backend_monolithic.model.enums.TaskStatus;
+import backend_monolithic.model.enums.Role;
 import backend_monolithic.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -209,6 +210,27 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
+    @Transactional
+    public TaskResponse updateTaskExpert(Long taskId, Long assignedUserId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
+
+        if (assignedUserId == null) {
+            task.setAssignedUserId(null);
+        } else {
+            User user = userService.getUserById(assignedUserId)
+                    .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+            if (user.getRoles() == null || !user.getRoles().contains(Role.EXPERT)) {
+                throw new BusinessException("Пользователь не является экспертом");
+            }
+            task.setAssignedUserId(assignedUserId);
+        }
+
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
+    }
+
+    @Override
     public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
         List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
         Task newTask = mapRequestToEntity(request);
@@ -259,6 +281,7 @@ public class TaskServiceImplementation implements TaskService {
         response.setDecisionAt(task.getDecisionAt());
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
+        response.setAssignedUserId(task.getAssignedUserId());
 
         // Обработка createdBy
         if (task.getCreatedBy() != null) {
