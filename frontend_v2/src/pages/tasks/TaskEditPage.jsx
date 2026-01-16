@@ -387,7 +387,7 @@ const TaskEditPage = () => {
 
     const handleRemoveContract = async () => {
         try {
-            const response = await api.delete(`/api/tasks/${id}/contract`);
+            const response = await api.put(`/api/tasks/${id}/contract`, { contractId: null });
             setTask(response.data);
         } catch (error) {
             console.error('Ошибка отвязки договора:', error);
@@ -410,7 +410,8 @@ const handleSave = async () => {
             representativeName: representativeAbsent ? '' : formData.representativeName,
             assignedUserId: formData.assignedUserId,
             previousProcessType: formData.procedureType,
-            previousNumber: formData.previousNumber
+            previousNumber: formData.previousNumber,
+            contractId: task?.contract?.id || null
         };
 
         console.log('Saving request:', request);

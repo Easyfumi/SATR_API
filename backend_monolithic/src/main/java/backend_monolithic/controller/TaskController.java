@@ -136,6 +136,18 @@ public class TaskController {
         }
     }
 
+    @DeleteMapping("/{id}/contract")
+    public ResponseEntity<?> deleteTaskContract(@PathVariable Long id) {
+        try {
+            TaskResponse response = taskService.updateTaskContract(id, null);
+            return ResponseEntity.ok(response);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}/expert")
     public ResponseEntity<?> updateTaskExpert(
             @PathVariable Long id,
