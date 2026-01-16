@@ -442,7 +442,7 @@ const TaskListPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру заявки, эксперту или номеру договора..."
+                            placeholder="Поиск по номеру заявки, исполнителю или номеру договора..."
                             className="search-input"
                             value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
@@ -718,10 +718,10 @@ const TaskListPage = () => {
                                         </div>
                                     </div>
 
-                                    {/* Информация об эксперте, договоре и оплате */}
+                                    {/* Информация об исполнителе, договоре и оплате */}
                                     <div className="expert-contract-section">
                                         <div className={`expert-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
-                                            <span className="info-label">Эксперт:</span>
+                                            <span className="info-label">Исполнитель:</span>
                                             <span className="info-value">
                                                 {task.assignedUser
                                                     ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`

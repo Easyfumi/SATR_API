@@ -607,7 +607,7 @@ const handleSave = async () => {
                     {/* Правая колонка */}
                     <div className="column right-column">
                         <div className="task-row">
-                            <span className="task-label">Эксперт:</span>
+                            <span className="task-label">Исполнитель:</span>
                             <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     value={formData.assignedUserId || ''}
@@ -617,7 +617,7 @@ const handleSave = async () => {
                                         if (!selected) {
                                             return (
                                                 <div className="selected-process">
-                                                    <span className="placeholder-text">Выберите эксперта</span>
+                                                    <span className="placeholder-text">Выберите исполнителя</span>
                                                 </div>
                                             );
                                         }

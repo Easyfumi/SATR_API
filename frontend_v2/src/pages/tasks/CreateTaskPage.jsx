@@ -674,7 +674,7 @@ const CreateTaskPage = () => {
                     )}
 
                     <div className="form-row">
-                        <label className="form-label">Эксперт:</label>
+                        <label className="form-label">Исполнитель:</label>
                         <FormControl fullWidth>
                             <Select
                                 value={formData.assignedUserId || ''}
@@ -684,7 +684,7 @@ const CreateTaskPage = () => {
                                     if (!selected) {
                                         return (
                                             <div className="selected-process">
-                                                <span className="placeholder-text">Выберите эксперта</span>
+                                                <span className="placeholder-text">Выберите исполнителя</span>
                                             </div>
                                         );
                                     }

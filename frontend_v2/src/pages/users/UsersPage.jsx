@@ -9,7 +9,7 @@ import './UsersPage.css';
 
 const translateRole = (role) => {
   const rolesMap = {
-    'EXPERT': 'Эксперт',
+    'EXPERT': 'Исполнитель',
     'DIRECTOR': 'Руководитель',
     'REGISTRAR': 'Регистрация',
     'ACCOUNTANT': 'Бухгалтерия',

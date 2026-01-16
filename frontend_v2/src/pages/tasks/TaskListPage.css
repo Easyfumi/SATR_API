@@ -273,7 +273,7 @@
     text-align: center;
 }
 
-/* Новая секция с экспертом, договором и оплатой */
+/* Новая секция с исполнителем, договором и оплатой */
 .expert-contract-section {
     display: flex;
     flex-direction: column;

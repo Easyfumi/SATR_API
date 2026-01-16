@@ -86,7 +86,7 @@
   max-width: fit-content;
 }
 
-/* Стили для выбора эксперта */
+/* Стили для выбора исполнителя */
 .selected-process {
   display: flex;
   align-items: center;
@@ -166,7 +166,7 @@
   border-radius: 8px;
 }
 
-/* Компактная ширина селекта эксперта */
+/* Компактная ширина селекта исполнителя */
 .expert-select-control {
   width: 240px;
 }

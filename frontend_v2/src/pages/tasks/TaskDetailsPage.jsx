@@ -105,7 +105,7 @@ const TaskDetailsPage = () => {
       const response = await api.get('/api/users/experts');
       setExperts(response.data);
     } catch (err) {
-      console.error('Ошибка загрузки экспертов:', err);
+      console.error('Ошибка загрузки исполнителей:', err);
     }
   };
 
@@ -333,11 +333,11 @@ const TaskDetailsPage = () => {
       setIsExpertChanged(false);
       setAlertMessage({
         type: 'success',
-        text: 'Эксперт успешно обновлен'
+        text: 'Исполнитель успешно обновлен'
       });
       setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
-      console.error('Ошибка обновления эксперта:', error);
+      console.error('Ошибка обновления исполнителя:', error);
       setAlertMessage({
         type: 'error',
         text: error.response?.data?.message || 'Произошла ошибка'
@@ -453,7 +453,7 @@ const TaskDetailsPage = () => {
             </div>
 
             <div className="task-row">
-              <span className="task-label">Эксперт</span>
+              <span className="task-label">Исполнитель</span>
               {task.assignedUserId || task.assignedUser?.id ? (
                 <span className="task-value">
                   {formatExpertName(
