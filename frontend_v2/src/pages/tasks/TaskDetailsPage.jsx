@@ -384,6 +384,7 @@ const TaskDetailsPage = () => {
     return initials;
   };
 
+
   if (loading) return <div className="loading">Загрузка...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!task) return <div className="error-message">Задача не найдена</div>;
@@ -715,18 +716,6 @@ const TaskDetailsPage = () => {
         </div>
       </div>
 
-      <div className="task-details-card">
-        <div className="task-row">
-          <span className="task-label">Дата создания</span>
-          <span className="task-value">{formatDateTime(task.createdAt)}</span>
-        </div>
-
-        <div className="task-row">
-          <span className="task-label">Заявка создана</span>
-          <span className="task-value">{task.createdBy || 'Не указано'}</span>
-        </div>
-      </div>
-
       {/* Блок договора (one-to-many) */}
       <div className="task-details-card">
         <div className="task-row contract-section">
@@ -788,6 +777,18 @@ const TaskDetailsPage = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      <div className="task-details-card">
+        <div className="task-row">
+          <span className="task-label">Дата создания</span>
+          <span className="task-value">{formatDateTime(task.createdAt)}</span>
+        </div>
+
+        <div className="task-row">
+          <span className="task-label">Заявка создана</span>
+          <span className="task-value">{task.createdBy || 'Не указано'}</span>
         </div>
       </div>
 

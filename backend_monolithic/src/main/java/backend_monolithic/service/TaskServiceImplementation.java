@@ -288,9 +288,23 @@ public class TaskServiceImplementation implements TaskService {
             Optional<User> createdBy = userService.getUserById(task.getCreatedBy());
             if (createdBy.isPresent()) {
                 User user = createdBy.get();
-                response.setCreatedBy(user.getFirstName() + " " +
-                        user.getSecondName().charAt(0) + "." +
-                        (user.getPatronymic() != null ? user.getPatronymic().charAt(0) + "." : ""));
+                StringBuilder shortName = new StringBuilder();
+                if (user.getSecondName() != null && !user.getSecondName().isBlank()) {
+                    shortName.append(user.getSecondName());
+                }
+                if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
+                    if (shortName.length() > 0) {
+                        shortName.append(" ");
+                    }
+                    shortName.append(user.getFirstName().charAt(0)).append(".");
+                }
+                if (user.getPatronymic() != null && !user.getPatronymic().isBlank()) {
+                    if (shortName.length() > 0) {
+                        shortName.append(" ");
+                    }
+                    shortName.append(user.getPatronymic().charAt(0)).append(".");
+                }
+                response.setCreatedBy(shortName.toString());
             }
         }
 

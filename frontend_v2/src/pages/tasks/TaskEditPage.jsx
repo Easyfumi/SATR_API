@@ -459,6 +459,7 @@ const handleSave = async () => {
         return initials;
     };
 
+
     if (loading) return <div className="loading">Загрузка...</div>;
     if (error) return <div className="error-message">{error}</div>;
 
