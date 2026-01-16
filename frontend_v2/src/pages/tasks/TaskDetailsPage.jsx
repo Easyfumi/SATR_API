@@ -394,7 +394,7 @@ const TaskDetailsPage = () => {
         <Alert
           severity={alertMessage.type}
           onClose={() => setAlertMessage(null)}
-          sx={{ mb: 2 }}
+          className="task-alert"
         >
           {alertMessage.text}
         </Alert>
@@ -517,26 +517,26 @@ const TaskDetailsPage = () => {
                         className: 'expert-menu'
                       }}
                     >
-                      <MenuItem value="" style={{ whiteSpace: 'normal' }}>
+                    <MenuItem value="" className="expert-menu-item">
                         <div className="process-option">
                           <Checkbox
                             checked={false}
-                            style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                          className="expert-menu-checkbox"
                             disabled
                           />
-                          <span style={{ fontStyle: 'italic' }}>Не назначен</span>
+                        <span className="expert-menu-placeholder">Не назначен</span>
                         </div>
                       </MenuItem>
                       {experts.map((expert) => (
                         <MenuItem
                           key={expert.id}
                           value={expert.id}
-                          style={{ whiteSpace: 'normal' }}
+                        className="expert-menu-item"
                         >
                           <div className="process-option">
                             <Checkbox
                               checked={selectedExpertId === expert.id}
-                              style={{ padding: '0 10px 0 0', flexShrink: 0 }}
+                            className="expert-menu-checkbox"
                             />
                             <span>{formatExpertName(expert)}</span>
                           </div>
@@ -591,7 +591,6 @@ const TaskDetailsPage = () => {
                     className="task-number-field"
                     inputProps={{ className: 'task-number-input' }}
                     disabled={isUpdating}
-                    sx={{ width: '100%', maxWidth: 143 }}
                   />
                   {isNumberChanged && (
                     <div className="status-actions">
@@ -872,7 +871,12 @@ const TaskDetailsPage = () => {
                 <div className="contract-item-number">
                   {contract.number}
                   {task.contract?.id === contract.id && (
-                    <Chip label="Текущий" size="small" color="primary" sx={{ ml: 1 }} />
+                    <Chip
+                      label="Текущий"
+                      size="small"
+                      color="primary"
+                      className="current-contract-chip"
+                    />
                   )}
                 </div>
                 <div className="contract-item-info">

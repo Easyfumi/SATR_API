@@ -34,6 +34,10 @@
   font-style: italic;
 }
 
+.task-alert {
+  margin-bottom: 16px;
+}
+
 .process-option {
   display: flex;
   align-items: center;
@@ -56,6 +60,11 @@
   border: 1px solid #c4c4c4;
 }
 
+.task-number-field {
+  width: 100%;
+  max-width: 143px;
+}
+
 .task-number-field .MuiOutlinedInput-root:hover {
   border-color: #1976d2;
 }
@@ -75,6 +84,19 @@
   font-size: 0.95rem;
 }
 
+.expert-menu-item {
+  white-space: normal;
+}
+
+.expert-menu-checkbox {
+  padding: 0 10px 0 0;
+  flex-shrink: 0;
+}
+
+.expert-menu-placeholder {
+  font-style: italic;
+}
+
 .task-details-card .modern-date-field input[type="date"] {
   height: 40px;
   border-radius: 8px;
@@ -89,6 +111,10 @@
 .status-menu .MuiPaper-root,
 .expert-menu .MuiPaper-root {
   width: 240px;
+}
+
+.current-contract-chip {
+  margin-left: 8px;
 }
 
 /* Специфичные стили для Material UI */
