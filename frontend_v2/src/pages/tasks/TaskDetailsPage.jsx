@@ -581,6 +581,8 @@ const TaskDetailsPage = () => {
                     onChange={(e) => setNewNumber(e.target.value)}
                     placeholder="Введите номер"
                     variant="outlined"
+                    className="task-number-field"
+                    inputProps={{ className: 'task-number-input' }}
                     disabled={isUpdating}
                     sx={{ width: '100%', maxWidth: 143 }}
                   />

@@ -30,7 +30,7 @@
 }
 
 .placeholder-text {
-  color: #999;
+  color: #999 !important;
   font-style: italic;
 }
 
@@ -39,6 +39,45 @@
   align-items: center;
   width: 100%;
   padding: 4px 0;
+}
+
+/* Выравнивание высоты контролов */
+.task-details-card .status-display {
+  min-height: 40px;
+}
+
+.expert-select-control .MuiOutlinedInput-root,
+.task-number-field .MuiOutlinedInput-root {
+  height: 40px;
+  border-radius: 8px;
+}
+
+.task-number-field .MuiOutlinedInput-root {
+  border: 1px solid #c4c4c4;
+}
+
+.task-number-field .MuiOutlinedInput-root:hover {
+  border-color: #1976d2;
+}
+
+.task-number-field .MuiOutlinedInput-root.Mui-focused {
+  border-color: #1976d2;
+  border-width: 2px;
+}
+
+.task-number-field .MuiOutlinedInput-notchedOutline {
+  border: none;
+}
+
+.task-number-input::placeholder {
+  color: #999;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.task-details-card .modern-date-field input[type="date"] {
+  height: 40px;
+  border-radius: 8px;
 }
 
 /* Компактная ширина селекта эксперта */
