@@ -33,6 +33,8 @@ const TaskDetailsPage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [newDecisionDate, setNewDecisionDate] = useState('');
   const [isUpdatingDecisionDate, setIsUpdatingDecisionDate] = useState(false);
+  const [isNumberChanged, setIsNumberChanged] = useState(false);
+  const [isDecisionDateChanged, setIsDecisionDateChanged] = useState(false);
 
   // Состояния для управления статусом
   const [statusAnchorEl, setStatusAnchorEl] = useState(null);
@@ -221,6 +223,7 @@ const TaskDetailsPage = () => {
         type: 'success',
         text: 'Номер успешно присвоен'
       });
+      setIsNumberChanged(false);
       setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка присвоения номера:', error);
@@ -251,6 +254,7 @@ const TaskDetailsPage = () => {
         type: 'success',
         text: 'Дата решения успешно установлена'
       });
+      setIsDecisionDateChanged(false);
       setTimeout(() => setAlertMessage(null), 3000);
     } catch (error) {
       console.error('Ошибка установки даты решения:', error);
@@ -578,7 +582,10 @@ const TaskDetailsPage = () => {
                   <TextField
                     size="small"
                     value={newNumber}
-                    onChange={(e) => setNewNumber(e.target.value)}
+                    onChange={(e) => {
+                      setNewNumber(e.target.value);
+                      setIsNumberChanged(true);
+                    }}
                     placeholder="Введите номер"
                     variant="outlined"
                     className="task-number-field"
@@ -586,17 +593,30 @@ const TaskDetailsPage = () => {
                     disabled={isUpdating}
                     sx={{ width: '100%', maxWidth: 143 }}
                   />
-                  <Button
-                    variant="contained"
-                    onClick={handleAssignNumber}
-                    disabled={!newNumber || isUpdating}
-                  >
-                    {isUpdating ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      'Присвоить номер'
-                    )}
-                  </Button>
+                  {isNumberChanged && (
+                    <div className="status-actions">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleAssignNumber}
+                        disabled={!newNumber || isUpdating}
+                        className="save-status-button"
+                      >
+                        {isUpdating ? <CircularProgress size={20} /> : 'Сохранить'}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => {
+                          setNewNumber('');
+                          setIsNumberChanged(false);
+                        }}
+                        disabled={isUpdating}
+                      >
+                        Отмена
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -611,21 +631,37 @@ const TaskDetailsPage = () => {
                     <input
                       type="date"
                       value={newDecisionDate}
-                      onChange={(e) => setNewDecisionDate(e.target.value)}
+                      onChange={(e) => {
+                        setNewDecisionDate(e.target.value);
+                        setIsDecisionDateChanged(true);
+                      }}
                       disabled={isUpdatingDecisionDate}
                     />
                   </div>
-                  <Button
-                    variant="contained"
-                    onClick={handleSetDecisionDate}
-                    disabled={!newDecisionDate || isUpdatingDecisionDate}
-                  >
-                    {isUpdatingDecisionDate ? (
-                      <CircularProgress size={24} />
-                    ) : (
-                      'Установить дату'
-                    )}
-                  </Button>
+                  {isDecisionDateChanged && (
+                    <div className="status-actions">
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={handleSetDecisionDate}
+                        disabled={!newDecisionDate || isUpdatingDecisionDate}
+                        className="save-status-button"
+                      >
+                        {isUpdatingDecisionDate ? <CircularProgress size={20} /> : 'Сохранить'}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => {
+                          setNewDecisionDate('');
+                          setIsDecisionDateChanged(false);
+                        }}
+                        disabled={isUpdatingDecisionDate}
+                      >
+                        Отмена
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
