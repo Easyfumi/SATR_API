@@ -719,63 +719,50 @@ const TaskDetailsPage = () => {
       {/* Блок договора (one-to-many) */}
       <div className="task-details-card">
         <div className="task-row contract-section">
-          <span className="task-label">Договор</span>
-          <div className="contracts-container">
-            <div className="contracts-header">
-              <Button
-                variant={task.contract ? "outlined" : "contained"}
-                onClick={handleContractButtonClick}
-                disabled={isUpdatingContract}
-                startIcon={<LinkIcon />}
-                endIcon={<ArrowDropDownIcon />}
-              >
-                {task.contract ? 'Изменить договор' : 'Привязать договор'}
-              </Button>
-            </div>
-
-            {task.contract ? (
-              <div className="contracts-list">
-                <div className="contract-item">
-                  <div className="contract-info">
-                    <div className="contract-number">
-                      {task.contract.number}
-                    </div>
-                    <div className="contract-details">
-                      <div className="contract-detail">
-                        <span className="contract-detail-label">Дата:</span>
-                        <span className="contract-detail-value">{formatDate(task.contract.date)}</span>
-                      </div>
-                      <div className="contract-detail">
-                        <span className="contract-detail-label">Статус оплаты:</span>
-                        <span className={`contract-detail-value payment-status-${task.contract.paymentStatus?.toLowerCase()}`}>
-                          {getPaymentStatusLabel(task.contract.paymentStatus)}
-                        </span>
-                      </div>
-                      {task.contract.applicantName && (
-                        <div className="contract-detail">
-                          <span className="contract-detail-label">Заявитель:</span>
-                          <span className="contract-detail-value">{task.contract.applicantName}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    startIcon={<UnlinkIcon />}
-                    onClick={handleUnlinkContract}
-                    disabled={isUpdatingContract}
-                  >
-                    Отвязать
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="no-contracts-message">
-                <p>Нет привязанного договора</p>
+          <div className={`contracts-container ${task.contract ? 'contract-attached' : ''}`}>
+            {!task.contract && (
+              <div className="contracts-header">
+                <Button
+                  variant="contained"
+                  onClick={handleContractButtonClick}
+                  disabled={isUpdatingContract}
+                  startIcon={<LinkIcon />}
+                  endIcon={<ArrowDropDownIcon />}
+                >
+                  Привязать договор
+                </Button>
               </div>
             )}
+
+            {task.contract ? (
+              <div className="contract-details-grid">
+                <div className="contract-column left-column">
+                  <div className="task-row contract-row">
+                    <span className="task-label">Номер договора</span>
+                    <span className="task-value">{task.contract.number}</span>
+                  </div>
+                  <div className="task-row contract-row">
+                    <span className="task-label">Статус оплаты</span>
+                    <span className={`task-value payment-status-badge payment-status-${task.contract.paymentStatus?.toLowerCase()}`}>
+                      {getPaymentStatusLabel(task.contract.paymentStatus)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="contract-divider"></div>
+
+                <div className="contract-column right-column">
+                  <div className="task-row contract-row">
+                    <span className="task-label">Дата</span>
+                    <span className="task-value">{formatDate(task.contract.date)}</span>
+                  </div>
+                  <div className="task-row contract-row">
+                    <span className="task-label">Заявитель</span>
+                    <span className="task-value">{task.contract.applicantName || 'Не указан'}</span>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

@@ -2,24 +2,88 @@
 /* Общие стили вынесены в common.css */
 
 .task-details-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
 }
 
 .back-button {
-    margin-bottom: 25px;
+  margin-bottom: 25px;
 }
 
 .task-details-card {
-    margin-top: 25px;
+  margin-top: 25px;
+}
+
+/* Блок договора */
+.contract-section {
+  align-items: flex-start;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.contract-section.task-row {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.contracts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.contracts-container.contract-attached {
+  gap: 0;
+}
+
+.contracts-header {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.contracts-list {
+  width: 100%;
+}
+
+.contract-details-grid {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  margin-left: 0;
+}
+
+.contract-column {
+  flex: 1;
+}
+
+.contract-divider {
+  width: 1px;
+  background-color: #f0f4f8;
+  margin: 0 6px;
+}
+
+.contract-row {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.contract-row:last-child {
+  border-bottom: none;
 }
 
 .details-payment-status {
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-weight: 600;
-    font-size: 0.9rem;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.contract-row .payment-status-badge {
+  display: inline-block;
+  width: auto;
+  max-width: fit-content;
 }
 
 /* Стили для выбора эксперта */
@@ -119,16 +183,16 @@
 
 /* Специфичные стили для Material UI */
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root {
-    border-radius: 8px;
+  border-radius: 8px;
 }
 
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-    border-color: #1976d2;
+  border-color: #1976d2;
 }
 
 .input-action-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-    border-color: #1976d2;
-    border-width: 2px;
+  border-color: #1976d2;
+  border-width: 2px;
 }
 
 /* Секция даты решения */
@@ -186,14 +250,15 @@
 .date-dialog-content .MuiTextField-root {
   width: 100%;
 }
+
 /* Адаптивность - специфичная для TaskDetailsPage */
 @media (max-width: 768px) {
-    .task-details-container {
-        padding: 15px;
-    }
-    
-    .back-button {
-        font-size: 0.9rem;
-        padding: 8px 12px;
-    }
+  .task-details-container {
+    padding: 15px;
+  }
+
+  .back-button {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
 }

@@ -135,6 +135,63 @@
   padding-top: 12px;
 }
 
+/* Блок договора */
+.contract-section {
+  align-items: flex-start;
+}
+
+.contracts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.contracts-container.contract-attached {
+  gap: 0;
+}
+
+.contracts-header {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.contract-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.contract-details-grid {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+}
+
+.contract-column {
+  flex: 1;
+}
+
+.contract-divider {
+  width: 1px;
+  background-color: #f0f4f8;
+  margin: 0 6px;
+}
+
+.contract-row {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.contract-row:last-child {
+  border-bottom: none;
+}
+
+.contract-row .payment-status-badge {
+  display: inline-block;
+  width: auto;
+  max-width: fit-content;
+}
+
 .contract-selection {
   width: 100%;
 }
