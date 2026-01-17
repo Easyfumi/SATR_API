@@ -17,6 +17,7 @@ public class TaskSimple {
     private String typeName;
     private String processType;
     private String previousProcessType;
+    private String previousNumber;
     private String assignedUserName;
     private String status;
     private LocalDateTime createdAt;

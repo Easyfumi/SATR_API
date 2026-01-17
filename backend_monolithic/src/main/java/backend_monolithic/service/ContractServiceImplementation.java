@@ -173,6 +173,7 @@ public class ContractServiceImplementation implements ContractService {
         dto.setTypeName(task.getTypeName());
         dto.setProcessType(task.getProcessType());
         dto.setPreviousProcessType(task.getPreviousProcessType());
+        dto.setPreviousNumber(task.getPreviousNumber());
         if (task.getAssignedUserId() != null) {
             userService.getUserById(task.getAssignedUserId())
                     .ifPresent(user -> dto.setAssignedUserName(buildShortName(user)));

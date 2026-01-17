@@ -721,9 +721,20 @@ const TaskListPage = () => {
 
                                     {/* Строка с данными в grid-контейнере */}
                                     <div className="info-grid">
-                                        <div className="grid-item">
-                                            <div className="grid-label-invisible">Тип</div>
-                                            <div className="grid-value">{task.docType}</div>
+                                        <div className="grid-item grid-item-first">
+                                            <div className="grid-value">
+                                                {task.docType && (
+                                                    <div className="task-doc-info">
+                                                        <div className="task-doc-type">{task.docType}</div>
+                                                        {task.previousProcessType && (
+                                                            <div className="task-procedure-type">{task.previousProcessType}</div>
+                                                        )}
+                                                        {task.previousNumber && (
+                                                            <div className="task-previous-number">{task.previousNumber}</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="grid-item">
                                             <div className="grid-label">Марка</div>
