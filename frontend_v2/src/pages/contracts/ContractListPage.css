@@ -265,7 +265,7 @@
     background: #fff;
     border: 1px solid var(--silver-accent);
     border-radius: 10px;
-    padding: 18px;
+    padding: 6px 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -284,71 +284,93 @@
     box-shadow: 0 4px 12px rgba(163, 184, 204, 0.2);
 }
 
-/* Заголовок карточки */
-.contract-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    gap: 10px;
-}
-
-.contract-number-section {
-    flex: 1;
+/* Строка с информацией договора */
+.contract-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    width: 100%;
 }
 
-.contract-number {
-    font-size: 1.2rem;
+.contract-col {
+    display: flex;
+    align-items: center;
+    color: #1e293b;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contract-col:not(:last-child) {
+    border-right: 1px solid rgba(148, 163, 184, 0.6);
+    padding-right: 12px;
+    margin-right: 12px;
+}
+
+.contract-col-number {
+    flex: 0 0 20%;
+}
+
+.contract-col-applicant {
+    flex: 0 0 40%;
+    justify-content: center;
+}
+
+.contract-col-tasks {
+    flex: 0 0 20%;
+    justify-content: center;
+}
+
+.contract-col-status {
+    flex: 0 0 20%;
+    justify-content: flex-start;
+}
+
+.contract-number-text {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.contract-date-text {
     font-weight: 600;
-    color: var(--deep-frost);
+    font-size: 1.05rem;
 }
 
-.tasks-chip {
-    cursor: pointer !important;
+.payment-status-text {
+    display: inline-block;
+    font-weight: 600;
+    color: #111827;
+    padding: 4px 8px;
+    border-radius: 12px;
+    background: #e2e8f0;
 }
 
-.tasks-chip:hover {
-    background-color: rgba(25, 118, 210, 0.08) !important;
+.payment-status-text.paid {
+    background: #c8e6c9;
 }
 
-/* Стили для бейджа статуса оплаты */
-.payment-status-section {
-    display: flex;
-    align-items: center;
+.payment-status-text.partially-paid {
+    background: #fde68a;
 }
 
-.payment-status-badge {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-}
-
-/* Основная информация договора */
-.contract-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.info-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
+.payment-status-text.not-paid {
+    background: #fecaca;
 }
 
 .info-label {
     color: #475569;
     font-size: 0.9rem;
-    min-width: 140px;
     font-weight: 500;
 }
 
 .info-value {
     color: #1e293b;
     font-weight: 500;
-    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Сообщения вынесены в common.css */
@@ -387,28 +409,27 @@
         width: 100%;
     }
 
-    .contract-card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+    .contract-row {
+        flex-wrap: wrap;
+        row-gap: 8px;
     }
 
-    .contract-number-section {
-        width: 100%;
-        justify-content: space-between;
+    .contract-col {
+        white-space: normal;
     }
 
-    .payment-status-section {
-        align-self: flex-end;
+    .contract-col:not(:last-child) {
+        border-right: none;
+        padding-right: 0;
+        margin-right: 0;
     }
 
-    .info-row {
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .info-label {
-        min-width: auto;
+    .contract-col-number,
+    .contract-col-applicant,
+    .contract-col-tasks,
+    .contract-col-status {
+        flex: 0 0 100%;
+        justify-content: flex-start;
     }
 
     .filters-grid {
@@ -421,13 +442,8 @@
         padding: 14px;
     }
 
-    .contract-number {
-        font-size: 1.1rem;
-    }
-
-    .payment-status-badge {
-        font-size: 0.75rem;
-        padding: 4px 8px;
+    .contract-col {
+        font-size: 0.95rem;
     }
 
     .create-contract-button {

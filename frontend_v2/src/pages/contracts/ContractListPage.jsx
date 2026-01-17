@@ -6,23 +6,6 @@ import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
-import {
-  Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  IconButton,
-  CircularProgress
-} from '@mui/material';
-import TaskIcon from '@mui/icons-material/Task';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import CloseIcon from '@mui/icons-material/Close';
 
 const ContractListPage = () => {
     const navigate = useNavigate();
@@ -30,10 +13,7 @@ const ContractListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
-    const [tasksDialogOpen, setTasksDialogOpen] = useState(false);
-    const [selectedContractTasks, setSelectedContractTasks] = useState([]);
-    const [selectedContractName, setSelectedContractName] = useState('');
-    const [loadingTasks, setLoadingTasks] = useState(false);
+    const [tasksCountByContract, setTasksCountByContract] = useState({});
 
     // Состояния для фильтров
     const [filters, setFilters] = useState({
@@ -46,22 +26,39 @@ const ContractListPage = () => {
     // Маппинг статусов оплаты
     const paymentStatusLabels = {
         PAIDFOR: 'Оплачен',
-        PARTIALLYPAIDFOR: 'Оплачен частично',
+        PARTIALLYPAIDFOR: 'Частично',
         NOTPAIDFOR: 'Не оплачен'
     };
 
-    const taskStatusLabels = {
-        RECEIVED: 'Заявка получена',
-        REGISTERED: 'Заявка зарегистрирована',
-        DECISION_DONE: 'Решение по заявке готово',
-        DOCUMENTS_WAITING: 'Ожидание документов',
-        REJECTION: 'Отказ в проведении работ',
-        CANCELLED: 'Аннулирована',
-        PROJECT: 'Переведено в проект',
-        SIGNED: 'Подписано',
-        FOR_REVISION: 'Возвращено на доработку',
-        COMPLETED: 'Заявка выполнена'
-    };
+    const fetchTaskCounts = useCallback(async (contractsList) => {
+        if (!contractsList.length) {
+            setTasksCountByContract({});
+            return;
+        }
+
+        try {
+            const results = await Promise.all(
+                contractsList.map(async (contract) => {
+                    try {
+                        const response = await api.get(`/api/contracts/${contract.id}/tasks`);
+                        const tasks = Array.isArray(response.data) ? response.data : [];
+                        return [contract.id, tasks.length];
+                    } catch (error) {
+                        console.error(`Error loading tasks count for contract ${contract.id}:`, error);
+                        return [contract.id, null];
+                    }
+                })
+            );
+
+            const nextCounts = {};
+            results.forEach(([id, count]) => {
+                nextCounts[id] = count;
+            });
+            setTasksCountByContract(nextCounts);
+        } catch (error) {
+            console.error('Error loading tasks counts:', error);
+        }
+    }, []);
 
     // Статусы оплаты для фильтра
     const paymentStatusOptions = [
@@ -78,6 +75,7 @@ const ContractListPage = () => {
             const response = await api.get('/api/contracts');
             const data = Array.isArray(response.data) ? response.data : [];
             setContracts(data);
+            fetchTaskCounts(data);
             setError(null);
         } catch (error) {
             console.error('Error fetching contracts:', error);
@@ -91,31 +89,6 @@ const ContractListPage = () => {
     useEffect(() => {
         fetchContracts();
     }, [fetchContracts]);
-
-    // Функция для загрузки задач договора
-    const handleShowTasks = async (contractId, contractNumber, event) => {
-        if (event) event.stopPropagation();
-        
-        setSelectedContractName(contractNumber || 'Договор');
-        setTasksDialogOpen(true);
-        setLoadingTasks(true);
-        
-        try {
-            const response = await api.get(`/api/contracts/${contractId}/tasks`);
-            setSelectedContractTasks(response.data || []);
-        } catch (error) {
-            console.error('Error loading tasks for contract:', error);
-            setSelectedContractTasks([]);
-        } finally {
-            setLoadingTasks(false);
-        }
-    };
-
-    // Функция для перехода к задаче
-    const handleGoToTask = (taskId) => {
-        setTasksDialogOpen(false);
-        navigate(`/tasks/${taskId}`);
-    };
 
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
@@ -211,15 +184,6 @@ const ContractListPage = () => {
     const formatDate = (date) => {
         if (!date) return 'Не указана';
         return new Date(date).toLocaleDateString('ru-RU');
-    };
-
-    const getTaskStatusColor = (status) => {
-        switch (status) {
-            case 'COMPLETED': return 'success';
-            case 'CANCELLED': return 'error';
-            case 'REJECTION': return 'warning';
-            default: return 'default';
-        }
     };
 
     return (
@@ -349,138 +313,44 @@ const ContractListPage = () => {
                             }
                         </div>
                     ) : (
-                        filteredContracts.map(contract => (
+                        filteredContracts.map(contract => {
+                            const statusText = (paymentStatusLabels[contract.paymentStatus] || contract.paymentStatus || '')
+                                .toString()
+                                .toUpperCase();
+                            const tasksCount = tasksCountByContract[contract.id];
+                            const tasksText = tasksCount == null ? null : `ЗАДАЧ: ${tasksCount}`;
+
+                            return (
                             <div
                                 key={contract.id}
                                 className={`contract-card ${filters.quickSearch ? 'highlighted' : ''}`}
                                 onClick={() => navigate(`/contracts/${contract.id}`)}
                             >
-                                {/* Верхняя строка с номером и статусом */}
-                                <div className="contract-card-header">
-                                    <div className="contract-number-section">
-                                        <div className="contract-number">
-                                            {contract.number || 'Номер не указан'}
+                                <div className="contract-row">
+                                    <div className="contract-row">
+                                        <div className="contract-col contract-col-number">
+                                            <span className="contract-number-text">{contract.number || 'Номер не указан'}</span>
+                                            &nbsp;от&nbsp;<span className="contract-date-text">{formatDate(contract.date)}</span>
                                         </div>
-                                        <Chip
-                                            icon={<TaskIcon />}
-                                            label="Задачи"
-                                            size="small"
-                                            color="primary"
-                                            onClick={(e) => handleShowTasks(contract.id, contract.number, e)}
-                                            className="tasks-chip"
-                                        />
-                                    </div>
-
-                                    {/* Статус оплаты */}
-                                    <div className="payment-status-section">
-                                        <span className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)}`}>
-                                            {paymentStatusLabels[contract.paymentStatus] || contract.paymentStatus}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Основная информация */}
-                                <div className="contract-info">
-                                    <div className="info-row">
-                                        <span className="info-label">Дата:</span>
-                                        <span className="info-value">
-                                            {formatDate(contract.date)}
-                                        </span>
-                                    </div>
-                                    <div className="info-row">
-                                        <span className="info-label">Заявитель:</span>
-                                        <span className="info-value">
+                                        <div className="contract-col contract-col-applicant">
                                             {contract.applicantName || 'Не указан'}
-                                        </span>
+                                        </div>
+                                        <div className="contract-col contract-col-tasks">
+                                            {tasksText || 'ЗАДАЧ: —'}
+                                        </div>
+                                        <div className="contract-col contract-col-status">
+                                            <span className={`payment-status-text ${getStatusBadgeClass(contract.paymentStatus)}`}>
+                                                {statusText}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             )}
-
-            {/* Диалог для просмотра задач договора */}
-            <Dialog
-                open={tasksDialogOpen}
-                onClose={() => setTasksDialogOpen(false)}
-                maxWidth="md"
-                fullWidth
-            >
-                <DialogTitle>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography variant="h6">
-                            Задачи договора: {selectedContractName}
-                        </Typography>
-                        <IconButton onClick={() => setTasksDialogOpen(false)} size="small">
-                            <CloseIcon />
-                        </IconButton>
-                    </div>
-                </DialogTitle>
-                <DialogContent>
-                    {loadingTasks ? (
-                        <div style={{ textAlign: 'center', padding: '40px' }}>
-                            <CircularProgress />
-                            <Typography variant="body2" style={{ marginTop: '16px' }}>
-                                Загрузка задач...
-                            </Typography>
-                        </div>
-                    ) : selectedContractTasks.length === 0 ? (
-                        <Typography variant="body1" style={{ padding: '20px', textAlign: 'center' }}>
-                            Нет привязанных задач
-                        </Typography>
-                    ) : (
-                        <List>
-                            {selectedContractTasks.map((task) => (
-                                <ListItem
-                                    key={task.id}
-                                    secondaryAction={
-                                        <IconButton
-                                            edge="end"
-                                            onClick={() => handleGoToTask(task.id)}
-                                        >
-                                            <ArrowForwardIcon />
-                                        </IconButton>
-                                    }
-                                    style={{ borderBottom: '1px solid #eee' }}
-                                >
-                                    <ListItemText
-                                        primary={
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <Typography variant="subtitle1">
-                                                    {task.number || `ID: ${task.id}`}
-                                                </Typography>
-                                                <Chip
-                                                    label={taskStatusLabels[task.status] || task.status}
-                                                    size="small"
-                                                    color={getTaskStatusColor(task.status)}
-                                                    variant="outlined"
-                                                />
-                                            </div>
-                                        }
-                                        secondary={
-                                            <React.Fragment>
-                                                <Typography variant="body2" component="span">
-                                                    {task.docType}
-                                                </Typography>
-                                                <br />
-                                                <Typography variant="body2" color="textSecondary">
-                                                    Создана: {task.createdAt ? new Date(task.createdAt).toLocaleDateString('ru-RU') : 'Не указана'}
-                                                </Typography>
-                                            </React.Fragment>
-                                        }
-                                    />
-                                </ListItem>
-                            ))}
-                        </List>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setTasksDialogOpen(false)}>
-                        Закрыть
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 };
