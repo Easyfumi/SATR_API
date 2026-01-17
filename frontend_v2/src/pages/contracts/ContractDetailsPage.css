@@ -1,13 +1,6 @@
 /* ContractDetailsPage.css - специфичные стили */
 /* Общие стили вынесены в common.css */
 
-.content-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
-    min-height: calc(100vh - 64px);
-}
-
 .contract-details {
     background: #fff;
     border-radius: 10px;
@@ -198,12 +191,20 @@
     gap: 12px;
 }
 
+.compact-tasks-list {
+    gap: 8px;
+}
+
 .task-item {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     padding: 15px;
     transition: all 0.3s ease;
+}
+
+.compact-task-item {
+    padding: 10px 12px;
 }
 
 .task-item:hover {
@@ -216,6 +217,10 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+}
+
+.compact-task-item .task-header {
+    margin-bottom: 6px;
 }
 
 .task-main-info {
@@ -232,6 +237,20 @@
     font-size: 1rem;
 }
 
+.task-assignee {
+    color: #475569;
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-left: 12px;
+}
+
+.task-assignee.task-number {
+    color: var(--deep-frost);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -240,27 +259,38 @@
     opacity: 0.8;
 }
 
-.task-details {
+.task-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 16px;
     cursor: pointer;
 }
 
 .task-detail {
     display: flex;
-    gap: 10px;
-    margin-bottom: 6px;
+    gap: 8px;
+    margin-bottom: 0;
     align-items: flex-start;
+    min-width: 0;
 }
 
 .task-label {
-    color: #64748b;
+    color: #6b7c93;
     font-size: 0.85rem;
-    min-width: 120px;
+    min-width: 110px;
+    font-weight: 500;
+    margin-right: 15px;
 }
 
 .task-value {
-    color: #374151;
-    font-size: 0.85rem;
-    flex: 1;
+    color: #1a2a3a;
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex-grow: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .no-tasks-message {
@@ -274,16 +304,27 @@
 
 /* Комментарии */
 .comments-content {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    border: none;
     line-height: 1.5;
-    color: #374151;
-    min-height: 60px;
+    color: #1a2a3a;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.comments-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.task-alert {
+    margin-bottom: 16px;
 }
 
 .comments-content p {
@@ -365,100 +406,5 @@
 }
 
 /* Сообщения вынесены в common.css */
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .content-container {
-        padding: 16px;
-    }
-    
-    .details-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-
-    .header-actions {
-        justify-content: center;
-    }
-
-    .contract-main-info {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-
-    .contract-title {
-        font-size: 1.5rem;
-        text-align: center;
-    }
-
-    .status-badge-container {
-        justify-content: center;
-    }
-
-    .status-edit-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .status-select {
-        min-width: 100% !important;
-    }
-
-    .inline-edit-actions {
-        justify-content: center;
-    }
-
-    .detail-item {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .detail-label {
-        min-width: auto;
-    }
-
-    .section-header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-    }
-
-    .task-detail {
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .task-label {
-        min-width: auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .details-content {
-        padding: 15px;
-    }
-
-    .detail-section {
-        padding: 15px;
-    }
-
-    .header-actions {
-        flex-direction: column;
-    }
-
-    .edit-button, .delete-button {
-        justify-content: center;
-    }
-
-    .inline-edit-actions {
-        flex-direction: column;
-    }
-
-    .save-inline-btn, .cancel-inline-btn {
-        justify-content: center;
-    }
-}
 
 /* CSS переменные вынесены в common.css */

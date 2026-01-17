@@ -3,31 +3,18 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import './ContractDetailsPage.css';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import TaskIcon from '@mui/icons-material/Assignment';
 import {
-    FormControl,
-    Select,
     MenuItem,
     Menu,
-    Checkbox,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Button as MuiButton,
     Button,
     CircularProgress,
     Chip,
     IconButton,
-    Typography,
     Alert
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
@@ -250,50 +237,25 @@ const ContractDetailsPage = () => {
                 <Alert
                     severity={alertMessage.type}
                     onClose={() => setAlertMessage(null)}
-                    sx={{ mb: 2 }}
+                    className="task-alert"
                 >
                     {alertMessage.text}
                 </Alert>
             )}
 
-            <div className="contract-details">
-                {/* Хедер с навигацией и действиями */}
-                <div className="details-header">
-                    <div className="header-navigation">
-                        <button 
-                            className="back-button"
-                            onClick={() => navigate('/contracts')}
-                        >
-                            <ArrowBackIcon />
-                            Назад к списку
-                        </button>
-                    </div>
-                    
-                    <div className="header-actions">
-                        <Link
-                            to={`/contracts/edit/${contract.id}`}
-                            className="edit-button"
-                        >
-                            <EditIcon />
-                            Редактировать
-                        </Link>
-                        <button
-                            onClick={handleDelete}
-                            className="delete-button"
-                        >
-                            <DeleteIcon />
-                            Удалить
-                        </button>
-                    </div>
-                </div>
+            <div>
+                <Link to="/contracts" className="back-button">
+                    <ArrowBackIcon />
+                    К списку договоров
+                </Link>
+            </div>
 
-                {/* Основная информация */}
-                <div className="details-content">
-                    <div className="contract-main-info">
-                        <h1 className="contract-title">Договор № {contract.number}</h1>
-                        
-                        <div className="status-badge-container">
-                            <div className="status-display-container">
+            <div className="task-details-card">
+                <div className="card-content">
+                    <div className="column left-column">
+                        <div className="task-row">
+                            <span className="task-label">Статус оплаты</span>
+                            <div className="status-container">
                                 <div className="status-display">
                                     <span className={`payment-status-badge ${getStatusBadgeClass(contract.paymentStatus)}`}>
                                         {getPaymentStatusLabel(selectedPaymentStatus || contract.paymentStatus)}
@@ -330,185 +292,172 @@ const ContractDetailsPage = () => {
                                 )}
                             </div>
                         </div>
+
+                        <div className="task-row">
+                            <span className="task-label">Номер договора</span>
+                            <span className="task-value">{contract.number}</span>
+                        </div>
+
+                        <div className="task-row">
+                            <span className="task-label">Дата договора</span>
+                            <span className="task-value">{formatDate(contract.date)}</span>
+                        </div>
                     </div>
 
-                    {/* Детальная информация */}
-                    <div className="details-grid">
-                        <div className="detail-section">
-                            <h3>Основная информация</h3>
-                            <div className="detail-items">
-                                <div className="detail-item">
-                                    <span className="detail-label">Номер договора:</span>
-                                    <span className="detail-value">{contract.number}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <span className="detail-label">Дата договора:</span>
-                                    <span className="detail-value">{formatDate(contract.date)}</span>
-                                </div>
-                                <div className="detail-item">
-                                    <span className="detail-label">Заявитель:</span>
-                                    <span className="detail-value">
-                                        {contract.applicantName || 'Не указан'}
-                                    </span>
-                                </div>
-                            </div>
+                    <div className="vertical-divider"></div>
+
+                    <div className="column right-column">
+                        <div className="task-row">
+                            <span className="task-label">Заявитель</span>
+                            <span className="task-value">{contract.applicantName || 'Не указан'}</span>
                         </div>
 
-                        {/* Связанные задачи */}
-                        <div className="detail-section">
-                            <div className="section-header">
-                                <h3>Связанные задачи ({tasks.length})</h3>
-                            </div>
-                            
-                            {loadingTasks ? (
-                                <div className="loading-tasks">
-                                    <CircularProgress size={24} />
-                                    <span>Загрузка задач...</span>
-                                </div>
-                            ) : tasks.length > 0 ? (
-                                <div className="tasks-list">
-                                    {tasks.map((task) => (
-                                        <div 
-                                            key={task.id}
-                                            className="task-item"
-                                        >
-                                            <div className="task-header">
-                                                <div 
-                                                    className="task-main-info clickable"
-                                                    onClick={() => handleTaskClick(task.id)}
-                                                >
-                                                    <span className="task-number">
-                                                        {task.number ? `Задача #${task.number}` : `ID: ${task.id}`}
-                                                    </span>
-                                                    <Chip
-                                                        label={taskStatusLabels[task.status] || task.status}
-                                                        size="small"
-                                                        color={getTaskStatusColor(task.status)}
-                                                        variant="outlined"
-                                                    />
-                                                </div>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => handleTaskClick(task.id)}
-                                                    title="Перейти к задаче"
-                                                >
-                                                    <ArrowForwardIcon />
-                                                </IconButton>
-                                            </div>
-                                            <div 
-                                                className="task-details clickable"
-                                                onClick={() => handleTaskClick(task.id)}
+                        <div className="task-row">
+                            <span className="task-label">Комментарий</span>
+                            <div className="task-value comments-block">
+                                {editingComments ? (
+                                    <div className="comments-edit-container">
+                                        <textarea
+                                            value={tempComments}
+                                            onChange={(e) => setTempComments(e.target.value)}
+                                            className="comments-edit-textarea"
+                                            placeholder="Введите комментарий..."
+                                            rows={4}
+                                        />
+                                        <div className="inline-edit-actions">
+                                            <button
+                                                onClick={saveComments}
+                                                className="save-inline-btn"
+                                                disabled={saving}
                                             >
-                                                <div className="task-detail">
-                                                    <span className="task-label">Тип одобрения:</span>
-                                                    <span className="task-value">{task.docType || 'Не указан'}</span>
-                                                </div>
-                                                {task.createdAt && (
-                                                    <div className="task-detail">
-                                                        <span className="task-label">Дата создания:</span>
-                                                        <span className="task-value">
-                                                            {formatDateTime(task.createdAt)}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
+                                                {saving ? <CircularProgress size={20} /> : <SaveIcon />}
+                                                {saving ? 'Сохранение...' : 'Сохранить'}
+                                            </button>
+                                            <button
+                                                onClick={cancelEditingComments}
+                                                className="cancel-inline-btn"
+                                                disabled={saving}
+                                            >
+                                                <CancelIcon />
+                                                Отмена
+                                            </button>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="no-tasks-message">
-                                    <p>Нет связанных задач</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Комментарии */}
-                        <div className="detail-section">
-                            <div className="section-header">
-                                <h3>Комментарий</h3>
-                                {!editingComments && contract.comments && (
-                                    <button 
-                                        className="edit-comments-btn"
-                                        onClick={startEditingComments}
-                                    >
-                                        <EditIcon />
-                                        Редактировать
-                                    </button>
-                                )}
-                            </div>
-                            
-                            {editingComments ? (
-                                <div className="comments-edit-container">
-                                    <textarea
-                                        value={tempComments}
-                                        onChange={(e) => setTempComments(e.target.value)}
-                                        className="comments-edit-textarea"
-                                        placeholder="Введите комментарий..."
-                                        rows={4}
-                                    />
-                                    <div className="inline-edit-actions">
-                                        <button 
-                                            onClick={saveComments}
-                                            className="save-inline-btn"
-                                            disabled={saving}
-                                        >
-                                            {saving ? <CircularProgress size={20} /> : <SaveIcon />}
-                                            {saving ? 'Сохранение...' : 'Сохранить'}
-                                        </button>
-                                        <button 
-                                            onClick={cancelEditingComments}
-                                            className="cancel-inline-btn"
-                                            disabled={saving}
-                                        >
-                                            <CancelIcon />
-                                            Отмена
-                                        </button>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="comments-content">
-                                    <p>{contract.comments || 'Комментарий отсутствует'}</p>
-                                    {!contract.comments && (
-                                        <button 
-                                            className="add-comments-btn"
-                                            onClick={startEditingComments}
-                                        >
-                                            <EditIcon />
-                                            Добавить комментарий
-                                        </button>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Мета-информация */}
-                        <div className="detail-section">
-                            <h3>Системная информация</h3>
-                            <div className="detail-items">
-                                <div className="detail-item">
-                                    <span className="detail-label">ID договора:</span>
-                                    <span className="detail-value">{contract.id}</span>
-                                </div>
-                                {contract.createdBy && (
-                                    <div className="detail-item">
-                                        <span className="detail-label">Создал:</span>
-                                        <span className="detail-value">
-                                            Пользователь #{contract.createdBy}
-                                        </span>
-                                    </div>
-                                )}
-                                {contract.createdAt && (
-                                    <div className="detail-item">
-                                        <span className="detail-label">Дата создания:</span>
-                                        <span className="detail-value">
-                                            {formatDateTime(contract.createdAt)}
-                                        </span>
+                                ) : (
+                                    <div className="comments-content">
+                                        <p>{contract.comments || 'Комментарий отсутствует'}</p>
+                                        {!contract.comments && (
+                                            <button
+                                                className="add-comments-btn"
+                                                onClick={startEditingComments}
+                                            >
+                                                <EditIcon />
+                                                Добавить комментарий
+                                            </button>
+                                        )}
+                                        {!editingComments && contract.comments && (
+                                            <button
+                                                className="edit-comments-btn"
+                                                onClick={startEditingComments}
+                                            >
+                                                <EditIcon />
+                                                Редактировать
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="task-details-card">
+                {loadingTasks ? (
+                    <div className="loading-tasks">
+                        <CircularProgress size={24} />
+                        <span>Загрузка задач...</span>
+                    </div>
+                ) : tasks.length > 0 ? (
+                    <div className="tasks-list compact-tasks-list">
+                        {tasks.map((task) => (
+                            <div
+                                key={task.id}
+                                className="task-item compact-task-item"
+                            >
+                                <div className="task-header">
+                                    <div
+                                        className="task-main-info clickable"
+                                        onClick={() => handleTaskClick(task.id)}
+                                    >
+                                        <span className="task-number">
+                                            {task.number ? `Номер заявки: ${task.number}` : 'Номер заявки: —'}
+                                        </span>
+                                        <span className={`status-badge ${task.status?.toLowerCase()}`}>
+                                            {taskStatusLabels[task.status] || task.status}
+                                        </span>
+                                    </div>
+                                    <div className="task-assignee task-number">
+                                        Исполнитель: {task.assignedUserName || 'Не назначен'}
+                                    </div>
+                                </div>
+                                <div
+                                    className="task-details-grid clickable"
+                                    onClick={() => handleTaskClick(task.id)}
+                                >
+                                    <div className="task-detail">
+                                        <span className="task-label">Заявитель</span>
+                                        <span className="task-value">{task.applicantName || 'Не указан'}</span>
+                                    </div>
+                                    <div className="task-detail">
+                                        <span className="task-label">Тип</span>
+                                        <span className="task-value">{task.typeName || 'Не указан'}</span>
+                                    </div>
+                                    <div className="task-detail">
+                                        <span className="task-label">Тип одобрения</span>
+                                        <span className="task-value">{task.docType || 'Не указан'}</span>
+                                    </div>
+                                    <div className="task-detail">
+                                        <span className="task-label">Тип процедуры</span>
+                                        <span className="task-value">
+                                            {task.previousProcessType || task.processType || 'Не указана'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="no-tasks-message">
+                        <p>Нет связанных задач</p>
+                    </div>
+                )}
+            </div>
+
+            <div className="task-details-card">
+                {contract.createdAt && (
+                    <div className="task-row">
+                        <span className="task-label">Дата создания</span>
+                        <span className="task-value">
+                            {formatDateTime(contract.createdAt)}
+                        </span>
+                    </div>
+                )}
+                {(contract.createdByName || contract.createdBy) && (
+                    <div className="task-row">
+                        <span className="task-label">Заявка создана</span>
+                        <span className="task-value">
+                            {contract.createdByName || `Пользователь #${contract.createdBy}`}
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            <div className="task-actions-footer">
+                <Link to={`/contracts/edit/${contract.id}`} className="edit-button">
+                    <EditIcon />
+                    Редактировать
+                </Link>
             </div>
 
             {/* Меню выбора статуса оплаты */}

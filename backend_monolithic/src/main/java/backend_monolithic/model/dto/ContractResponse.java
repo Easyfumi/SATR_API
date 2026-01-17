@@ -19,5 +19,6 @@ public class ContractResponse {
     private PaymentStatus paymentStatus;
     private String comments;
     private Long createdBy;
+    private String createdByName;
     private LocalDateTime createdAt;
 }

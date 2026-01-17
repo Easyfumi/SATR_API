@@ -256,11 +256,11 @@ const EditContractPage = () => {
                         />
                     </div>
 
-                    {contract.createdBy && (
+                    {(contract.createdByName || contract.createdBy) && (
                         <div className="form-row">
                             <label className="form-label">Создал:</label>
                             <div className="readonly-field">
-                                {contract.createdBy} {/* Здесь можно также загрузить и отобразить имя пользователя */}
+                                {contract.createdByName || `Пользователь #${contract.createdBy}`}
                             </div>
                         </div>
                     )}

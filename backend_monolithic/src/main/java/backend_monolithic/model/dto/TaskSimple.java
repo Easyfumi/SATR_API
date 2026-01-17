@@ -11,6 +11,11 @@ public class TaskSimple {
     private Long id;
     private String number;
     private String docType;
+    private String applicantName;
+    private String typeName;
+    private String processType;
+    private String previousProcessType;
+    private String assignedUserName;
     private String status;
     private LocalDateTime createdAt;
 }

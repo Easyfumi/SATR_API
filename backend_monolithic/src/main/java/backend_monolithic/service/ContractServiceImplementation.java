@@ -153,6 +153,12 @@ public class ContractServiceImplementation implements ContractService {
         dto.setPaymentStatus(contract.getPaymentStatus());
         dto.setComments(contract.getComments());
         dto.setCreatedBy(contract.getCreatedBy());
+        if (contract.getCreatedBy() != null) {
+            Optional<User> createdBy = userService.getUserById(contract.getCreatedBy());
+            if (createdBy.isPresent()) {
+                dto.setCreatedByName(buildShortName(createdBy.get()));
+            }
+        }
         dto.setCreatedAt(contract.getCreatedAt());
         return dto;
     }
@@ -162,9 +168,37 @@ public class ContractServiceImplementation implements ContractService {
         dto.setId(task.getId());
         dto.setNumber(task.getNumber());
         dto.setDocType(task.getDocType());
+        dto.setApplicantName(task.getApplicant() != null ? task.getApplicant().getName() : null);
+        dto.setTypeName(task.getTypeName());
+        dto.setProcessType(task.getProcessType());
+        dto.setPreviousProcessType(task.getPreviousProcessType());
+        if (task.getAssignedUserId() != null) {
+            userService.getUserById(task.getAssignedUserId())
+                    .ifPresent(user -> dto.setAssignedUserName(buildShortName(user)));
+        }
         dto.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
         dto.setCreatedAt(task.getCreatedAt());
         return dto;
+    }
+
+    private String buildShortName(User user) {
+        StringBuilder shortName = new StringBuilder();
+        if (user.getSecondName() != null && !user.getSecondName().isBlank()) {
+            shortName.append(user.getSecondName());
+        }
+        if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getFirstName().charAt(0)).append(".");
+        }
+        if (user.getPatronymic() != null && !user.getPatronymic().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getPatronymic().charAt(0)).append(".");
+        }
+        return shortName.toString();
     }
 
     private Applicant getOrCreateApplicant(String name) {
