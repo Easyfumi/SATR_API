@@ -30,6 +30,7 @@ const TaskDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newNumber, setNewNumber] = useState('');
+  const [newApplicationDate, setNewApplicationDate] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [newDecisionDate, setNewDecisionDate] = useState('');
   const [isUpdatingDecisionDate, setIsUpdatingDecisionDate] = useState(false);
@@ -211,12 +212,16 @@ const TaskDetailsPage = () => {
   };
 
   const handleAssignNumber = async () => {
-    if (!newNumber.trim()) return;
+    if (!newNumber.trim() || !newApplicationDate.trim()) return;
 
     setIsUpdating(true);
     try {
-      await api.put(`/api/tasks/${id}/number`, { number: newNumber });
+      await api.put(`/api/tasks/${id}/number`, {
+        number: newNumber,
+        applicationDate: newApplicationDate
+      });
       setNewNumber('');
+      setNewApplicationDate('');
       // Обновляем данные задачи для получения актуального статуса
       await fetchTask();
       setAlertMessage({
@@ -546,29 +551,47 @@ const TaskDetailsPage = () => {
             <div className="task-row">
               <span className="task-label">Номер заявки</span>
               {task.number ? (
-                <span className="task-value">{task.number}</span>
+                <span className="task-value">
+                  {task.applicationDate
+                    ? `${task.number} от ${formatDate(task.applicationDate)}`
+                    : task.number}
+                </span>
               ) : (
                 <div className="input-action-container">
-                  <TextField
-                    size="small"
-                    value={newNumber}
-                    onChange={(e) => {
-                      setNewNumber(e.target.value);
-                      setIsNumberChanged(true);
-                    }}
-                    placeholder="Введите номер"
-                    variant="outlined"
-                    className="task-number-field"
-                    inputProps={{ className: 'task-number-input' }}
-                    disabled={isUpdating}
-                  />
+                  <div className="task-number-date-inputs">
+                    <TextField
+                      size="small"
+                      value={newNumber}
+                      onChange={(e) => {
+                        setNewNumber(e.target.value);
+                        setIsNumberChanged(true);
+                      }}
+                      placeholder="Введите номер"
+                      variant="outlined"
+                      className="task-number-field"
+                      inputProps={{ className: 'task-number-input' }}
+                      disabled={isUpdating}
+                    />
+                    <span className="task-number-separator">от</span>
+                    <div className="modern-date-field">
+                      <input
+                        type="date"
+                        value={newApplicationDate}
+                        onChange={(e) => {
+                          setNewApplicationDate(e.target.value);
+                          setIsNumberChanged(true);
+                        }}
+                        disabled={isUpdating}
+                      />
+                    </div>
+                  </div>
                   {isNumberChanged && (
                     <div className="status-actions">
                       <Button
                         variant="contained"
                         size="small"
                         onClick={handleAssignNumber}
-                        disabled={!newNumber || isUpdating}
+                        disabled={!newNumber || !newApplicationDate || isUpdating}
                         className="save-status-button"
                       >
                         {isUpdating ? <CircularProgress size={20} /> : 'Сохранить'}
@@ -578,6 +601,7 @@ const TaskDetailsPage = () => {
                         size="small"
                         onClick={() => {
                           setNewNumber('');
+                          setNewApplicationDate('');
                           setIsNumberChanged(false);
                         }}
                         disabled={isUpdating}

@@ -167,6 +167,7 @@ public class ContractServiceImplementation implements ContractService {
         TaskSimple dto = new TaskSimple();
         dto.setId(task.getId());
         dto.setNumber(task.getNumber());
+        dto.setApplicationDate(task.getApplicationDate());
         dto.setDocType(task.getDocType());
         dto.setApplicantName(task.getApplicant() != null ? task.getApplicant().getName() : null);
         dto.setTypeName(task.getTypeName());

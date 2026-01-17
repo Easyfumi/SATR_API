@@ -391,7 +391,9 @@ const ContractDetailsPage = () => {
                                         onClick={() => handleTaskClick(task.id)}
                                     >
                                         <span className="task-number">
-                                            {task.number ? `Номер заявки: ${task.number}` : 'Номер заявки: —'}
+                                            {task.number
+                                                ? `Номер заявки: ${task.number}${task.applicationDate ? ` от ${formatDate(task.applicationDate)}` : ''}`
+                                                : 'Номер заявки: —'}
                                         </span>
                                         <span className={`status-badge ${task.status?.toLowerCase()}`}>
                                             {taskStatusLabels[task.status] || task.status}

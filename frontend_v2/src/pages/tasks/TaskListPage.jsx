@@ -677,7 +677,11 @@ const TaskListPage = () => {
                                     <div className="task-card-header">
                                         <div className="left-header-section">
                                             <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
-                                                {task.number || 'Не зарегистрирована'}
+                                                {task.number
+                                                    ? (task.applicationDate
+                                                        ? `${task.number} от ${formatDate(task.applicationDate)}`
+                                                        : task.number)
+                                                    : 'Не зарегистрирована'}
                                             </div>
                                             <div className="decision-date">
                                                 Решение по заявке: {task.decisionAt ? formatDate(task.decisionAt) : 'отсутствует'}

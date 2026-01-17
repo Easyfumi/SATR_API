@@ -82,7 +82,7 @@ public class TaskController {
             @PathVariable Long id,
             @Valid @RequestBody TaskNumberRequest request) {
         try {
-            TaskResponse response = taskService.setTaskNumber(id, request.getNumber());
+            TaskResponse response = taskService.setTaskNumber(id, request.getNumber(), request.getApplicationDate());
             return ResponseEntity.ok(response);
         } catch (DuplicateNumberException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

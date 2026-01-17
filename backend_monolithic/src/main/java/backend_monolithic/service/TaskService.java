@@ -13,7 +13,7 @@ public interface TaskService {
     PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
     TaskResponse updateTask(Long taskId, TaskRequest request);
     TaskResponse updateStatus(Long taskId, TaskStatus newStatus);
-    TaskResponse setTaskNumber(Long taskId, String number);
+    TaskResponse setTaskNumber(Long taskId, String number, LocalDate applicationDate);
     TaskResponse setDecisionDate(Long taskId, LocalDate decisionDate);
     TaskResponse updateTaskContract(Long taskId, Long contractId);
     TaskResponse updateTaskExpert(Long taskId, Long assignedUserId);

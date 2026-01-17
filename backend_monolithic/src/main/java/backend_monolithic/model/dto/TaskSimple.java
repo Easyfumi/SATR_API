@@ -3,6 +3,7 @@ package backend_monolithic.model.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 public class TaskSimple {
     private Long id;
     private String number;
+    private LocalDate applicationDate;
     private String docType;
     private String applicantName;
     private String typeName;

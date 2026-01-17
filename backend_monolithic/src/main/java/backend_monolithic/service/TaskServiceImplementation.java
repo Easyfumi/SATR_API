@@ -147,7 +147,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     @Transactional
-    public TaskResponse setTaskNumber(Long taskId, String number) {
+    public TaskResponse setTaskNumber(Long taskId, String number, LocalDate applicationDate) {
         if (taskRepository.existsByNumber(number)) {
             throw new DuplicateNumberException("Номер " + number + " уже существует");
         }
@@ -160,6 +160,7 @@ public class TaskServiceImplementation implements TaskService {
         }
 
         task.setNumber(number);
+        task.setApplicationDate(applicationDate);
         task.setStatus(TaskStatus.REGISTERED);
         task = taskRepository.save(task);
         return mapEntityToResponse(task);
@@ -278,6 +279,7 @@ public class TaskServiceImplementation implements TaskService {
         response.setPreviousProcessType(task.getPreviousProcessType());
         response.setPreviousNumber(task.getPreviousNumber());
         response.setRepresentative(task.getRepresentative() != null ? task.getRepresentative().getName() : null);
+        response.setApplicationDate(task.getApplicationDate());
         response.setDecisionAt(task.getDecisionAt());
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus() != null ? task.getStatus().name() : null);

@@ -29,6 +29,8 @@ public class Task {
     @Column(unique = true)
     private String number;
 
+    private LocalDate applicationDate;
+
     private String docType;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -26,6 +26,7 @@ public class TaskResponse {
     private String previousProcessType;
     private String previousNumber;
     private String representative;
+    private LocalDate applicationDate;
     private LocalDate decisionAt;
     private LocalDateTime createdAt;
     private String status;

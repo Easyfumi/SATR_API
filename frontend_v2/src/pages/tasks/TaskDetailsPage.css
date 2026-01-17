@@ -15,6 +15,10 @@
   margin-top: 25px;
 }
 
+.task-details-card {
+  --task-control-height: 40px;
+  --task-control-padding-y: 10px;
+}
 /* Блок договора */
 .contract-section {
   align-items: flex-start;
@@ -114,10 +118,45 @@
   min-height: 40px;
 }
 
+.task-details-card .status-container {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.task-details-card .status-actions {
+  margin-left: 0;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.task-details-card .input-action-container {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .expert-select-control .MuiOutlinedInput-root,
 .task-number-field .MuiOutlinedInput-root {
-  height: 40px;
+  height: var(--task-control-height) !important;
+  min-height: var(--task-control-height) !important;
   border-radius: 8px;
+}
+
+.expert-select-control .MuiSelect-select {
+  min-height: var(--task-control-height) !important;
+  height: var(--task-control-height) !important;
+  padding-top: var(--task-control-padding-y) !important;
+  padding-bottom: var(--task-control-padding-y) !important;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+}
+
+.expert-select-control .MuiOutlinedInput-input,
+.task-number-field .MuiOutlinedInput-input {
+  height: var(--task-control-height) !important;
+  padding-top: var(--task-control-padding-y) !important;
+  padding-bottom: var(--task-control-padding-y) !important;
+  box-sizing: border-box;
 }
 
 .task-number-field .MuiOutlinedInput-root {
@@ -127,6 +166,21 @@
 .task-number-field {
   width: 100%;
   max-width: 143px;
+}
+
+.task-number-date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-number-date-inputs .modern-date-field {
+  width: 100%;
+  max-width: 143px;
+}
+
+.task-number-date-inputs .modern-date-field input[type="date"] {
+  width: 100%;
 }
 
 .task-number-field .MuiOutlinedInput-root:hover {
@@ -162,7 +216,9 @@
 }
 
 .task-details-card .modern-date-field input[type="date"] {
-  height: 40px;
+  height: var(--task-control-height);
+  padding-top: var(--task-control-padding-y);
+  padding-bottom: var(--task-control-padding-y);
   border-radius: 8px;
 }
 
