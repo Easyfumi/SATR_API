@@ -209,7 +209,18 @@
 
 .task-item:hover {
     border-color: var(--ice-blue);
+    background: var(--ice-blue);
+    color: var(--deep-frost);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.task-item:hover .task-number,
+.task-item:hover .task-assignee,
+.task-item:hover .task-text-label,
+.task-item:hover .task-text-value,
+.task-item:hover .task-label,
+.task-item:hover .task-value {
+    color: var(--deep-frost);
 }
 
 .task-header {
@@ -232,7 +243,10 @@
 }
 
 .task-number {
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 400;
     color: var(--deep-frost);
     font-size: 1rem;
 }
@@ -240,15 +254,23 @@
 .task-assignee {
     color: #475569;
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: 400;
     white-space: nowrap;
     margin-left: 12px;
 }
 
 .task-assignee.task-number {
     color: var(--deep-frost);
-    font-weight: 600;
+    font-weight: 400;
     font-size: 1rem;
+}
+
+.task-text-label {
+    font-weight: 400;
+}
+
+.task-text-value {
+    font-weight: 600;
 }
 
 .clickable {
