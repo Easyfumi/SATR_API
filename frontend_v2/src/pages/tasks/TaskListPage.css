@@ -177,18 +177,81 @@
 /* Новая структура заголовка карточки */
 .task-card-header {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    width: 100%;
     margin-bottom: 15px;
-    gap: 10px;
 }
 
-.left-header-section {
+.task-top-line {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    align-items: center;
+    width: 100%;
 }
 
+.task-top-col {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+}
+
+.task-top-col:not(:last-child) {
+    padding-right: 12px;
+    margin-right: 12px;
+}
+
+.task-top-col:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 22px;
+    background: rgba(148, 163, 184, 0.6);
+}
+
+.task-top-col-number {
+    flex: 0 0 18%;
+}
+
+.task-top-col-assignee,
+.task-top-col-decision {
+    flex: 0 0 27%;
+}
+
+.task-top-col-status {
+    flex: 1 1 25%;
+    justify-content: flex-end;
+}
+
+.task-list-assignee {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.task-list-decision {
+    font-size: 0.9rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.task-top-value {
+    font-weight: 600;
+}
+
+.task-top-value-missing {
+    color: #c62828;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.contract-number-value {
+    font-weight: 600;
+}
 .decision-date {
     font-size: 0.85rem;
     color: #64748b;
@@ -209,17 +272,27 @@
 .payment-status {
     padding: 6px 14px;
     border-radius: 16px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
+    border: none;
+    box-shadow: none;
+}
+
+.payment-status {
+    text-transform: uppercase;
+}
+
+.registration-status {
+    font-size: 0.9rem;
 }
 
 .registration-status.registered {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: none;
+    color: #475569;
 }
 
 .registration-status.unregistered {
-    background: #ffebee;
+    background: none;
     color: #c62828;
 }
 
@@ -290,16 +363,44 @@
     align-items: center;
 }
 
+.expert-contract-section .contract-row {
+    justify-content: flex-start;
+    gap: 0;
+    column-gap: 4px;
+}
+
+.contract-payment-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 0;
+}
+
 .info-label {
     color: #475569;
     font-size: 0.9rem;
-    min-width: 120px;
+    min-width: 0;
+}
+
+.expert-contract-section .info-label {
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    margin-right: 0 !important;
 }
 
 .info-value {
     color: #1e293b;
     font-weight: 500;
-    margin-left: 8px;
+    margin-left: 0;
+}
+
+.expert-contract-section .contract-row .info-value,
+.expert-contract-section .contract-row .contract-payment-inline {
+    flex: 0 0 auto !important;
+}
+
+.expert-contract-section .info-value {
+    flex-grow: 0 !important;
 }
 
 .not-assigned .info-value {

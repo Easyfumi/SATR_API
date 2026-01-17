@@ -673,26 +673,49 @@ const TaskListPage = () => {
                                     className={`task-card ${filters.quickSearch ? 'highlighted' : ''}`}
                                     onClick={() => navigate(`/tasks/${task.id}`)}
                                 >
-                                    {/* Верхняя строка с номером и статусом */}
+                                    {/* Верхняя строка с номером, исполнителем, решением и статусом */}
                                     <div className="task-card-header">
-                                        <div className="left-header-section">
-                                            <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
-                                                {task.number
-                                                    ? (task.applicationDate
-                                                        ? `${task.number} от ${formatDate(task.applicationDate)}`
-                                                        : task.number)
-                                                    : 'Не зарегистрирована'}
+                                        <div className="task-top-line">
+                                            <div className="task-top-col task-top-col-number">
+                                                <div className={`registration-status ${task.number ? 'registered' : 'unregistered'}`}>
+                                                    {task.number ? (
+                                                        <span className="task-top-value">
+                                                            {task.applicationDate
+                                                                ? `${task.number} от ${formatDate(task.applicationDate)}`
+                                                                : task.number}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="task-top-value-missing">не зарегистрирована</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="decision-date">
-                                                Решение по заявке: {task.decisionAt ? formatDate(task.decisionAt) : 'отсутствует'}
+                                            <div className="task-top-col task-top-col-assignee">
+                                                <div className="task-list-assignee">
+                                                    Исполнитель: <span className="task-top-value">
+                                                        {task.assignedUser ? (
+                                                            `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
+                                                        ) : (
+                                                            <span className="task-top-value-missing">не назначен</span>
+                                                        )}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        {/* Статус заявки в правом верхнем углу */}
-                                        <div className="task-status-section">
-                                            <span className={`status-badge ${task.status?.toLowerCase()}`}>
-                                                {statusLabels[task.status] || task.status}
-                                            </span>
+                                            <div className="task-top-col task-top-col-decision">
+                                                <div className="task-list-decision">
+                                                    Решение по заявке: <span className="task-top-value">
+                                                        {task.decisionAt ? (
+                                                            formatDate(task.decisionAt)
+                                                        ) : (
+                                                            <span className="task-top-value-missing">отсутствует</span>
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="task-top-col task-top-col-status">
+                                                <span className={`status-badge ${task.status?.toLowerCase()}`}>
+                                                    {statusLabels[task.status] || task.status}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -724,32 +747,27 @@ const TaskListPage = () => {
 
                                     {/* Информация об исполнителе, договоре и оплате */}
                                     <div className="expert-contract-section">
-                                        <div className={`expert-row ${!task.assignedUser ? 'not-assigned' : ''}`}>
-                                            <span className="info-label">Исполнитель:</span>
-                                            <span className="info-value">
-                                                {task.assignedUser
-                                                    ? `${task.assignedUser.secondName} ${task.assignedUser.firstName[0]}.${task.assignedUser.patronymic?.[0] || ''}`
-                                                    : 'не назначен'}
-                                            </span>
-                                        </div>
-
                                         <div className="contract-row">
-                                            <span className="info-label">Номер договора:</span>
-                                            <span className="info-value">
-                                                {task.contract ? task.contract.number : 'Договор не привязан'}
+                                            <span className={`info-label ${!task.contract ? 'task-top-value-missing' : ''}`}>
+                                                Номер договора:{' '}
                                             </span>
-                                        </div>
-
-                                        {task.contract && (
-                                            <div className="payment-row">
-                                                <span className="info-label">Статус оплаты:</span>
-                                                <span className={`payment-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' :
-                                                    task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
-                                                    {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
-                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
+                                            <span className="info-value">
+                                                {task.contract ? (
+                                                    <span className="contract-number-value">{task.contract.number}</span>
+                                                ) : (
+                                                    <span className="task-top-value-missing">договор не привязан</span>
+                                                )}
+                                            </span>
+                                            {task.contract && (
+                                                <span className="contract-payment-inline">
+                                                    <span className={`payment-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' :
+                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
+                                                        {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
+                                                            task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
+                                                    </span>
                                                 </span>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             ))
