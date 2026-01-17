@@ -35,7 +35,7 @@
     color: var(--deep-frost);
     border: 1px solid var(--silver-accent);
     transition: all 0.25s ease;
-    background: white;
+    margin-top: 25px;
 }
 
 .create-contract-button:hover {

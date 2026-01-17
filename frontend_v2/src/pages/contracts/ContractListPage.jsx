@@ -224,7 +224,7 @@ const ContractListPage = () => {
 
     return (
         <div className="content-container">
-            <div className="contracts-header">
+            <div className="tasks-header">
                 <h2 className="page-title">Раздел договоров</h2>
 
                 <Link
