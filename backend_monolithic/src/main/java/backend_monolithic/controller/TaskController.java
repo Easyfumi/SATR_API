@@ -177,8 +177,8 @@ public class TaskController {
             @RequestParam(required = false) Boolean paymentStatus,
             @RequestParam(required = false) Boolean hasContract,
             @RequestParam(required = false) String contractNumber,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtFrom,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtTo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate applicationDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate applicationDateTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -195,8 +195,8 @@ public class TaskController {
         filter.setPaymentStatus(paymentStatus);
         filter.setHasContract(hasContract);
         filter.setContractNumber(contractNumber);
-        filter.setCreatedAtFrom(createdAtFrom);
-        filter.setCreatedAtTo(createdAtTo);
+        filter.setApplicationDateFrom(applicationDateFrom);
+        filter.setApplicationDateTo(applicationDateTo);
 
         PageResponse<TaskResponse> response = taskService.getFilteredTasks(filter, jwt, page, size);
         return ResponseEntity.ok(response);

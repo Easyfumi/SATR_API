@@ -40,8 +40,8 @@ const TaskListPage = () => {
         assignedUser: '',
         status: '',
         paymentStatus: '',
-        createdAtFrom: '',
-        createdAtTo: '',
+        applicationDateFrom: '',
+        applicationDateTo: '',
         hasContract: '',
         contractNumber: ''
     });
@@ -260,8 +260,8 @@ const TaskListPage = () => {
             assignedUser: '',
             status: '',
             paymentStatus: '',
-            createdAtFrom: '',
-            createdAtTo: '',
+            applicationDateFrom: '',
+            applicationDateTo: '',
             hasContract: '',
             contractNumber: ''
         };
@@ -280,7 +280,7 @@ const TaskListPage = () => {
         if (filters.mark) activeFilters.push({ label: 'Марка', value: filters.mark });
         if (filters.typeName) activeFilters.push({ label: 'Наименование типа', value: filters.typeName });
         if (filters.representative) activeFilters.push({ label: 'Представитель', value: filters.representative });
-        if (filters.assignedUser) activeFilters.push({ label: 'Ответственный', value: filters.assignedUser });
+        if (filters.assignedUser) activeFilters.push({ label: 'Исполнитель', value: filters.assignedUser });
         if (filters.status) activeFilters.push({
             label: 'Статус',
             value: statusOptions.find(s => s.value === filters.status)?.label
@@ -297,10 +297,10 @@ const TaskListPage = () => {
             label: 'Номер договора',
             value: filters.contractNumber
         });
-        if (filters.createdAtFrom || filters.createdAtTo) {
+        if (filters.applicationDateFrom || filters.applicationDateTo) {
             activeFilters.push({
-                label: 'Дата создания',
-                value: `${filters.createdAtFrom || '...'} - ${filters.createdAtTo || '...'}`
+                label: 'Дата заявки',
+                value: `${filters.applicationDateFrom || '...'} - ${filters.applicationDateTo || '...'}`
             });
         }
 
@@ -554,12 +554,12 @@ const TaskListPage = () => {
                             </div>
 
                             <div className="filter-group">
-                                <label>Ответственный</label>
+                                <label>Исполнитель</label>
                                 <input
                                     type="text"
                                     value={filters.assignedUser}
                                     onChange={(e) => handleFilterChange('assignedUser', e.target.value)}
-                                    placeholder="Введите ответственного"
+                                    placeholder="Введите исполнителя"
                                 />
                             </div>
 
@@ -617,11 +617,11 @@ const TaskListPage = () => {
                             </div>
 
                             <div className="filter-group date-filter">
-                                <label>Дата создания с</label>
+                                <label>Дата заявки с</label>
                                 <input
                                     type="date"
-                                    value={filters.createdAtFrom}
-                                    onChange={(e) => handleFilterChange('createdAtFrom', e.target.value)}
+                                    value={filters.applicationDateFrom}
+                                    onChange={(e) => handleFilterChange('applicationDateFrom', e.target.value)}
                                 />
                             </div>
 
@@ -629,8 +629,8 @@ const TaskListPage = () => {
                                 <label>по</label>
                                 <input
                                     type="date"
-                                    value={filters.createdAtTo}
-                                    onChange={(e) => handleFilterChange('createdAtTo', e.target.value)}
+                                    value={filters.applicationDateTo}
+                                    onChange={(e) => handleFilterChange('applicationDateTo', e.target.value)}
                                 />
                             </div>
                         </div>

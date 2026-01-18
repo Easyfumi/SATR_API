@@ -39,8 +39,8 @@ const MyTasksPage = () => {
         representative: '',
         status: '',
         paymentStatus: '',
-        createdAtFrom: '',
-        createdAtTo: '',
+        applicationDateFrom: '',
+        applicationDateTo: '',
         hasContract: '',
         contractNumber: ''
     });
@@ -176,8 +176,22 @@ const MyTasksPage = () => {
                 task.typeName && task.typeName.toLowerCase().includes(filters.typeName.toLowerCase())
             );
         }
+        if (filters.representative) {
+            filteredData = filteredData.filter(task => 
+                task.representative && task.representative.toLowerCase().includes(filters.representative.toLowerCase())
+            );
+        }
         if (filters.status) {
             filteredData = filteredData.filter(task => task.status === filters.status);
+        }
+        if (filters.paymentStatus === 'true') {
+            filteredData = filteredData.filter(task => 
+                task.contract && (task.contract.paymentStatus === 'PAIDFOR')
+            );
+        } else if (filters.paymentStatus === 'false') {
+            filteredData = filteredData.filter(task => 
+                !task.contract || task.contract.paymentStatus === 'NOTPAIDFOR' || task.contract.paymentStatus === 'PARTIALLYPAIDFOR'
+            );
         }
         if (filters.hasContract === 'true') {
             filteredData = filteredData.filter(task => task.contract != null);
@@ -188,6 +202,22 @@ const MyTasksPage = () => {
             filteredData = filteredData.filter(task => 
                 task.contract?.number && task.contract.number.toLowerCase().includes(filters.contractNumber.toLowerCase())
             );
+        }
+        if (filters.applicationDateFrom) {
+            const fromDate = new Date(filters.applicationDateFrom);
+            filteredData = filteredData.filter(task => {
+                if (!task.applicationDate) return false;
+                const taskDate = new Date(task.applicationDate);
+                return taskDate >= fromDate;
+            });
+        }
+        if (filters.applicationDateTo) {
+            const toDate = new Date(filters.applicationDateTo);
+            filteredData = filteredData.filter(task => {
+                if (!task.applicationDate) return false;
+                const taskDate = new Date(task.applicationDate);
+                return taskDate <= toDate;
+            });
         }
 
         return filteredData;
@@ -226,8 +256,8 @@ const MyTasksPage = () => {
             representative: '',
             status: '',
             paymentStatus: '',
-            createdAtFrom: '',
-            createdAtTo: '',
+            applicationDateFrom: '',
+            applicationDateTo: '',
             hasContract: '',
             contractNumber: ''
         };
@@ -245,9 +275,14 @@ const MyTasksPage = () => {
         if (filters.manufacturer) activeFilters.push({ label: 'Производитель', value: filters.manufacturer });
         if (filters.mark) activeFilters.push({ label: 'Марка', value: filters.mark });
         if (filters.typeName) activeFilters.push({ label: 'Наименование типа', value: filters.typeName });
+        if (filters.representative) activeFilters.push({ label: 'Представитель', value: filters.representative });
         if (filters.status) activeFilters.push({
             label: 'Статус',
             value: statusOptions.find(s => s.value === filters.status)?.label
+        });
+        if (filters.paymentStatus) activeFilters.push({
+            label: 'Оплата',
+            value: paymentStatusOptions.find(p => p.value === filters.paymentStatus)?.label
         });
         if (filters.hasContract) activeFilters.push({
             label: 'Договор',
@@ -257,6 +292,12 @@ const MyTasksPage = () => {
             label: 'Номер договора',
             value: filters.contractNumber
         });
+        if (filters.applicationDateFrom || filters.applicationDateTo) {
+            activeFilters.push({
+                label: 'Дата заявки',
+                value: `${filters.applicationDateFrom || '...'} - ${filters.applicationDateTo || '...'}`
+            });
+        }
 
         return activeFilters;
     };
@@ -438,12 +479,36 @@ const MyTasksPage = () => {
                             </div>
 
                             <div className="filter-group">
+                                <label>Представитель</label>
+                                <input
+                                    type="text"
+                                    value={filters.representative}
+                                    onChange={(e) => handleFilterChange('representative', e.target.value)}
+                                    placeholder="Введите представителя"
+                                />
+                            </div>
+
+                            <div className="filter-group">
                                 <label>Статус</label>
                                 <select
                                     value={filters.status}
                                     onChange={(e) => handleFilterChange('status', e.target.value)}
                                 >
                                     {statusOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="filter-group">
+                                <label>Статус оплаты</label>
+                                <select
+                                    value={filters.paymentStatus}
+                                    onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+                                >
+                                    {paymentStatusOptions.map(option => (
                                         <option key={option.value} value={option.value}>
                                             {option.label}
                                         </option>
@@ -472,6 +537,24 @@ const MyTasksPage = () => {
                                     value={filters.contractNumber}
                                     onChange={(e) => handleFilterChange('contractNumber', e.target.value)}
                                     placeholder="Введите номер договора"
+                                />
+                            </div>
+
+                            <div className="filter-group date-filter">
+                                <label>Дата заявки с</label>
+                                <input
+                                    type="date"
+                                    value={filters.applicationDateFrom}
+                                    onChange={(e) => handleFilterChange('applicationDateFrom', e.target.value)}
+                                />
+                            </div>
+
+                            <div className="filter-group date-filter">
+                                <label>по</label>
+                                <input
+                                    type="date"
+                                    value={filters.applicationDateTo}
+                                    onChange={(e) => handleFilterChange('applicationDateTo', e.target.value)}
                                 />
                             </div>
                         </div>

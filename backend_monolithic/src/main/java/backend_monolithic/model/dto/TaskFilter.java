@@ -17,8 +17,8 @@ public class TaskFilter {
     private String assignedUser;
     private TaskStatus status;
     private Boolean paymentStatus;
-    private LocalDate createdAtFrom;
-    private LocalDate createdAtTo;
+    private LocalDate applicationDateFrom;
+    private LocalDate applicationDateTo;
     private String quickSearch;
     private Boolean hasContract;
     private String contractNumber;

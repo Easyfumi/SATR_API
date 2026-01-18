@@ -190,7 +190,7 @@ public class TaskSpecifications {
         };
     }
 
-    public static Specification<Task> withCreatedAtBetween(LocalDate from, LocalDate to) {
+    public static Specification<Task> withApplicationDateBetween(LocalDate from, LocalDate to) {
         return (root, query, criteriaBuilder) -> {
             if (from == null && to == null) {
                 return criteriaBuilder.conjunction();
@@ -198,19 +198,19 @@ public class TaskSpecifications {
 
             if (from != null && to != null) {
                 return criteriaBuilder.between(
-                        root.get("createdAt"),
-                        from.atStartOfDay(),
-                        to.atTime(LocalTime.MAX)
+                        root.get("applicationDate"),
+                        from,
+                        to
                 );
             } else if (from != null) {
                 return criteriaBuilder.greaterThanOrEqualTo(
-                        root.get("createdAt"),
-                        from.atStartOfDay()
+                        root.get("applicationDate"),
+                        from
                 );
             } else {
                 return criteriaBuilder.lessThanOrEqualTo(
-                        root.get("createdAt"),
-                        to.atTime(LocalTime.MAX)
+                        root.get("applicationDate"),
+                        to
                 );
             }
         };
@@ -271,7 +271,7 @@ public class TaskSpecifications {
                     .and(withAssignedUser(filter.getAssignedUser()))
                     .and(withStatus(filter.getStatus()))
                     .and(withPaymentStatus(filter.getPaymentStatus()))
-                    .and(withCreatedAtBetween(filter.getCreatedAtFrom(), filter.getCreatedAtTo()))
+                    .and(withApplicationDateBetween(filter.getApplicationDateFrom(), filter.getApplicationDateTo()))
                     .and(withHasContract(filter.getHasContract())) // Фильтр по наличию договора
                     .and(withContractNumber(filter.getContractNumber())); // Фильтр по номеру договора
         }
