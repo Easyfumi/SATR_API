@@ -234,7 +234,7 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
         List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
-        Task newTask = mapRequestToEntity(request);
+        Task newTask = mapRequestToEntityForComparison(request);
 
         return existingTasks.stream()
                 .filter(existingTask -> areTasksDuplicates(existingTask, newTask))
@@ -261,6 +261,30 @@ public class TaskServiceImplementation implements TaskService {
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
+        task.setAssignedUserId(request.getAssignedUserId());
+        return task;
+    }
+
+    // Метод для создания Task из request без сохранения связанных сущностей (для проверки дубликатов)
+    private Task mapRequestToEntityForComparison(TaskRequest request) {
+        Task task = new Task();
+        task.setDocType(request.getDocType());
+        // Создаем временные объекты только с именами для сравнения (без сохранения в БД)
+        if (request.getApplicantName() != null && !request.getApplicantName().trim().isEmpty()) {
+            task.setApplicant(new Applicant(request.getApplicantName()));
+        }
+        if (request.getManufacturerName() != null && !request.getManufacturerName().trim().isEmpty()) {
+            task.setManufacturer(new Manufacturer(request.getManufacturerName()));
+        }
+        task.setCategories(request.getCategories());
+        task.setMark(request.getMark());
+        task.setTypeName(request.getTypeName());
+        task.setPreviousProcessType(request.getPreviousProcessType());
+        task.setPreviousNumber(request.getPreviousNumber());
+        task.setProcessType(request.getProcessType());
+        if (request.getRepresentativeName() != null && !request.getRepresentativeName().trim().isEmpty()) {
+            task.setRepresentative(new Representative(request.getRepresentativeName()));
+        }
         task.setAssignedUserId(request.getAssignedUserId());
         return task;
     }
