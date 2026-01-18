@@ -164,7 +164,29 @@ public class TaskSpecifications {
             if (paymentStatus == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("paymentStatus"), paymentStatus);
+            
+            // Статус оплаты находится в Contract, а не в Task
+            // paymentStatus = true означает "оплачено" (только PAIDFOR)
+            // paymentStatus = false означает "не оплачено" (NOTPAIDFOR, PARTIALLYPAIDFOR или отсутствие договора)
+            
+            if (paymentStatus) {
+                // Ищем задачи с договором, где статус оплаты = PAIDFOR (только полностью оплаченные)
+                return criteriaBuilder.and(
+                    criteriaBuilder.isNotNull(root.get("contract")),
+                    criteriaBuilder.equal(root.get("contract").get("paymentStatus"), backend_monolithic.model.enums.PaymentStatus.PAIDFOR)
+                );
+            } else {
+                // Ищем задачи где договор отсутствует ИЛИ статус оплаты = NOTPAIDFOR или PARTIALLYPAIDFOR
+                Predicate contractIsNull = criteriaBuilder.isNull(root.get("contract"));
+                Predicate contractNotPaid = criteriaBuilder.and(
+                    criteriaBuilder.isNotNull(root.get("contract")),
+                    criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("contract").get("paymentStatus"), backend_monolithic.model.enums.PaymentStatus.NOTPAIDFOR),
+                        criteriaBuilder.equal(root.get("contract").get("paymentStatus"), backend_monolithic.model.enums.PaymentStatus.PARTIALLYPAIDFOR)
+                    )
+                );
+                return criteriaBuilder.or(contractIsNull, contractNotPaid);
+            }
         };
     }
 

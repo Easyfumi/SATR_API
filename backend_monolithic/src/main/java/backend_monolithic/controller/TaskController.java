@@ -174,6 +174,7 @@ public class TaskController {
             @RequestParam(required = false) String representative,
             @RequestParam(required = false) String assignedUser,
             @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) Boolean paymentStatus,
             @RequestParam(required = false) Boolean hasContract,
             @RequestParam(required = false) String contractNumber,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createdAtFrom,
@@ -191,6 +192,7 @@ public class TaskController {
         filter.setRepresentative(representative);
         filter.setAssignedUser(assignedUser);
         filter.setStatus(status);
+        filter.setPaymentStatus(paymentStatus);
         filter.setHasContract(hasContract);
         filter.setContractNumber(contractNumber);
         filter.setCreatedAtFrom(createdAtFrom);

@@ -103,7 +103,7 @@ const TaskListPage = () => {
     const fetchTasks = useCallback(async (searchFilters = {}, page = 0, size = pagination.pageSize) => {
         setLoading(true);
         try {
-            // Удаляем пустые поля из фильтров
+            // Удаляем пустые поля из фильтров, но сохраняем boolean значения
             const cleanFilters = Object.fromEntries(
                 Object.entries(searchFilters).filter(([_, value]) => {
                     if (value === '' || value == null) return false;
@@ -112,16 +112,14 @@ const TaskListPage = () => {
                 })
             );
 
-            // Преобразуем булевые значения в строки
+            // Оставляем boolean значения как boolean (axios правильно сериализует их)
             const preparedFilters = {};
             Object.entries(cleanFilters).forEach(([key, value]) => {
-                if (typeof value === 'boolean') {
-                    preparedFilters[key] = value.toString();
-                } else {
-                    preparedFilters[key] = value;
-                }
+                preparedFilters[key] = value;
             });
 
+            console.log('Отправляем запрос с параметрами:', { ...preparedFilters, page, size });
+            
             const response = await api.get('/api/tasks/search', {
                 params: {
                     ...preparedFilters,
@@ -236,6 +234,16 @@ const TaskListPage = () => {
             delete preparedFilters.hasContract;
         }
 
+        // Преобразуем paymentStatus из строки в boolean
+        if (preparedFilters.paymentStatus === 'true') {
+            preparedFilters.paymentStatus = true;
+        } else if (preparedFilters.paymentStatus === 'false') {
+            preparedFilters.paymentStatus = false;
+        } else if (preparedFilters.paymentStatus === '') {
+            delete preparedFilters.paymentStatus;
+        }
+
+        console.log('Применяем фильтры:', preparedFilters);
         fetchTasks(preparedFilters, 0);
     };
 
@@ -318,6 +326,15 @@ const TaskListPage = () => {
                     delete preparedFilters.hasContract;
                 }
 
+                // Преобразуем paymentStatus из строки в boolean
+                if (preparedFilters.paymentStatus === 'true') {
+                    preparedFilters.paymentStatus = true;
+                } else if (preparedFilters.paymentStatus === 'false') {
+                    preparedFilters.paymentStatus = false;
+                } else if (preparedFilters.paymentStatus === '') {
+                    delete preparedFilters.paymentStatus;
+                }
+
                 if (filters.quickSearch) {
                     fetchTasks({ quickSearch: filters.quickSearch }, newPage);
                 } else {
@@ -349,6 +366,15 @@ const TaskListPage = () => {
                 preparedFilters.hasContract = false;
             } else if (preparedFilters.hasContract === '') {
                 delete preparedFilters.hasContract;
+            }
+
+            // Преобразуем paymentStatus из строки в boolean
+            if (preparedFilters.paymentStatus === 'true') {
+                preparedFilters.paymentStatus = true;
+            } else if (preparedFilters.paymentStatus === 'false') {
+                preparedFilters.paymentStatus = false;
+            } else if (preparedFilters.paymentStatus === '') {
+                delete preparedFilters.paymentStatus;
             }
 
             if (filters.quickSearch) {
@@ -721,20 +747,9 @@ const TaskListPage = () => {
 
                                     {/* Строка с данными в grid-контейнере */}
                                     <div className="info-grid">
-                                        <div className="grid-item grid-item-first">
-                                            <div className="grid-value">
-                                                {task.docType && (
-                                                    <div className="task-doc-info">
-                                                        <div className="task-doc-type">{task.docType}</div>
-                                                        {task.previousProcessType && (
-                                                            <div className="task-procedure-type">{task.previousProcessType}</div>
-                                                        )}
-                                                        {task.previousNumber && (
-                                                            <div className="task-previous-number">{task.previousNumber}</div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                                        <div className="grid-item">
+                                            <div className="grid-label-invisible">Тип</div>
+                                            <div className="grid-value">{task.docType}</div>
                                         </div>
                                         <div className="grid-item">
                                             <div className="grid-label">Марка</div>
