@@ -6,6 +6,7 @@ import backend_monolithic.error.DuplicateNumberException;
 import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
+import backend_monolithic.model.dto.TaskAssignmentNotification;
 import backend_monolithic.model.enums.TaskStatus;
 import backend_monolithic.model.enums.Role;
 import backend_monolithic.repository.*;
@@ -37,6 +38,7 @@ public class TaskServiceImplementation implements TaskService {
     private final RepresentativeRepository representativeRepository;
     private final ContractRepository contractRepository;
     private final UserService userService;
+    private final NotificationProducerService notificationProducerService;
 
     @Override
     @Transactional
@@ -241,6 +243,16 @@ public class TaskServiceImplementation implements TaskService {
                 throw new BusinessException("Пользователь не является экспертом");
             }
             task.setAssignedUserId(assignedUserId);
+            
+            // Отправка уведомления о назначении исполнителя
+            TaskAssignmentNotification notification = new TaskAssignmentNotification();
+            notification.setRecipientEmail(user.getEmail());
+            notification.setRecipientName(buildShortName(user));
+            notification.setTaskId(task.getId());
+            notification.setTaskNumber(task.getNumber() != null ? task.getNumber() : "ID: " + task.getId());
+            notification.setMessage("Новая заявка в работу");
+            
+            notificationProducerService.sendTaskAssignmentNotification(notification);
         }
 
         Task updatedTask = taskRepository.save(task);
@@ -459,5 +471,25 @@ public class TaskServiceImplementation implements TaskService {
 
         return representativeRepository.findByName(name)
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
+    }
+
+    private String buildShortName(User user) {
+        StringBuilder shortName = new StringBuilder();
+        if (user.getSecondName() != null && !user.getSecondName().isBlank()) {
+            shortName.append(user.getSecondName());
+        }
+        if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getFirstName().charAt(0)).append(".");
+        }
+        if (user.getPatronymic() != null && !user.getPatronymic().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getPatronymic().charAt(0)).append(".");
+        }
+        return shortName.toString();
     }
 }
