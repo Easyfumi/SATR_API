@@ -96,6 +96,29 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
+    public PageResponse<TaskResponse> getMyTasks(String jwt, int page, int size) {
+        User user = userService.getUserProfile(jwt);
+        
+        Specification<Task> spec = TaskSpecifications.withAssignedUserId(user.getId());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Task> taskPage = taskRepository.findAll(spec, pageable);
+
+        List<TaskResponse> taskResponses = taskPage.getContent().stream()
+                .map(this::mapEntityToResponse)
+                .collect(Collectors.toList());
+
+        PageResponse<TaskResponse> pageResponse = new PageResponse<>();
+        pageResponse.setContent(taskResponses);
+        pageResponse.setCurrentPage(taskPage.getNumber());
+        pageResponse.setTotalPages(taskPage.getTotalPages());
+        pageResponse.setTotalElements(taskPage.getTotalElements());
+        pageResponse.setPageSize(taskPage.getSize());
+
+        return pageResponse;
+    }
+
+    @Override
     @Transactional
     public TaskResponse updateTask(Long taskId, TaskRequest request) {
         Task task = taskRepository.findById(taskId)

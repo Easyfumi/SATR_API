@@ -90,6 +90,15 @@ public class TaskSpecifications {
         };
     }
 
+    public static Specification<Task> withAssignedUserId(Long assignedUserId) {
+        return (root, query, criteriaBuilder) -> {
+            if (assignedUserId == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("assignedUserId"), assignedUserId);
+        };
+    }
+
     public static Specification<Task> withAssignedUser(String assignedUser) {
         return (root, query, criteriaBuilder) -> {
             if (assignedUser == null || assignedUser.isEmpty()) {

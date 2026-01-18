@@ -6,6 +6,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HistoryIcon from '@mui/icons-material/History';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -18,6 +19,7 @@ const Sidebar = () => {
       icon: <HomeIcon />,
       activePaths: ["/tasks", "/decl", "/serts"]
     },
+    { path: "/my-tasks", text: "Мои заявки", icon: <AssignmentIndIcon /> },
     { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },

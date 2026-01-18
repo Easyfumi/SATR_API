@@ -217,4 +217,13 @@ public class TaskController {
         List<TaskDuplicateInfo> duplicates = taskService.checkDuplicates(request);
         return ResponseEntity.ok(duplicates);
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<PageResponse<TaskResponse>> getMyTasks(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        PageResponse<TaskResponse> response = taskService.getMyTasks(jwt, page, size);
+        return ResponseEntity.ok(response);
+    }
 }

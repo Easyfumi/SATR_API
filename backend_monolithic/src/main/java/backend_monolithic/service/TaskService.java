@@ -11,6 +11,7 @@ public interface TaskService {
     TaskResponse getTaskById(Long id);
     List<TaskResponse> getAllTasks(String jwt);
     PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size);
+    PageResponse<TaskResponse> getMyTasks(String jwt, int page, int size);
     TaskResponse updateTask(Long taskId, TaskRequest request);
     TaskResponse updateStatus(Long taskId, TaskStatus newStatus);
     TaskResponse setTaskNumber(Long taskId, String number, LocalDate applicationDate);

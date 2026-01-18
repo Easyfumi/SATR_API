@@ -11,10 +11,13 @@ import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
 import UserDetailPage from './pages/users/UserDetailPage';
 import TaskListPage from './pages/tasks/TaskListPage';
+import MyTasksPage from './pages/tasks/MyTasksPage';
 import TaskEditPage from './pages/tasks/TaskEditPage';
 import CreateTaskPage from './pages/tasks/CreateTaskPage';
 import DeclarationPage from './pages/declaration/DeclarationPage';
+import MyDeclarationPage from './pages/declaration/MyDeclarationPage';
 import CertificatesPage from './pages/certificates/CertificatesPage';
+import MyCertificatesPage from './pages/certificates/MyCertificatesPage';
 import TaskDetailsPage from './pages/tasks/TaskDetailsPage';
 import ContractListPage from './pages/contracts/ContractListPage';
 import CreateContractPage from './pages/contracts/CreateContractPage';
@@ -53,10 +56,13 @@ function App() {
             <Route path="/users/all" element={<UsersPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
             <Route path="/tasks" element={<TaskListPage />} />
+            <Route path="/my-tasks" element={<MyTasksPage />} />
             <Route path="/tasks/create" element={<CreateTaskPage />} />
             <Route path="/tasks/:id" element={<TaskDetailsPage />} />
             <Route path="/decl" element={<DeclarationPage />} />
+            <Route path="/my-decl" element={<MyDeclarationPage />} />
             <Route path="/serts" element={<CertificatesPage />} />
+            <Route path="/my-serts" element={<MyCertificatesPage />} />
             <Route path="/contracts" element={<ContractListPage />} />
             <Route path="/contracts/create" element={<CreateContractPage />} />
             <Route path="/contracts/:id" element={<ContractDetailsPage />} />
