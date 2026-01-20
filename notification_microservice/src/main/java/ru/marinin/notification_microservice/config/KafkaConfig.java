@@ -9,7 +9,6 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import ru.marinin.notification_microservice.model.TaskAssignmentNotification;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,34 +23,33 @@ public class KafkaConfig {
     private String groupId;
 
     @Bean
-    public ConsumerFactory<String, TaskAssignmentNotification> consumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         
-        // Настройка JsonDeserializer для правильной десериализации
-        JsonDeserializer<TaskAssignmentNotification> jsonDeserializer = new JsonDeserializer<>(TaskAssignmentNotification.class, false);
+        // Настройка JsonDeserializer для обработки разных типов уведомлений
+        JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>(Object.class, false);
         jsonDeserializer.setRemoveTypeHeaders(false);
         jsonDeserializer.addTrustedPackages("*");
-        // Отключаем использование информации о типе из сообщения, используем наш класс напрямую
         jsonDeserializer.setUseTypeHeaders(false);
         
         configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, jsonDeserializer);
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         
         // At least once delivery guarantees
-        configProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false); // Отключаем автоматический commit
-        configProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000); // Таймаут сессии
-        configProps.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 10000); // Интервал heartbeat
-        configProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10); // Максимум записей за один poll
+        configProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        configProps.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000);
+        configProps.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 10000);
+        configProps.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10);
         
         return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), jsonDeserializer);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TaskAssignmentNotification> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, TaskAssignmentNotification> factory = 
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = 
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         

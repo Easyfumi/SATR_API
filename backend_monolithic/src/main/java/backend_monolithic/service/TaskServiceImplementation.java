@@ -7,6 +7,7 @@ import backend_monolithic.error.TaskNotFoundException;
 import backend_monolithic.model.*;
 import backend_monolithic.model.dto.*;
 import backend_monolithic.model.dto.TaskAssignmentNotification;
+import backend_monolithic.model.dto.TaskDecisionNotification;
 import backend_monolithic.model.enums.TaskStatus;
 import backend_monolithic.model.enums.Role;
 import backend_monolithic.repository.*;
@@ -208,6 +209,21 @@ public class TaskServiceImplementation implements TaskService {
         task.setDecisionAt(decisionDate);
         task.setStatus(TaskStatus.DECISION_DONE);
         task = taskRepository.save(task);
+        
+        // Отправка уведомлений всем пользователям с ролью "Бухгалтерия"
+        List<User> accountants = userService.getUsersByRole(Role.ACCOUNTANT);
+        for (User accountant : accountants) {
+            TaskDecisionNotification notification = new TaskDecisionNotification();
+            notification.setRecipientEmail(accountant.getEmail());
+            notification.setRecipientName(buildShortName(accountant));
+            notification.setTaskId(task.getId());
+            notification.setTaskNumber(task.getNumber() != null ? task.getNumber() : "ID: " + task.getId());
+            notification.setDecisionDate(task.getDecisionAt());
+            notification.setApplicantName(task.getApplicant() != null ? task.getApplicant().getName() : "Не указан");
+            
+            notificationProducerService.sendTaskDecisionNotification(notification);
+        }
+        
         return mapEntityToResponse(task);
     }
 
