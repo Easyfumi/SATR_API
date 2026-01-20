@@ -9,6 +9,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import ru.marinin.notification_microservice.model.TaskAssignmentNotification;
 import ru.marinin.notification_microservice.model.TaskDecisionNotification;
+import ru.marinin.notification_microservice.model.UserRegistrationNotification;
 import ru.marinin.notification_microservice.service.EmailService;
 
 import java.util.Map;
@@ -41,6 +42,11 @@ public class NotificationConsumer {
             else if (messageMap.containsKey("decisionDate")) {
                 TaskDecisionNotification notification = objectMapper.convertValue(messageValue, TaskDecisionNotification.class);
                 consumeTaskDecisionNotification(notification, acknowledgment);
+            } 
+            // Проверяем наличие поля "newUserEmail" для UserRegistrationNotification
+            else if (messageMap.containsKey("newUserEmail")) {
+                UserRegistrationNotification notification = objectMapper.convertValue(messageValue, UserRegistrationNotification.class);
+                consumeUserRegistrationNotification(notification, acknowledgment);
             } else {
                 log.error("Неизвестный тип уведомления: {}", messageMap);
                 acknowledgment.acknowledge(); // Подтверждаем, чтобы не зациклиться
@@ -104,6 +110,35 @@ public class NotificationConsumer {
         } catch (Exception e) {
             log.error("Ошибка при обработке уведомления о решении: recipient={}, taskId={}. Сообщение будет обработано повторно.", 
                     notification.getRecipientEmail(), notification.getTaskId(), e);
+            throw e; // Пробрасываем исключение для повторной обработки
+        }
+    }
+
+    private void consumeUserRegistrationNotification(
+            UserRegistrationNotification notification,
+            Acknowledgment acknowledgment) {
+        try {
+            log.info("Получено уведомление о регистрации нового пользователя: recipient={}, newUserEmail={}", 
+                    notification.getRecipientEmail(), notification.getNewUserEmail());
+            
+            // Отправляем email
+            emailService.sendUserRegistrationNotification(
+                    notification.getRecipientEmail(),
+                    notification.getRecipientName(),
+                    notification.getNewUserEmail(),
+                    notification.getNewUserFirstName(),
+                    notification.getNewUserSecondName(),
+                    notification.getNewUserPatronymic()
+            );
+            
+            // Подтверждаем обработку только после успешной отправки email
+            acknowledgment.acknowledge();
+            
+            log.info("Уведомление о регистрации пользователя успешно обработано и подтверждено: recipient={}, newUserEmail={}", 
+                    notification.getRecipientEmail(), notification.getNewUserEmail());
+        } catch (Exception e) {
+            log.error("Ошибка при обработке уведомления о регистрации пользователя: recipient={}, newUserEmail={}. Сообщение будет обработано повторно.", 
+                    notification.getRecipientEmail(), notification.getNewUserEmail(), e);
             throw e; // Пробрасываем исключение для повторной обработки
         }
     }

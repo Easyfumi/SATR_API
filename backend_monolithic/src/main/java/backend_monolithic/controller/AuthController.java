@@ -13,13 +13,17 @@ import org.springframework.web.bind.annotation.*;
 import backend_monolithic.config.JwtProvider;
 import backend_monolithic.error.ErrorResponse;
 import backend_monolithic.model.User;
+import backend_monolithic.model.dto.UserRegistrationNotification;
 import backend_monolithic.model.enums.Role;
 import backend_monolithic.repository.UserRepository;
 import backend_monolithic.request.LoginRequest;
 import backend_monolithic.response.AuthResponse;
 import backend_monolithic.service.CustomUserServiceImplementation;
+import backend_monolithic.service.NotificationProducerService;
+import backend_monolithic.service.UserService;
 
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +33,8 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserServiceImplementation customUserServiceImplementation;
+    private final UserService userService;
+    private final NotificationProducerService notificationProducerService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> createUserHandler(
@@ -54,6 +60,20 @@ public class AuthController {
         newUser.setPassword(passwordEncoder.encode(password));
 
         User savedUser = userRepository.save(newUser);
+
+        // Отправка уведомлений всем пользователям с ролью "Директор"
+        List<User> directors = userService.getUsersByRole(Role.DIRECTOR);
+        for (User director : directors) {
+            UserRegistrationNotification notification = new UserRegistrationNotification();
+            notification.setRecipientEmail(director.getEmail());
+            notification.setRecipientName(buildShortName(director));
+            notification.setNewUserEmail(savedUser.getEmail());
+            notification.setNewUserFirstName(savedUser.getFirstName());
+            notification.setNewUserSecondName(savedUser.getSecondName());
+            notification.setNewUserPatronymic(savedUser.getPatronymic());
+            
+            notificationProducerService.sendUserRegistrationNotification(notification);
+        }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -113,6 +133,26 @@ public class AuthController {
         }
 
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    }
+
+    private String buildShortName(User user) {
+        StringBuilder shortName = new StringBuilder();
+        if (user.getSecondName() != null && !user.getSecondName().isBlank()) {
+            shortName.append(user.getSecondName());
+        }
+        if (user.getFirstName() != null && !user.getFirstName().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getFirstName().charAt(0)).append(".");
+        }
+        if (user.getPatronymic() != null && !user.getPatronymic().isBlank()) {
+            if (shortName.length() > 0) {
+                shortName.append(" ");
+            }
+            shortName.append(user.getPatronymic().charAt(0)).append(".");
+        }
+        return shortName.toString();
     }
 
 }

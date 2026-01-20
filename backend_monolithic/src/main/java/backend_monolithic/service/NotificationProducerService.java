@@ -2,6 +2,7 @@ package backend_monolithic.service;
 
 import backend_monolithic.model.dto.TaskAssignmentNotification;
 import backend_monolithic.model.dto.TaskDecisionNotification;
+import backend_monolithic.model.dto.UserRegistrationNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,29 @@ public class NotificationProducerService {
             log.error("Ошибка при отправке уведомления о решении в Kafka: recipient={}, taskId={}",
                     notification.getRecipientEmail(), notification.getTaskId(), e);
             throw new RuntimeException("Не удалось отправить уведомление о решении в Kafka", e);
+        }
+    }
+
+    public void sendUserRegistrationNotification(UserRegistrationNotification notification) {
+        try {
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(
+                    notificationsTopic,
+                    notification.getRecipientEmail(),
+                    notification
+            );
+
+            SendResult<String, Object> result = future.get(10, TimeUnit.SECONDS);
+            
+            log.info("Уведомление о регистрации пользователя успешно отправлено в Kafka: recipient={}, newUserEmail={}, offset={}, partition={}",
+                    notification.getRecipientEmail(), 
+                    notification.getNewUserEmail(),
+                    result.getRecordMetadata().offset(),
+                    result.getRecordMetadata().partition());
+                    
+        } catch (Exception e) {
+            log.error("Ошибка при отправке уведомления о регистрации пользователя в Kafka: recipient={}, newUserEmail={}",
+                    notification.getRecipientEmail(), notification.getNewUserEmail(), e);
+            throw new RuntimeException("Не удалось отправить уведомление о регистрации пользователя в Kafka", e);
         }
     }
 }
