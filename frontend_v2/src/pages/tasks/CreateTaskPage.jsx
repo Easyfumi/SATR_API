@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canModifyTasks } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './CreateTaskPage.css';
 import { VehicleCategories } from '../../constants/vehicleCategories';
 import {
@@ -18,21 +21,10 @@ import {
 import DuplicateCheckModal from '../../pages/tasks/DuplicateCheckModal';
 
 const CreateTaskPage = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [experts, setExperts] = useState([]);
-
-    useEffect(() => {
-        const fetchExperts = async () => {
-            try {
-                const response = await api.get('/api/users/experts');
-                setExperts(response.data);
-            } catch (error) {
-                console.error('Error fetching experts:', error);
-            }
-        };
-        fetchExperts();
-    }, []);
 
     // Состояния для модалки дубликатов
     const [showDuplicateModal, setShowDuplicateModal] = useState(false);
@@ -319,6 +311,23 @@ const CreateTaskPage = () => {
             setRepresentativeSameAsApplicant(false);
         }
     }, [representativeAbsent]);
+
+    useEffect(() => {
+        const fetchExperts = async () => {
+            try {
+                const response = await api.get('/api/users/experts');
+                setExperts(response.data);
+            } catch (error) {
+                console.error('Error fetching experts:', error);
+            }
+        };
+        fetchExperts();
+    }, []);
+
+    // Проверка доступа (после всех хуков)
+    if (!canModifyTasks(user)) {
+        return <AccessDenied message="У вас нет доступа для создания заявок. Доступ имеют только пользователи с ролью 'Эксперт' или 'Руководитель'." />;
+    }
 
     return (
         <div className="content-container">

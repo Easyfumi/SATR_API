@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getUserById, updateUserRoles } from '../../services/users';
+import { useAuth } from '../../context/AuthContext';
+import { isDirector } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './UserDetailPage.css';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import CloseIcon from '@mui/icons-material/Close';
@@ -28,6 +31,7 @@ const translateRole = (role) => {
 };
 
 const UserDetailPage = () => {
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState(null);
@@ -65,6 +69,11 @@ const UserDetailPage = () => {
   useEffect(() => {
     setAvailableRoles(allRoles.filter(role => !editedRoles.includes(role)));
   }, [editedRoles, allRoles]);
+
+  // Проверка доступа - только DIRECTOR может изменять роли (после всех хуков)
+  if (!isDirector(currentUser)) {
+    return <AccessDenied message="У вас нет доступа для изменения ролей пользователей. Доступ имеют только пользователи с ролью 'Руководитель'." />;
+  }
 
   const handleAddRole = (role) => {
     setEditedRoles(prev => [...prev, role]);

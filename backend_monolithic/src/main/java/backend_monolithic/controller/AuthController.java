@@ -62,17 +62,30 @@ public class AuthController {
         User savedUser = userRepository.save(newUser);
 
         // Отправка уведомлений всем пользователям с ролью "Директор"
-        List<User> directors = userService.getUsersByRole(Role.DIRECTOR);
-        for (User director : directors) {
-            UserRegistrationNotification notification = new UserRegistrationNotification();
-            notification.setRecipientEmail(director.getEmail());
-            notification.setRecipientName(buildShortName(director));
-            notification.setNewUserEmail(savedUser.getEmail());
-            notification.setNewUserFirstName(savedUser.getFirstName());
-            notification.setNewUserSecondName(savedUser.getSecondName());
-            notification.setNewUserPatronymic(savedUser.getPatronymic());
-            
-            notificationProducerService.sendUserRegistrationNotification(notification);
+        // Обернуто в try-catch, чтобы ошибка отправки не прерывала регистрацию
+        try {
+            List<User> directors = userService.getUsersByRole(Role.DIRECTOR);
+            for (User director : directors) {
+                try {
+                    UserRegistrationNotification notification = new UserRegistrationNotification();
+                    notification.setRecipientEmail(director.getEmail());
+                    notification.setRecipientName(buildShortName(director));
+                    notification.setNewUserEmail(savedUser.getEmail());
+                    notification.setNewUserFirstName(savedUser.getFirstName());
+                    notification.setNewUserSecondName(savedUser.getSecondName());
+                    notification.setNewUserPatronymic(savedUser.getPatronymic());
+                    
+                    notificationProducerService.sendUserRegistrationNotification(notification);
+                } catch (Exception e) {
+                    // Логируем ошибку, но продолжаем регистрацию
+                    System.err.println("Ошибка отправки уведомления директору " + director.getEmail() + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            // Логируем ошибку, но продолжаем регистрацию
+            System.err.println("Ошибка при отправке уведомлений о регистрации: " + e.getMessage());
+            e.printStackTrace();
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);

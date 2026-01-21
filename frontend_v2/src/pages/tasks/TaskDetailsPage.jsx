@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './TaskDetailsPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -25,6 +28,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import UnlinkIcon from '@mui/icons-material/LinkOff';
 
 const TaskDetailsPage = () => {
+  const { user } = useAuth();
   const { id } = useParams();
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,6 +84,11 @@ const TaskDetailsPage = () => {
     fetchTask();
     fetchExperts();
   }, [id]);
+
+  // Проверка доступа (после всех хуков)
+  if (!canViewTasksAndContracts(user)) {
+    return <AccessDenied message="У вас нет доступа для просмотра заявок. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+  }
 
   // Функция для загрузки задачи
   const fetchTask = async () => {

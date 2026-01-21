@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './ContractListPage.css';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,6 +11,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
 
 const ContractListPage = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -85,6 +89,11 @@ const ContractListPage = () => {
             setLoading(false);
         }
     }, []);
+
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
 
     useEffect(() => {
         fetchContracts();

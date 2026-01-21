@@ -3,6 +3,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './TaskListPage.css';
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,6 +17,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 const TaskListPage = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const [tasks, setTasks] = useState([]);
@@ -193,6 +197,11 @@ const TaskListPage = () => {
             console.log('Все поля задачи:', Object.keys(tasks[0]));
         }
     }, [tasks]);
+
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра заявок. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
 
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {

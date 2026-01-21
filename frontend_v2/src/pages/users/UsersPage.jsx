@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { getAllUsers } from '../../services/users';
+import { useAuth } from '../../context/AuthContext';
+import { isDirector } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import SettingsIcon from '@mui/icons-material/Settings';
 import IconButton from '@mui/material/IconButton';
 import './UsersPage.css';
@@ -21,6 +24,7 @@ const translateRole = (role) => {
 
 
 const UsersPage = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
 
@@ -30,10 +34,10 @@ const UsersPage = () => {
         const response = await getAllUsers();
         setUsers(response.data);
       } catch (error) {
-        if (error.response?.status === 403) {
-          navigate('/tasks', { replace: true });
+        if (error.response?.status === 403 || error.isAccessDenied) {
+          // Доступ уже проверен выше, но на случай если API вернет 403
+          return;
         }
-        // убрать потом
         console.error('Ошибка загрузки пользователей:', error);
       }
     };
@@ -41,7 +45,10 @@ const UsersPage = () => {
     fetchUsers();
   }, [navigate]);
 
-
+  // Проверка доступа (после всех хуков)
+  if (!isDirector(user)) {
+    return <AccessDenied message="У вас нет доступа для просмотра списка пользователей. Доступ имеют только пользователи с ролью 'Руководитель'." />;
+  }
 
   return (
 

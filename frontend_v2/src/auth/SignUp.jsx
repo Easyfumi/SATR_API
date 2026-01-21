@@ -24,13 +24,17 @@ export default function SignUp() {
     agreeTerms: false
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setError('');
+      setSuccess(false);
       await signUp({
         firstName: formData.firstName,
         patronymic: formData.patronymic,
@@ -38,7 +42,17 @@ export default function SignUp() {
         email: formData.email,
         password: formData.password
       });
-      navigate('/signin');
+      
+      // Показываем сообщение об успехе
+      setSuccess(true);
+      setSnackbarMessage('Регистрация успешно завершена! Перенаправление на страницу авторизации...');
+      setSnackbarSeverity('success');
+      setOpenSnackbar(true);
+      
+      // Перенаправляем через небольшую задержку, чтобы пользователь увидел сообщение
+      setTimeout(() => {
+        navigate('/signin', { replace: true });
+      }, 1500);
     } catch (err) {
       let errorMessage = 'Не удалось выполнить регистрацию';
 
@@ -47,6 +61,8 @@ export default function SignUp() {
       }
 
       setError(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity('error');
       setOpenSnackbar(true);
     }
   };
@@ -151,17 +167,17 @@ export default function SignUp() {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={success ? 2000 : 6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="error"
+          severity={snackbarSeverity}
           variant="filled"
           sx={{ width: '100%' }}
         >
-          {error}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Container>

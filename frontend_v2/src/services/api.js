@@ -18,4 +18,18 @@ api.interceptors.request.use(config => {
   return config;
 });
 
+// Добавляем интерцептор для обработки ошибок доступа
+api.interceptors.response.use(
+  response => response,
+  error => {
+    // Обрабатываем ошибку 403 (Forbidden - нет доступа)
+    if (error.response && error.response.status === 403) {
+      // Добавляем флаг в ошибку для удобной обработки на фронтенде
+      error.isAccessDenied = true;
+      error.accessDeniedMessage = error.response.data?.message || 'У вас нет прав для выполнения этого действия';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

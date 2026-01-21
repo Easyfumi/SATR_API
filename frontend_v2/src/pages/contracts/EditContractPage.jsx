@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canManageContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './EditContractPage.css';
 import {
     FormControl,
@@ -16,6 +19,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 const EditContractPage = () => {
+    const { user } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -40,6 +44,11 @@ const EditContractPage = () => {
     ];
 
     // Загрузка данных договора и заявителей
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для редактирования договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {

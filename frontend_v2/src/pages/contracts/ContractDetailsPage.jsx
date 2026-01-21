@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './ContractDetailsPage.css';
 import EditIcon from '@mui/icons-material/Edit';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -19,6 +22,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const ContractDetailsPage = () => {
+    const { user } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
     const [contract, setContract] = useState(null);
@@ -58,6 +62,11 @@ const ContractDetailsPage = () => {
         FOR_REVISION: 'Возвращено на доработку',
         COMPLETED: 'Заявка выполнена'
     };
+
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
 
     useEffect(() => {
         fetchContract();

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canModifyTasks } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './TaskEditPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -24,6 +27,7 @@ import {
 } from '@mui/material';
 
 const TaskEditPage = () => {
+    const { user } = useAuth();
     const { id } = useParams();
     const navigate = useNavigate();
     const [task, setTask] = useState(null);
@@ -460,6 +464,11 @@ const handleSave = async () => {
         return initials;
     };
 
+
+    // Проверка доступа (после всех хуков)
+    if (!canModifyTasks(user)) {
+        return <AccessDenied message="У вас нет доступа для редактирования заявок. Доступ имеют только пользователи с ролью 'Эксперт' или 'Руководитель'." />;
+    }
 
     if (loading) return <div className="loading">Загрузка...</div>;
     if (error) return <div className="error-message">{error}</div>;

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canManageContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
 import './CreateContractPage.css';
 import {
     FormControl,
@@ -13,10 +16,24 @@ import {
 } from '@mui/material';
 
 const CreateContractPage = () => {
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const [formData, setFormData] = useState({
+        number: '',
+        date: '',
+        paymentStatus: '',
+        applicantName: '',
+        comments: ''
+    });
+
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для создания договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
 
     // Загрузка списка заявителей
     useEffect(() => {
@@ -30,14 +47,6 @@ const CreateContractPage = () => {
         };
         fetchApplicants();
     }, []);
-
-    const [formData, setFormData] = useState({
-        number: '',
-        date: '',
-        paymentStatus: '',
-        applicantName: '',
-        comments: ''
-    });
 
     // Статусы оплаты
     const paymentStatusOptions = [
