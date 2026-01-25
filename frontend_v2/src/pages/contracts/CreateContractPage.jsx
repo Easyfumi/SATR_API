@@ -30,11 +30,6 @@ const CreateContractPage = () => {
         comments: ''
     });
 
-    // Проверка доступа (после всех хуков)
-    if (!canManageContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для создания договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
-    }
-
     // Загрузка списка заявителей
     useEffect(() => {
         const fetchApplicants = async () => {
@@ -47,6 +42,11 @@ const CreateContractPage = () => {
         };
         fetchApplicants();
     }, []);
+
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для создания договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
 
     // Статусы оплаты
     const paymentStatusOptions = [

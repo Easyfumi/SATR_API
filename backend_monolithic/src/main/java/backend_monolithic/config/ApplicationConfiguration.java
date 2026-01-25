@@ -96,6 +96,8 @@ public class ApplicationConfiguration {
                 // Заменяем setAllowedOrigins на setAllowedOriginPatterns
                 cfg.setAllowedOriginPatterns(List.of(
                         "http://localhost:3000", // Для локальной разработки
+                        "http://frontend:80", // Для Docker контейнера frontend
+                        "http://localhost:*", // Для любых локальных портов
                         "https://your-production-domain.com" // Ваш продакшен домен
                 ));
 
