@@ -1,0 +1,5 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+user_service/src/main/resources/application.properties
+/SATR_API.iml
