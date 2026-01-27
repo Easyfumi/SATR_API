@@ -11,3 +11,4 @@
 /backend_microservices/eureka_server/mvnw
 /backend_microservices/eureka_server/mvnw.cmd
 /frontend_v2/node_modules/*
+/backend_microservices/*
