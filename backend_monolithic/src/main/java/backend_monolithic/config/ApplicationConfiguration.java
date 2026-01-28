@@ -1,6 +1,7 @@
 package backend_monolithic.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,10 +16,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import backend_monolithic.config.JwtTokenValidator;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class ApplicationConfiguration {
+
+    @Value("${app.cors.allowed-origin-patterns:http://localhost:3000}")
+    private String allowedOriginPatterns;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -93,11 +98,11 @@ public class ApplicationConfiguration {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
 
-                // Заменяем setAllowedOrigins на setAllowedOriginPatterns
-                cfg.setAllowedOriginPatterns(List.of(
-                        "http://localhost:3000", // Для локальной разработки
-                        "https://your-production-domain.com" // Ваш продакшен домен
-                ));
+                List<String> patterns = Arrays.stream(allowedOriginPatterns.split(","))
+                        .map(String::trim)
+                        .filter(value -> !value.isEmpty())
+                        .toList();
+                cfg.setAllowedOriginPatterns(patterns);
 
                 cfg.setAllowedMethods(List.of(
                         "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
