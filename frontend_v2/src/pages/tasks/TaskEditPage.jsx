@@ -191,8 +191,8 @@ const TaskEditPage = () => {
         const fetchData = async () => {
             try {
                 const [taskResponse, expertsResponse] = await Promise.all([
-                    api.get(`/api/tasks/${id}`),
-                    api.get('/api/users/experts')
+                    api.get(`/tasks/${id}`),
+                    api.get('/users/experts')
                 ]);
 
                 setTask(taskResponse.data);
@@ -241,7 +241,7 @@ const TaskEditPage = () => {
 
     const searchApplicants = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/applicants/search?search=${encodeURIComponent(searchText)}`);
             setApplicants(response.data);
         } catch (error) {
             console.error('Error searching applicants:', error);
@@ -250,7 +250,7 @@ const TaskEditPage = () => {
 
     const searchManufacturers = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/manufacturers/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/manufacturers/search?search=${encodeURIComponent(searchText)}`);
             setManufacturers(response.data);
         } catch (error) {
             console.error('Error searching manufacturers:', error);
@@ -259,7 +259,7 @@ const TaskEditPage = () => {
 
     const searchRepresentatives = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/representatives/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/representatives/search?search=${encodeURIComponent(searchText)}`);
             setRepresentatives(response.data);
         } catch (error) {
             console.error('Error searching representatives:', error);
@@ -334,7 +334,7 @@ const TaskEditPage = () => {
     const fetchAllContracts = async () => {
         setIsLoadingContracts(true);
         try {
-            const response = await api.get('/api/contracts');
+            const response = await api.get('/contracts');
             setContracts(response.data);
             setFilteredContracts(response.data);
         } catch (err) {
@@ -379,7 +379,7 @@ const TaskEditPage = () => {
 
     const handleContractSelect = async (contractId) => {
         try {
-            const response = await api.put(`/api/tasks/${id}/contract`, { contractId });
+            const response = await api.put(`/tasks/${id}/contract`, { contractId });
             setTask(response.data);
         } catch (error) {
             console.error('Ошибка привязки договора:', error);
@@ -391,7 +391,7 @@ const TaskEditPage = () => {
 
     const handleRemoveContract = async () => {
         try {
-            const response = await api.put(`/api/tasks/${id}/contract`, { contractId: null });
+            const response = await api.put(`/tasks/${id}/contract`, { contractId: null });
             setTask(response.data);
         } catch (error) {
             console.error('Ошибка отвязки договора:', error);
@@ -420,7 +420,7 @@ const handleSave = async () => {
 
         console.log('Saving request:', request);
 
-        const response = await api.put(`/api/tasks/${id}`, request);
+        const response = await api.put(`/tasks/${id}`, request);
         setTask(response.data);
         alert('Изменения успешно сохранены');
         navigate(`/tasks/${id}`);

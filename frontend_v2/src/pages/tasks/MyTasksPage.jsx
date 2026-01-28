@@ -106,7 +106,7 @@ const MyTasksPage = () => {
     const fetchMyTasks = useCallback(async (page = 0, size = pagination.pageSize) => {
         setLoading(true);
         try {
-            const response = await api.get('/api/tasks/my', {
+            const response = await api.get('/tasks/my', {
                 params: {
                     page,
                     size

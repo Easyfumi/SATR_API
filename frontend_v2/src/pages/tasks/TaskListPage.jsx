@@ -124,7 +124,7 @@ const TaskListPage = () => {
 
             console.log('Отправляем запрос с параметрами:', { ...preparedFilters, page, size });
             
-            const response = await api.get('/api/tasks/search', {
+            const response = await api.get('/tasks/search', {
                 params: {
                     ...preparedFilters,
                     page,
@@ -164,7 +164,7 @@ const TaskListPage = () => {
     const fetchAllTasks = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get('/api/tasks');
+            const response = await api.get('/tasks');
             const data = Array.isArray(response.data) ? response.data : [];
             console.log('Все задачи:', data);
             setTasks(data);

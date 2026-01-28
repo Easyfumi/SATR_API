@@ -115,7 +115,7 @@ const CreateTaskPage = () => {
         // Сохраняем request на случай дубликатов
         setPendingRequest(request);
 
-        await api.post('/api/tasks', request);
+        await api.post('/tasks', request);
 
         // Если успешно - переходим к списку заявок
         navigate('/tasks');
@@ -137,7 +137,7 @@ const CreateTaskPage = () => {
         if (!pendingRequest) return;
 
         try {
-            await api.post('/api/tasks/create', pendingRequest);
+            await api.post('/tasks/create', pendingRequest);
             setShowDuplicateModal(false);
             setPendingRequest(null);
             setDuplicates([]);
@@ -220,7 +220,7 @@ const CreateTaskPage = () => {
     // Обработчики поиска
     const searchApplicants = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/applicants/search?search=${encodeURIComponent(searchText)}`);
             setApplicants(response.data);
         } catch (error) {
             console.error('Error searching applicants:', error);
@@ -229,7 +229,7 @@ const CreateTaskPage = () => {
 
     const searchManufacturers = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/manufacturers/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/manufacturers/search?search=${encodeURIComponent(searchText)}`);
             setManufacturers(response.data);
         } catch (error) {
             console.error('Error searching manufacturers:', error);
@@ -238,7 +238,7 @@ const CreateTaskPage = () => {
 
     const searchRepresentatives = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/representatives/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/representatives/search?search=${encodeURIComponent(searchText)}`);
             setRepresentatives(response.data);
         } catch (error) {
             console.error('Error searching representatives:', error);
@@ -315,7 +315,7 @@ const CreateTaskPage = () => {
     useEffect(() => {
         const fetchExperts = async () => {
             try {
-                const response = await api.get('/api/users/experts');
+                const response = await api.get('/users/experts');
                 setExperts(response.data);
             } catch (error) {
                 console.error('Error fetching experts:', error);
@@ -422,7 +422,7 @@ const CreateTaskPage = () => {
                                 onOpen={() => {
                                     // Загружаем данные только если они еще не загружены
                                     if (applicants.length === 0) {
-                                        api.get('/api/applicants/search')
+                                        api.get('/applicants/search')
                                             .then(response => setApplicants(response.data))
                                             .catch(error => console.error('Error loading applicants:', error));
                                     }
@@ -465,7 +465,7 @@ const CreateTaskPage = () => {
                                 }}
                                 onOpen={() => {
                                     if (manufacturers.length === 0) {
-                                        api.get('/api/manufacturers/search')
+                                        api.get('/manufacturers/search')
                                             .then(response => setManufacturers(response.data))
                                             .catch(error => console.error('Error loading manufacturers:', error));
                                     }
@@ -517,7 +517,7 @@ const CreateTaskPage = () => {
                                     }}
                                     onOpen={() => {
                                         if (representatives.length === 0) {
-                                            api.get('/api/representatives/search')
+                                            api.get('/representatives/search')
                                                 .then(response => setRepresentatives(response.data))
                                                 .catch(error => console.error('Error loading representatives:', error));
                                         }

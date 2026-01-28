@@ -34,7 +34,7 @@ const CreateContractPage = () => {
     useEffect(() => {
         const fetchApplicants = async () => {
             try {
-                const response = await api.get('/api/applicants/search');
+                const response = await api.get('/applicants/search');
                 setApplicants(response.data);
             } catch (error) {
                 console.error('Error fetching applicants:', error);
@@ -62,7 +62,7 @@ const CreateContractPage = () => {
     // Обработчик поиска заявителей
     const searchApplicants = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/applicants/search?search=${encodeURIComponent(searchText)}`);
             setApplicants(response.data);
         } catch (error) {
             console.error('Error searching applicants:', error);
@@ -82,7 +82,7 @@ const CreateContractPage = () => {
                 comments: formData.comments
             };
 
-            await api.post('/api/contracts', request);
+            await api.post('/contracts', request);
             navigate('/contracts');
         } catch (error) {
             console.error('Error creating contract:', error);
@@ -191,7 +191,7 @@ const CreateContractPage = () => {
                                 }}
                                 onOpen={() => {
                                     if (applicants.length === 0) {
-                                        api.get('/api/applicants/search')
+                                        api.get('/applicants/search')
                                             .then(response => setApplicants(response.data))
                                             .catch(error => console.error('Error loading applicants:', error));
                                     }

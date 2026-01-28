@@ -76,7 +76,7 @@ const ContractListPage = () => {
     const fetchContracts = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await api.get('/api/contracts');
+            const response = await api.get('/contracts');
             const data = Array.isArray(response.data) ? response.data : [];
             setContracts(data);
             fetchTaskCounts(data);

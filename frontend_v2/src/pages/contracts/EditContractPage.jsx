@@ -47,8 +47,8 @@ const EditContractPage = () => {
         const fetchData = async () => {
             try {
                 const [contractResponse, applicantsResponse] = await Promise.all([
-                    api.get(`/api/contracts/${id}`),
-                    api.get('/api/applicants/search')
+                    api.get(`/contracts/${id}`),
+                    api.get('/applicants/search')
                 ]);
 
                 setContract(contractResponse.data);
@@ -84,7 +84,7 @@ const EditContractPage = () => {
     // Обработчик поиска заявителей
     const searchApplicants = debounce(async (searchText) => {
         try {
-            const response = await api.get(`/api/applicants/search?search=${encodeURIComponent(searchText)}`);
+            const response = await api.get(`/applicants/search?search=${encodeURIComponent(searchText)}`);
             setApplicants(response.data);
         } catch (error) {
             console.error('Error searching applicants:', error);
@@ -104,7 +104,7 @@ const EditContractPage = () => {
                 comments: formData.comments
             };
 
-            await api.put(`/api/contracts/${id}`, request);
+            await api.put(`/contracts/${id}`, request);
             navigate(`/contracts/${id}`);
         } catch (error) {
             console.error('Error updating contract:', error);
@@ -229,7 +229,7 @@ const EditContractPage = () => {
                                 }}
                                 onOpen={() => {
                                     if (applicants.length === 0) {
-                                        api.get('/api/applicants/search')
+                                        api.get('/applicants/search')
                                             .then(response => setApplicants(response.data))
                                             .catch(error => console.error('Error loading applicants:', error));
                                     }

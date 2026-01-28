@@ -94,7 +94,7 @@ const TaskDetailsPage = () => {
   const fetchTask = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/tasks/${id}`);
+      const response = await api.get(`/tasks/${id}`);
       setTask(response.data);
       setSelectedStatus(response.data.status);
       setSelectedExpertId(
@@ -112,7 +112,7 @@ const TaskDetailsPage = () => {
 
   const fetchExperts = async () => {
     try {
-      const response = await api.get('/api/users/experts');
+      const response = await api.get('/users/experts');
       setExperts(response.data);
     } catch (err) {
       console.error('Ошибка загрузки исполнителей:', err);
@@ -124,7 +124,7 @@ const TaskDetailsPage = () => {
     setIsLoadingContracts(true);
     setContractError(null);
     try {
-      const response = await api.get('/api/contracts');
+      const response = await api.get('/contracts');
       setContracts(response.data);
       setFilteredContracts(response.data);
     } catch (err) {
@@ -173,7 +173,7 @@ const TaskDetailsPage = () => {
   const handleLinkContract = async (contractId) => {
     setIsUpdatingContract(true);
     try {
-      await api.put(`/api/tasks/${id}/contract`, { contractId });
+      await api.put(`/tasks/${id}/contract`, { contractId });
       // Обновляем данные задачи
       await fetchTask();
       setContractAnchorEl(null);
@@ -201,7 +201,7 @@ const TaskDetailsPage = () => {
 
     setIsUpdatingContract(true);
     try {
-      await api.put(`/api/tasks/${id}/contract`, { contractId: null });
+      await api.put(`/tasks/${id}/contract`, { contractId: null });
       // Обновляем данные задачи
       await fetchTask();
       setAlertMessage({
@@ -225,7 +225,7 @@ const TaskDetailsPage = () => {
 
     setIsUpdating(true);
     try {
-      await api.put(`/api/tasks/${id}/number`, {
+      await api.put(`/tasks/${id}/number`, {
         number: newNumber,
         applicationDate: newApplicationDate
       });
@@ -258,7 +258,7 @@ const TaskDetailsPage = () => {
       // Преобразуем дату в формат YYYY-MM-DD
       const formattedDate = new Date(newDecisionDate).toISOString().split('T')[0];
 
-      await api.put(`/api/tasks/${id}/decision-date`, {
+      await api.put(`/tasks/${id}/decision-date`, {
         decisionDate: formattedDate
       });
       setNewDecisionDate('');
@@ -301,7 +301,7 @@ const TaskDetailsPage = () => {
 
     setIsUpdatingStatus(true);
     try {
-      const response = await api.put(`/api/tasks/${id}/status`, {
+      const response = await api.put(`/tasks/${id}/status`, {
         status: selectedStatus
       });
       setTask(response.data);
@@ -337,7 +337,7 @@ const TaskDetailsPage = () => {
 
     setIsUpdatingExpert(true);
     try {
-      const response = await api.put(`/api/tasks/${id}/expert`, {
+      const response = await api.put(`/tasks/${id}/expert`, {
         assignedUserId: selectedExpertId || null
       });
       setTask(response.data);

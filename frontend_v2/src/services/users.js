@@ -1,18 +1,18 @@
 import api from './api';
 
 export const getProfile = async () => {
-    return api.get('/api/users/profile');
+    return api.get('/users/profile');
   };
   
   export const getAllUsers = async () => {
-    return api.get('/api/users/all');
+    return api.get('/users/all');
   };
   
   export const getUserById = async (id) => {
-    return api.get(`/api/users/${id}`); 
+    return api.get(`/users/${id}`); 
   };
 
   export const updateUserRoles = async (userId, roles) => {
-    const response = await api.put(`/api/users/${userId}/roles`, { roles });
+    const response = await api.put(`/users/${userId}/roles`, { roles });
     return response.data;
   };
