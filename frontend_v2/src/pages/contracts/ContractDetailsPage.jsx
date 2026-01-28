@@ -63,11 +63,6 @@ const ContractDetailsPage = () => {
         COMPLETED: 'Заявка выполнена'
     };
 
-    // Проверка доступа (после всех хуков)
-    if (!canViewTasksAndContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
-    }
-
     useEffect(() => {
         fetchContract();
         fetchContractTasks();
@@ -235,6 +230,11 @@ const ContractDetailsPage = () => {
             default: return 'default';
         }
     };
+
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
 
     if (loading) return <div className="loading">Загрузка...</div>;
     if (error) return <div className="error-message">{error}</div>;

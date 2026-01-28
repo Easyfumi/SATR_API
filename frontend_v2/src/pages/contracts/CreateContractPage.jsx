@@ -30,11 +30,6 @@ const CreateContractPage = () => {
         comments: ''
     });
 
-    // Проверка доступа (после всех хуков)
-    if (!canManageContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для создания договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
-    }
-
     // Загрузка списка заявителей
     useEffect(() => {
         const fetchApplicants = async () => {
@@ -105,6 +100,11 @@ const CreateContractPage = () => {
     const getCurrentDate = () => {
         return new Date().toISOString().split('T')[0];
     };
+
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для создания договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
 
     return (
         <div className="content-container">

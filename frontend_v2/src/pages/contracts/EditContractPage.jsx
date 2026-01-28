@@ -43,12 +43,6 @@ const EditContractPage = () => {
         { value: 'PAIDFOR', label: 'Оплачен' }
     ];
 
-    // Загрузка данных договора и заявителей
-    // Проверка доступа (после всех хуков)
-    if (!canManageContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для редактирования договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
-    }
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -132,6 +126,11 @@ const EditContractPage = () => {
     const getCurrentDate = () => {
         return new Date().toISOString().split('T')[0];
     };
+
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для редактирования договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
 
     if (initialLoading) return <div className="loading">Загрузка...</div>;
     if (!contract) return <div className="error-message">Договор не найден</div>;
