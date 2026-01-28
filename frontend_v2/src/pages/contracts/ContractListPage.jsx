@@ -88,7 +88,12 @@ const ContractListPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [fetchTaskCounts]);
+    }, []);
+
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
 
     useEffect(() => {
         fetchContracts();
@@ -101,11 +106,6 @@ const ContractListPage = () => {
             quickSearch: value
         }));
     }, []);
-
-    // Проверка доступа (после всех хуков)
-    if (!canViewTasksAndContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для просмотра договоров. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
-    }
 
     // Обработчик изменения фильтров
     const handleFilterChange = (field, value) => {

@@ -44,6 +44,11 @@ const EditContractPage = () => {
     ];
 
     // Загрузка данных договора и заявителей
+    // Проверка доступа (после всех хуков)
+    if (!canManageContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для редактирования договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -72,11 +77,6 @@ const EditContractPage = () => {
         };
         fetchData();
     }, [id]);
-
-    // Проверка доступа (после всех хуков)
-    if (!canManageContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для редактирования договоров. Доступ имеют только пользователи с ролью 'Бухгалтерия'." />;
-    }
 
     // Функция для поиска с задержкой
     const debounce = (func, delay) => {

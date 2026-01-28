@@ -198,6 +198,11 @@ const TaskListPage = () => {
         }
     }, [tasks]);
 
+    // Проверка доступа (после всех хуков)
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра заявок. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
+
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
         const newFilters = {
@@ -215,11 +220,6 @@ const TaskListPage = () => {
             fetchTasks({ quickSearch: value }, 0);
         }
     }, [filters, fetchTasks, fetchAllTasks]);
-
-    // Проверка доступа (после всех хуков)
-    if (!canViewTasksAndContracts(user)) {
-        return <AccessDenied message="У вас нет доступа для просмотра заявок. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
-    }
 
     // Обработчик изменения фильтров
     const handleFilterChange = (field, value) => {

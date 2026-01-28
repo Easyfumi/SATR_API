@@ -1,19 +1,7 @@
 import axios from 'axios';
 
-// Для Docker используем относительные пути (nginx проксирует /api к backend)
-// Для локальной разработки можно использовать REACT_APP_API_URL
-const getBaseURL = () => {
-  const envUrl = process.env.REACT_APP_API_URL;
-  // Если URL не указан или пустой, используем относительный путь (для Docker)
-  if (!envUrl || envUrl === '') {
-    return '';
-  }
-  // Если указан полный URL, используем его (для локальной разработки)
-  return envUrl;
-};
-
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: 'http://localhost:3001',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
