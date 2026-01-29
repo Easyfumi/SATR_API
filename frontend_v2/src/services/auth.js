@@ -1,10 +1,20 @@
-import api from './api';
+import axios from 'axios';
+
+// Auth endpoints are mounted at /auth (without /api)
+const authApi = axios.create({
+  baseURL: process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest'
+  }
+});
 
 export const signUp = async (userData) => {
-  return api.post('/auth/signup', userData);
+  return authApi.post('/auth/signup', userData);
 };
 
 export const signIn = async (credentials) => {
-  return api.post('/auth/signin', credentials);
+  return authApi.post('/auth/signin', credentials);
 };
 

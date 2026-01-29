@@ -10,10 +10,10 @@ function Stop-ProcessFromPid {
         Write-Host "$Name not running (pid file not found)."
         return
     }
-    $pid = Get-Content $PidFile -ErrorAction SilentlyContinue
-    if ($pid) {
-        Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-        Write-Host "$Name stopped. PID: $pid"
+    $processId = Get-Content $PidFile -ErrorAction SilentlyContinue
+    if ($processId) {
+        Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
+        Write-Host "$Name stopped. PID: $processId"
     }
     Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
 }
