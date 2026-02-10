@@ -44,7 +44,7 @@ const ContractListPage = () => {
             const results = await Promise.all(
                 contractsList.map(async (contract) => {
                     try {
-                        const response = await api.get(`/api/contracts/${contract.id}/tasks`);
+                        const response = await api.get(`/contracts/${contract.id}/tasks`);
                         const tasks = Array.isArray(response.data) ? response.data : [];
                         return [contract.id, tasks.length];
                     } catch (error) {

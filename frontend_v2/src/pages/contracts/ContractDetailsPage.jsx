@@ -79,7 +79,7 @@ const ContractDetailsPage = () => {
     const fetchContract = async () => {
         try {
             setLoading(true);
-            const response = await api.get(`/api/contracts/${id}`);
+            const response = await api.get(`/contracts/${id}`);
             setContract(response.data);
             setError(null);
         } catch (error) {
@@ -94,7 +94,7 @@ const ContractDetailsPage = () => {
     const fetchContractTasks = async () => {
         try {
             setLoadingTasks(true);
-            const response = await api.get(`/api/contracts/${id}/tasks`);
+            const response = await api.get(`/contracts/${id}/tasks`);
             setTasks(response.data || []);
         } catch (error) {
             console.error('Error fetching contract tasks:', error);
@@ -107,7 +107,7 @@ const ContractDetailsPage = () => {
     const handleDelete = async () => {
         if (window.confirm('Вы уверены, что хотите удалить этот договор? Это действие нельзя отменить.')) {
             try {
-                await api.delete(`/api/contracts/${id}`);
+                await api.delete(`/contracts/${id}`);
                 navigate('/contracts');
             } catch (error) {
                 console.error('Error deleting contract:', error);
@@ -134,7 +134,7 @@ const ContractDetailsPage = () => {
     const saveComments = async () => {
         setSaving(true);
         try {
-            const response = await api.patch(`/api/contracts/${id}/comments`, {
+            const response = await api.patch(`/contracts/${id}/comments`, {
                 comments: tempComments
             });
             setContract(response.data);
@@ -167,7 +167,7 @@ const ContractDetailsPage = () => {
 
         setIsUpdatingPaymentStatus(true);
         try {
-            await api.patch(`/api/contracts/${id}/payment-status`, {
+            await api.patch(`/contracts/${id}/payment-status`, {
                 paymentStatus: selectedPaymentStatus
             });
             // Обновляем данные договора для получения актуального статуса
