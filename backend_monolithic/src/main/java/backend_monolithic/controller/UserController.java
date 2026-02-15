@@ -15,7 +15,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/users")
+// @RequestMapping("api/users")
+@RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
 

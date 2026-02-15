@@ -19,7 +19,8 @@ import backend_monolithic.repository.RepresentativeRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+// @RequestMapping("/api")
+@RequestMapping("")
 @RequiredArgsConstructor
 public class SupportingController {
 
