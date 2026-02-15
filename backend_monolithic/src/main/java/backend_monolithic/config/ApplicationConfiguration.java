@@ -70,6 +70,18 @@ public class ApplicationConfiguration {
                                 .hasAnyAuthority("EXPERT", "DIRECTOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/declarations/{id}")
                                 .hasAnyAuthority("EXPERT", "DIRECTOR")
+
+                        // Просмотр сертификатов - все авторизованные кроме EMPTY
+                        .requestMatchers(HttpMethod.GET, "/api/certificates", "/api/certificates/{id}", "/api/certificates/my")
+                                .hasAnyAuthority("EXPERT", "ACCOUNTANT", "DIRECTOR", "REGISTRAR")
+
+                        // Создание и изменение сертификатов - только EXPERT и DIRECTOR
+                        .requestMatchers(HttpMethod.POST, "/api/certificates", "/api/certificates/create", "/api/certificates/check-duplicates")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/certificates/{id}", "/api/certificates/{id}/number", "/api/certificates/{id}/status", "/api/certificates/{id}/expert")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/certificates/{id}")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
                         
                         // Привязка заявки к договору - только ACCOUNTANT
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}/contract").hasAuthority("ACCOUNTANT")

@@ -1,6 +1,7 @@
 package backend_monolithic.service;
 
 import backend_monolithic.model.dto.TaskAssignmentNotification;
+import backend_monolithic.model.dto.CertificateRegisteredNotification;
 import backend_monolithic.model.dto.DeclarationRegisteredNotification;
 import backend_monolithic.model.dto.TaskDecisionNotification;
 import backend_monolithic.model.dto.UserRegistrationNotification;
@@ -116,6 +117,28 @@ public class NotificationProducerService {
             log.error("Ошибка при отправке уведомления о регистрации декларации: recipient={}, applicationNumber={}",
                     notification.getRecipientEmail(), notification.getApplicationNumber(), e);
             throw new RuntimeException("Не удалось отправить уведомление о регистрации декларации в Kafka", e);
+        }
+    }
+
+    public void sendCertificateRegisteredNotification(CertificateRegisteredNotification notification) {
+        try {
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(
+                    notificationsTopic,
+                    notification.getRecipientEmail(),
+                    notification
+            );
+
+            SendResult<String, Object> result = future.get(10, TimeUnit.SECONDS);
+
+            log.info("Уведомление о регистрации сертификата отправлено: recipient={}, applicationNumber={}, offset={}, partition={}",
+                    notification.getRecipientEmail(),
+                    notification.getApplicationNumber(),
+                    result.getRecordMetadata().offset(),
+                    result.getRecordMetadata().partition());
+        } catch (Exception e) {
+            log.error("Ошибка при отправке уведомления о регистрации сертификата: recipient={}, applicationNumber={}",
+                    notification.getRecipientEmail(), notification.getApplicationNumber(), e);
+            throw new RuntimeException("Не удалось отправить уведомление о регистрации сертификата в Kafka", e);
         }
     }
 }

@@ -1,16 +1,68 @@
-// MyCertificatesPage.jsx
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import './CertificatesPage.css';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import SearchIcon from '@mui/icons-material/Search';
+import api from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import AccessDenied from '../../components/AccessDenied';
+import '../tasks/TaskListPage.css';
+
+const statusLabels = {
+    RECEIVED: 'Заявка получена',
+    JOURNAL_REGISTERED: 'Заявка зарегистрирована в журнале',
+    FGIS_ENTERED: 'Заявка занесена во ФГИС',
+    CERTIFICATE_REGISTERED: 'Сертификат зарегистрирован'
+};
 
 const MyCertificatesPage = () => {
+    const { user } = useAuth();
     const location = useLocation();
-    // Навигационные кнопки для "Мои заявки"
+    const navigate = useNavigate();
+    const [certificates, setCertificates] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [quickSearch, setQuickSearch] = useState('');
+
     const navItems = [
         { path: '/my-tasks', label: 'ОТТС / ОТШ' },
         { path: '/my-decl', label: 'Декларации' },
         { path: '/my-serts', label: 'Сертификаты' }
     ];
+
+    useEffect(() => {
+        const fetchMyCertificates = async () => {
+            setLoading(true);
+            try {
+                const response = await api.get('/certificates/my');
+                setCertificates(Array.isArray(response.data) ? response.data : []);
+                setError(null);
+            } catch (e) {
+                setError('Ошибка загрузки сертификатов');
+                setCertificates([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMyCertificates();
+    }, []);
+
+    const filteredCertificates = useMemo(() => {
+        const search = quickSearch.trim().toLowerCase();
+        if (!search) return certificates;
+        return certificates.filter((certificate) => (
+            certificate.number?.toLowerCase().includes(search)
+            || certificate.certificateNumber?.toLowerCase().includes(search)
+            || certificate.applicant?.toLowerCase().includes(search)
+            || certificate.typeName?.toLowerCase().includes(search)
+            || certificate.mark?.toLowerCase().includes(search)
+        ));
+    }, [certificates, quickSearch]);
+
+    if (!canViewTasksAndContracts(user)) {
+        return <AccessDenied message="У вас нет доступа для просмотра заявок. Доступ имеют только авторизованные пользователи с назначенными ролями." />;
+    }
+
     return (
         <div className="content-container">
             <div className="tasks-header">
@@ -19,18 +71,97 @@ const MyCertificatesPage = () => {
                         <Link
                             key={item.path}
                             to={item.path}
-                            className={`nav-button ${location.pathname === item.path ? 'active' : ''
-                                }`}
+                            className={`nav-button ${location.pathname.startsWith(item.path) ? 'active' : ''}`}
                         >
                             {item.label}
                         </Link>
                     ))}
                 </div>
-                <h2 className="page-title">Раздел "Мои сертификаты соответствия" в разработке</h2>
+                <h2 className="page-title">Мои сертификаты</h2>
             </div>
+
+            <div className="search-filters-panel">
+                <div className="quick-search-section">
+                    <div className="search-input-container">
+                        <SearchIcon className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Поиск по номеру, заявителю, типу..."
+                            className="search-input"
+                            value={quickSearch}
+                            onChange={(e) => setQuickSearch(e.target.value)}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="results-info-panel">
+                <div className="results-count">Найдено заявок: {filteredCertificates.length}</div>
+            </div>
+
+            {loading ? (
+                <div className="loading">Загрузка...</div>
+            ) : error ? (
+                <div className="error-message">{error}</div>
+            ) : (
+                <div className="tasks-list">
+                    {filteredCertificates.length === 0 ? (
+                        <div className="no-tasks-message">У вас нет назначенных сертификатов</div>
+                    ) : (
+                        filteredCertificates.map((certificate) => (
+                            <div
+                                key={certificate.id}
+                                className="task-card"
+                                onClick={() => navigate(`/serts/${certificate.id}`)}
+                            >
+                                <div className="task-card-header">
+                                    <div className="task-top-line">
+                                        <div className="task-top-col task-top-col-number">
+                                            <div className={`registration-status ${certificate.number ? 'registered' : 'unregistered'}`}>
+                                                {certificate.number ? (
+                                                    <span className="task-top-value">
+                                                        {certificate.applicationDate
+                                                            ? `${certificate.number} от ${new Date(certificate.applicationDate).toLocaleDateString('ru-RU')}`
+                                                            : certificate.number}
+                                                    </span>
+                                                ) : (
+                                                    <span className="task-top-value-missing">не зарегистрирована</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="task-top-col task-top-col-status">
+                                            <span className={`status-badge ${certificate.status?.toLowerCase()}`}>
+                                                {statusLabels[certificate.status] || certificate.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="info-grid">
+                                    <div className="grid-item">
+                                        <div className="grid-label">Категория ТС</div>
+                                        <div className="grid-value">{certificate.categories?.join(', ') || 'Не указана'}</div>
+                                    </div>
+                                    <div className="grid-item">
+                                        <div className="grid-label">Марка</div>
+                                        <div className="grid-value">{certificate.mark || 'Не указана'}</div>
+                                    </div>
+                                    <div className="grid-item">
+                                        <div className="grid-label">Тип</div>
+                                        <div className="grid-value">{certificate.typeName}</div>
+                                    </div>
+                                    <div className="grid-item">
+                                        <div className="grid-label">Заявитель</div>
+                                        <div className="grid-value">{certificate.applicant}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
         </div>
-    )
+    );
 };
 
-
 export default MyCertificatesPage;
+

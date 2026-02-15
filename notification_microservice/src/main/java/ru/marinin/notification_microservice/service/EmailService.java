@@ -316,4 +316,59 @@ public class EmailService {
                 "</body>" +
                 "</html>";
     }
+
+    public void sendCertificateRegisteredNotification(String recipientEmail, String recipientName,
+                                                      String applicationNumber, java.time.LocalDate applicationDate,
+                                                      String applicantName, String certificateNumber, String executorName) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail, senderName);
+            helper.setTo(recipientEmail);
+            helper.setSubject("Зарегистрирован сертификат");
+            helper.setText(buildCertificateRegisteredEmailContent(
+                    recipientName,
+                    applicationNumber,
+                    applicationDate,
+                    applicantName,
+                    certificateNumber,
+                    executorName
+            ), true);
+
+            mailSender.send(mimeMessage);
+            log.info("Email о регистрации сертификата отправлен: recipient={}, certificateNumber={}",
+                    recipientEmail, certificateNumber);
+        } catch (MessagingException e) {
+            log.error("Ошибка отправки email о регистрации сертификата: recipient={}, certificateNumber={}",
+                    recipientEmail, certificateNumber, e);
+            throw new RuntimeException("Не удалось отправить email о регистрации сертификата", e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка отправки email о регистрации сертификата: recipient={}, certificateNumber={}",
+                    recipientEmail, certificateNumber, e);
+            throw new RuntimeException("Не удалось отправить email о регистрации сертификата", e);
+        }
+    }
+
+    private String buildCertificateRegisteredEmailContent(String recipientName, String applicationNumber,
+                                                          java.time.LocalDate applicationDate, String applicantName,
+                                                          String certificateNumber, String executorName) {
+        String dateText = applicationDate != null
+                ? applicationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                : "не указана";
+        String applicantText = (applicantName != null && !applicantName.isBlank()) ? applicantName : "Не указан";
+
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head><meta charset=\"UTF-8\"></head>" +
+                "<body style=\"font-family: Arial, sans-serif; color:#333;\">" +
+                "<h2>Зарегистрирован сертификат</h2>" +
+                "<p><strong>По заявке № " + applicationNumber + " от " + dateText +
+                " зарегистрирован сертификат с номером " + certificateNumber + ".</strong></p>" +
+                "<p><strong>Заявитель: " + applicantText + ".</strong></p>" +
+                "<p><strong>Исполнитель: " + executorName + ".</strong></p>" +
+                "<p>Это автоматическое сообщение. Пожалуйста, не отвечайте на него.</p>" +
+                "</body>" +
+                "</html>";
+    }
 }

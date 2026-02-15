@@ -21,6 +21,9 @@ import DeclarationDetailsPage from './pages/declaration/DeclarationDetailsPage';
 import DeclarationEditPage from './pages/declaration/DeclarationEditPage';
 import CertificatesPage from './pages/certificates/CertificatesPage';
 import MyCertificatesPage from './pages/certificates/MyCertificatesPage';
+import CreateCertificatePage from './pages/certificates/CreateCertificatePage';
+import CertificateDetailsPage from './pages/certificates/CertificateDetailsPage';
+import CertificateEditPage from './pages/certificates/CertificateEditPage';
 import TaskDetailsPage from './pages/tasks/TaskDetailsPage';
 import ContractListPage from './pages/contracts/ContractListPage';
 import CreateContractPage from './pages/contracts/CreateContractPage';
@@ -69,6 +72,9 @@ function App() {
             <Route path="/decl/edit/:id" element={<DeclarationEditPage />} />
             <Route path="/serts" element={<CertificatesPage />} />
             <Route path="/my-serts" element={<MyCertificatesPage />} />
+            <Route path="/serts/create" element={<CreateCertificatePage />} />
+            <Route path="/serts/:id" element={<CertificateDetailsPage />} />
+            <Route path="/serts/edit/:id" element={<CertificateEditPage />} />
             <Route path="/contracts" element={<ContractListPage />} />
             <Route path="/contracts/create" element={<CreateContractPage />} />
             <Route path="/contracts/:id" element={<ContractDetailsPage />} />

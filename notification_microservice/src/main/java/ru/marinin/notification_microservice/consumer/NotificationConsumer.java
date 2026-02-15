@@ -11,6 +11,7 @@ import ru.marinin.notification_microservice.model.TaskAssignmentNotification;
 import ru.marinin.notification_microservice.model.TaskDecisionNotification;
 import ru.marinin.notification_microservice.model.UserRegistrationNotification;
 import ru.marinin.notification_microservice.model.DeclarationRegisteredNotification;
+import ru.marinin.notification_microservice.model.CertificateRegisteredNotification;
 import ru.marinin.notification_microservice.service.EmailService;
 
 import java.util.Map;
@@ -54,6 +55,12 @@ public class NotificationConsumer {
                 DeclarationRegisteredNotification notification =
                         objectMapper.convertValue(messageValue, DeclarationRegisteredNotification.class);
                 consumeDeclarationRegisteredNotification(notification, acknowledgment);
+            }
+            // Проверяем наличие поля "certificateNumber" для CertificateRegisteredNotification
+            else if (messageMap.containsKey("certificateNumber") && messageMap.containsKey("applicationNumber")) {
+                CertificateRegisteredNotification notification =
+                        objectMapper.convertValue(messageValue, CertificateRegisteredNotification.class);
+                consumeCertificateRegisteredNotification(notification, acknowledgment);
             } else {
                 log.error("Неизвестный тип уведомления: {}", messageMap);
                 acknowledgment.acknowledge(); // Подтверждаем, чтобы не зациклиться
@@ -174,6 +181,34 @@ public class NotificationConsumer {
         } catch (Exception e) {
             log.error("Ошибка при обработке уведомления о регистрации декларации: recipient={}, declarationNumber={}",
                     notification.getRecipientEmail(), notification.getDeclarationNumber(), e);
+            throw e;
+        }
+    }
+
+    private void consumeCertificateRegisteredNotification(
+            CertificateRegisteredNotification notification,
+            Acknowledgment acknowledgment) {
+        try {
+            log.info("Получено уведомление о регистрации сертификата: recipient={}, certificateNumber={}",
+                    notification.getRecipientEmail(), notification.getCertificateNumber());
+
+            emailService.sendCertificateRegisteredNotification(
+                    notification.getRecipientEmail(),
+                    notification.getRecipientName(),
+                    notification.getApplicationNumber(),
+                    notification.getApplicationDate(),
+                    notification.getApplicantName(),
+                    notification.getCertificateNumber(),
+                    notification.getExecutorName()
+            );
+
+            acknowledgment.acknowledge();
+
+            log.info("Уведомление о регистрации сертификата обработано: recipient={}, certificateNumber={}",
+                    notification.getRecipientEmail(), notification.getCertificateNumber());
+        } catch (Exception e) {
+            log.error("Ошибка при обработке уведомления о регистрации сертификата: recipient={}, certificateNumber={}",
+                    notification.getRecipientEmail(), notification.getCertificateNumber(), e);
             throw e;
         }
     }
