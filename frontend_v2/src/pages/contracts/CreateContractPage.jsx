@@ -47,7 +47,8 @@ const CreateContractPage = () => {
     const paymentStatusOptions = [
         { value: 'NOTPAIDFOR', label: 'Не оплачен' },
         { value: 'PARTIALLYPAIDFOR', label: 'Оплачен частично' },
-        { value: 'PAIDFOR', label: 'Оплачен' }
+        { value: 'PAIDFOR', label: 'Оплачен' },
+        { value: 'POSTPAID', label: 'Постоплата' }
     ];
 
     // Функция для поиска с задержкой

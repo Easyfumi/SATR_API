@@ -14,6 +14,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { canModifyTasks } from '../../utils/roleUtils';
@@ -28,6 +29,7 @@ const CertificateEditPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState(null);
     const [experts, setExperts] = useState([]);
     const [applicants, setApplicants] = useState([]);
@@ -174,6 +176,22 @@ const CertificateEditPage = () => {
         }
     };
 
+    const handleDeleteCertificate = async () => {
+        if (!window.confirm('Удалить заявку? Это действие нельзя отменить.')) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            await api.delete(`/certificates/${id}`);
+            navigate('/serts');
+        } catch (e) {
+            alert(e.response?.data?.message || 'Ошибка удаления заявки');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     if (!canModifyTasks(user)) {
         return <AccessDenied message="У вас нет доступа для редактирования заявок. Доступ имеют только пользователи с ролью 'Эксперт' или 'Руководитель'." />;
     }
@@ -189,10 +207,19 @@ const CertificateEditPage = () => {
                     Назад к просмотру
                 </Link>
                 <div className="edit-actions">
-                    <Button variant="outlined" onClick={() => navigate(`/serts/${id}`)} startIcon={<CancelIcon />}>
+                    <Button variant="outlined" onClick={() => navigate(`/serts/${id}`)} startIcon={<CancelIcon />} disabled={saving || deleting}>
                         Отмена
                     </Button>
-                    <Button variant="contained" onClick={handleSave} disabled={saving} startIcon={<SaveIcon />}>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDeleteCertificate}
+                        startIcon={<DeleteIcon />}
+                        disabled={saving || deleting}
+                    >
+                        {deleting ? 'Удаление...' : 'Удалить заявку'}
+                    </Button>
+                    <Button variant="contained" onClick={handleSave} disabled={saving || deleting} startIcon={<SaveIcon />}>
                         {saving ? 'Сохранение...' : 'Сохранить'}
                     </Button>
                 </div>

@@ -77,7 +77,8 @@ const TaskDetailsPage = () => {
   const paymentStatusLabels = {
     PAIDFOR: 'Оплачен',
     PARTIALLYPAIDFOR: 'Оплачен частично',
-    NOTPAIDFOR: 'Не оплачен'
+    NOTPAIDFOR: 'Не оплачен',
+    POSTPAID: 'Постоплата'
   };
 
   useEffect(() => {

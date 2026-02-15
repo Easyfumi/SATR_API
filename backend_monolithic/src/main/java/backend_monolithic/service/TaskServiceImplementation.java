@@ -276,6 +276,17 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
+    @Transactional
+    public void deleteTask(Long taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
+
+        // Explicitly detach from contract to keep the bidirectional relation consistent.
+        task.setContract(null);
+        taskRepository.delete(task);
+    }
+
+    @Override
     public List<TaskDuplicateInfo> checkDuplicates(TaskRequest request) {
         List<Task> existingTasks = taskRepository.findByStatusNot(TaskStatus.COMPLETED);
         Task newTask = mapRequestToEntityForComparison(request);

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ContractServiceImplementation implements ContractService {
 
     private final ContractRepository contractRepository;
+    private final TaskRepository taskRepository;
     private final ApplicantRepository applicantRepository;
     private final UserService userService;
 
@@ -104,10 +105,19 @@ public class ContractServiceImplementation implements ContractService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        if (!contractRepository.existsById(id)) {
-            throw new EntityNotFoundException("Договор не найден");
+        Contract contract = contractRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Договор не найден"));
+
+        // Before deleting the contract, detach all linked tasks to avoid FK constraint errors.
+        List<Task> linkedTasks = taskRepository.findByContractId(id);
+        if (!linkedTasks.isEmpty()) {
+            for (Task task : linkedTasks) {
+                task.setContract(null);
+            }
+            taskRepository.saveAll(linkedTasks);
         }
-        contractRepository.deleteById(id);
+
+        contractRepository.delete(contract);
     }
 
     @Override

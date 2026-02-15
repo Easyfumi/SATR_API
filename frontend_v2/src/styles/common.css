@@ -161,6 +161,12 @@
   color: var(--error-color);
 }
 
+.payment-status-badge.post-payment,
+.payment-status-postpaid {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
 .payment-status-badge.editable {
   cursor: pointer;
   position: relative;

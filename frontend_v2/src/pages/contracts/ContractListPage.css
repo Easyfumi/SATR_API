@@ -358,6 +358,11 @@
     background: #fecaca;
 }
 
+.payment-status-text.post-payment {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
 .info-label {
     color: #475569;
     font-size: 0.9rem;

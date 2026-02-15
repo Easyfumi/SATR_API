@@ -78,6 +78,18 @@ public class TaskController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+        try {
+            taskService.deleteTask(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}/number")  // Changed from PATCH to PUT
     public ResponseEntity<?> setTaskNumber(
             @PathVariable Long id,

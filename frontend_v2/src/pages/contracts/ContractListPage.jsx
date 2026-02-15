@@ -31,7 +31,8 @@ const ContractListPage = () => {
     const paymentStatusLabels = {
         PAIDFOR: 'Оплачен',
         PARTIALLYPAIDFOR: 'Частично',
-        NOTPAIDFOR: 'Не оплачен'
+        NOTPAIDFOR: 'Не оплачен',
+        POSTPAID: 'Постоплата'
     };
 
     const fetchTaskCounts = useCallback(async (contractsList) => {
@@ -69,7 +70,8 @@ const ContractListPage = () => {
         { value: '', label: 'Все статусы' },
         { value: 'PAIDFOR', label: 'Оплачен' },
         { value: 'PARTIALLYPAIDFOR', label: 'Оплачен частично' },
-        { value: 'NOTPAIDFOR', label: 'Не оплачен' }
+        { value: 'NOTPAIDFOR', label: 'Не оплачен' },
+        { value: 'POSTPAID', label: 'Постоплата' }
     ];
 
     // Загрузка договоров (теперь получаем ContractSimple)
@@ -181,6 +183,7 @@ const ContractListPage = () => {
             case 'PAIDFOR': return 'paid';
             case 'PARTIALLYPAIDFOR': return 'partially-paid';
             case 'NOTPAIDFOR': return 'not-paid';
+            case 'POSTPAID': return 'post-payment';
             default: return '';
         }
     };

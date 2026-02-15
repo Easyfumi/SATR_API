@@ -17,6 +17,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const EditContractPage = () => {
     const { user } = useAuth();
@@ -25,6 +26,7 @@ const EditContractPage = () => {
 
     const [applicants, setApplicants] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [contract, setContract] = useState(null);
     const [initialLoading, setInitialLoading] = useState(true);
 
@@ -40,7 +42,8 @@ const EditContractPage = () => {
     const paymentStatusOptions = [
         { value: 'NOTPAIDFOR', label: 'Не оплачен' },
         { value: 'PARTIALLYPAIDFOR', label: 'Оплачен частично' },
-        { value: 'PAIDFOR', label: 'Оплачен' }
+        { value: 'PAIDFOR', label: 'Оплачен' },
+        { value: 'POSTPAID', label: 'Постоплата' }
     ];
 
     useEffect(() => {
@@ -59,7 +62,9 @@ const EditContractPage = () => {
                     number: contractResponse.data.number || '',
                     date: contractResponse.data.date || '',
                     paymentStatus: contractResponse.data.paymentStatus || '',
-                    applicantName: contractResponse.data.applicant ? contractResponse.data.applicant.name : '',
+                    applicantName: contractResponse.data.applicantName
+                        || contractResponse.data.applicant?.name
+                        || '',
                     comments: contractResponse.data.comments || ''
                 });
             } catch (error) {
@@ -120,6 +125,23 @@ const EditContractPage = () => {
 
     const handleCancel = () => {
         navigate(`/contracts/${id}`);
+    };
+
+    const handleDelete = async () => {
+        if (!window.confirm('Удалить договор? Это действие нельзя отменить.')) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            await api.delete(`/contracts/${id}`);
+            navigate('/contracts');
+        } catch (error) {
+            console.error('Error deleting contract:', error);
+            alert('Ошибка при удалении договора: ' + (error.response?.data?.message || error.message));
+        } finally {
+            setDeleting(false);
+        }
     };
 
     // Получение текущей даты в формате YYYY-MM-DD
@@ -288,14 +310,25 @@ const EditContractPage = () => {
                             onClick={handleCancel}
                             className="cancel-btn"
                             startIcon={<CancelIcon />}
+                            disabled={loading || deleting}
                         >
                             Отмена
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            type="button"
+                            color="error"
+                            onClick={handleDelete}
+                            startIcon={<DeleteIcon />}
+                            disabled={loading || deleting}
+                        >
+                            {deleting ? 'Удаление...' : 'Удалить договор'}
                         </Button>
                         <Button
                             variant="contained"
                             type="submit"
                             className="save-btn"
-                            disabled={loading}
+                            disabled={loading || deleting}
                             startIcon={<SaveIcon />}
                         >
                             {loading ? 'Сохранение...' : 'Сохранить изменения'}

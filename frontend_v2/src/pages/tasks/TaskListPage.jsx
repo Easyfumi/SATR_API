@@ -795,10 +795,14 @@ const TaskListPage = () => {
                                             </span>
                                             {task.contract && (
                                                 <span className="contract-payment-inline">
-                                                    <span className={`payment-status ${task.contract.paymentStatus === 'PAIDFOR' ? 'paid' :
-                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' : 'unpaid'}`}>
+                                                    <span className={`payment-status ${
+                                                        task.contract.paymentStatus === 'PAIDFOR' ? 'paid' :
+                                                        task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'partially-paid' :
+                                                        task.contract.paymentStatus === 'POSTPAID' ? 'post-payment' : 'unpaid'
+                                                    }`}>
                                                         {task.contract.paymentStatus === 'PAIDFOR' ? 'Оплачен' :
-                                                            task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' : 'Не оплачен'}
+                                                            task.contract.paymentStatus === 'PARTIALLYPAIDFOR' ? 'Частично оплачен' :
+                                                            task.contract.paymentStatus === 'POSTPAID' ? 'Постоплата' : 'Не оплачен'}
                                                     </span>
                                                 </span>
                                             )}

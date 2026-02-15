@@ -58,6 +58,7 @@ public class ApplicationConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/tasks", "/api/tasks/create", "/api/tasks/check-duplicates").hasAnyAuthority("EXPERT", "DIRECTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}", "/api/tasks/{id}/number", "/api/tasks/{id}/decision-date", 
                                 "/api/tasks/{id}/status", "/api/tasks/{id}/expert").hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tasks/{id}").hasAnyAuthority("EXPERT", "DIRECTOR")
 
                         // Просмотр деклараций - все авторизованные кроме EMPTY
                         .requestMatchers(HttpMethod.GET, "/api/declarations", "/api/declarations/{id}", "/api/declarations/my")

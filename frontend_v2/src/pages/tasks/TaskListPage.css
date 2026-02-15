@@ -338,6 +338,11 @@
     color: #c62828;
 }
 
+.payment-status.post-payment {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
 .info-grid {
     display: grid;
     grid-template-columns: minmax(0, 240px) minmax(0, 170px) minmax(0, 170px) minmax(0, 120px) minmax(0, 360px);

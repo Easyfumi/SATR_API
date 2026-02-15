@@ -8,6 +8,7 @@ import './TaskEditPage.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
 import {
@@ -33,6 +34,7 @@ const TaskEditPage = () => {
     const [task, setTask] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState(null);
 
     // Состояния для формы
@@ -87,7 +89,8 @@ const TaskEditPage = () => {
     const paymentStatusLabels = {
         PAIDFOR: 'Оплачен',
         PARTIALLYPAIDFOR: 'Оплачен частично',
-        NOTPAIDFOR: 'Не оплачен'
+        NOTPAIDFOR: 'Не оплачен',
+        POSTPAID: 'Постоплата'
     };
 
     const processOptions = [
@@ -436,6 +439,23 @@ const handleSave = async () => {
         navigate(`/tasks/${id}`);
     };
 
+    const handleDeleteTask = async () => {
+        if (!window.confirm('Удалить заявку? Это действие нельзя отменить.')) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            await api.delete(`/tasks/${id}`);
+            navigate('/tasks');
+        } catch (error) {
+            console.error('Ошибка удаления заявки:', error);
+            alert(error.response?.data?.message || 'Произошла ошибка при удалении');
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     const formatDateTime = (dateTime) => {
         if (!dateTime) return 'Не указана';
         return new Date(dateTime).toLocaleString('ru-RU');
@@ -485,13 +505,23 @@ const handleSave = async () => {
                         variant="outlined"
                         onClick={handleCancel}
                         startIcon={<CancelIcon />}
+                        disabled={saving || deleting}
                     >
                         Отмена
                     </Button>
                     <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDeleteTask}
+                        startIcon={<DeleteIcon />}
+                        disabled={saving || deleting}
+                    >
+                        {deleting ? 'Удаление...' : 'Удалить заявку'}
+                    </Button>
+                    <Button
                         variant="contained"
                         onClick={handleSave}
-                        disabled={saving}
+                        disabled={saving || deleting}
                         startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
                     >
                         {saving ? 'Сохранение...' : 'Сохранить'}

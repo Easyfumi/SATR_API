@@ -13,7 +13,6 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { canModifyTasks, canViewTasksAndContracts } from '../../utils/roleUtils';
@@ -156,18 +155,6 @@ const DeclarationDetailsPage = () => {
             showAlert('error', e.response?.data?.message || 'Ошибка обновления исполнителя');
         } finally {
             setIsUpdatingExpert(false);
-        }
-    };
-
-    const handleDeleteDeclaration = async () => {
-        if (!window.confirm('Удалить заявку? Это действие нельзя отменить.')) {
-            return;
-        }
-        try {
-            await api.delete(`/declarations/${id}`);
-            navigate('/decl');
-        } catch (e) {
-            showAlert('error', e.response?.data?.message || 'Ошибка удаления заявки');
         }
     };
 
@@ -402,9 +389,6 @@ const DeclarationDetailsPage = () => {
                         <EditIcon />
                         Редактировать
                     </Link>
-                    <Button color="error" variant="outlined" onClick={handleDeleteDeclaration} startIcon={<DeleteIcon />}>
-                        Удалить
-                    </Button>
                 </div>
             )}
 

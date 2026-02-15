@@ -47,7 +47,8 @@ const ContractDetailsPage = () => {
     const paymentStatusOptions = [
         { value: 'NOTPAIDFOR', label: 'Не оплачен' },
         { value: 'PARTIALLYPAIDFOR', label: 'Оплачен частично' },
-        { value: 'PAIDFOR', label: 'Оплачен' }
+        { value: 'PAIDFOR', label: 'Оплачен' },
+        { value: 'POSTPAID', label: 'Постоплата' }
     ];
 
     const taskStatusLabels = {
@@ -208,7 +209,8 @@ const ContractDetailsPage = () => {
         const statusLabels = {
             'PAIDFOR': 'Оплачен',
             'PARTIALLYPAIDFOR': 'Оплачен частично',
-            'NOTPAIDFOR': 'Не оплачен'
+            'NOTPAIDFOR': 'Не оплачен',
+            'POSTPAID': 'Постоплата'
         };
         return statusLabels[status] || status;
     };
@@ -218,6 +220,7 @@ const ContractDetailsPage = () => {
             case 'PAIDFOR': return 'paid';
             case 'PARTIALLYPAIDFOR': return 'partially-paid';
             case 'NOTPAIDFOR': return 'not-paid';
+            case 'POSTPAID': return 'post-payment';
             default: return '';
         }
     };
