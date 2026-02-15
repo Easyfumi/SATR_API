@@ -261,4 +261,59 @@ public class EmailService {
                 "</body>" +
                 "</html>";
     }
+
+    public void sendDeclarationRegisteredNotification(String recipientEmail, String recipientName,
+                                                      String applicationNumber, java.time.LocalDate applicationDate,
+                                                      String applicantName, String declarationNumber, String executorName) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail, senderName);
+            helper.setTo(recipientEmail);
+            helper.setSubject("Зарегистрирована декларация");
+            helper.setText(buildDeclarationRegisteredEmailContent(
+                    recipientName,
+                    applicationNumber,
+                    applicationDate,
+                    applicantName,
+                    declarationNumber,
+                    executorName
+            ), true);
+
+            mailSender.send(mimeMessage);
+            log.info("Email о регистрации декларации отправлен: recipient={}, declarationNumber={}",
+                    recipientEmail, declarationNumber);
+        } catch (MessagingException e) {
+            log.error("Ошибка отправки email о регистрации декларации: recipient={}, declarationNumber={}",
+                    recipientEmail, declarationNumber, e);
+            throw new RuntimeException("Не удалось отправить email о регистрации декларации", e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка отправки email о регистрации декларации: recipient={}, declarationNumber={}",
+                    recipientEmail, declarationNumber, e);
+            throw new RuntimeException("Не удалось отправить email о регистрации декларации", e);
+        }
+    }
+
+    private String buildDeclarationRegisteredEmailContent(String recipientName, String applicationNumber,
+                                                          java.time.LocalDate applicationDate, String applicantName,
+                                                          String declarationNumber, String executorName) {
+        String dateText = applicationDate != null
+                ? applicationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                : "не указана";
+        String applicantText = (applicantName != null && !applicantName.isBlank()) ? applicantName : "Не указан";
+
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head><meta charset=\"UTF-8\"></head>" +
+                "<body style=\"font-family: Arial, sans-serif; color:#333;\">" +
+                "<h2>Зарегистрирована декларация</h2>" +
+                "<p><strong>По заявке № " + applicationNumber + " от " + dateText +
+                " зарегистрирована декларация с номером " + declarationNumber + ".</strong></p>" +
+                "<p><strong>Заявитель: " + applicantText + ".</strong></p>" +
+                "<p><strong>Исполнитель: " + executorName + ".</strong></p>" +
+                "<p>Это автоматическое сообщение. Пожалуйста, не отвечайте на него.</p>" +
+                "</body>" +
+                "</html>";
+    }
 }

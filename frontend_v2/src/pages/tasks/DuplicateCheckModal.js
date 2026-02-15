@@ -7,7 +7,12 @@ const DuplicateCheckModal = ({
     onClose, 
     duplicates, 
     onForceCreate,
-    isLoading 
+    isLoading,
+    itemPathPrefix = '/tasks',
+    title = 'Найдены дубликаты заявок',
+    description = 'Обнаружены заявки с аналогичными данными:',
+    forceLabel = 'Все равно зарегистрировать',
+    statusLabels = null
 }) => {
     const [ignoreDuplicates, setIgnoreDuplicates] = useState(false);
 
@@ -27,7 +32,7 @@ const DuplicateCheckModal = ({
     };
 
         // Объект для отображения статусов
-    const statusLabels = {
+    const defaultStatusLabels = {
         RECEIVED: 'Заявка получена',
         REGISTERED: 'Заявка зарегистрирована',
         DECISION_DONE: 'Решение по заявке готово',
@@ -42,7 +47,8 @@ const DuplicateCheckModal = ({
 
     // Функция для получения читаемого названия статуса
     const getStatusLabel = (status) => {
-        return statusLabels[status] || status;
+        const labels = statusLabels || defaultStatusLabels;
+        return labels[status] || status;
     };
 
     // Функция для получения цвета статуса
@@ -76,7 +82,7 @@ const DuplicateCheckModal = ({
                 borderRadius: 2
             }}>
                 <Typography variant="h6" component="h2" gutterBottom>
-                    {isLoading ? 'Поиск дубликатов...' : 'Найдены дубликаты заявок'}
+                    {isLoading ? 'Поиск дубликатов...' : title}
                 </Typography>
 
                 {isLoading ? (
@@ -86,7 +92,7 @@ const DuplicateCheckModal = ({
                 ) : (
                     <>
                         <Typography variant="body1" sx={{ mb: 2 }}>
-                            Обнаружены заявки с аналогичными данными:
+                            {description}
                         </Typography>
 
                         <Box sx={{ 
@@ -115,7 +121,7 @@ const DuplicateCheckModal = ({
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                                             <Box>
                                                 <Link 
-                                                    href={`/tasks/${duplicate.id}`}
+                                                    href={`${itemPathPrefix}/${duplicate.id}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     sx={{ 
@@ -189,7 +195,7 @@ const DuplicateCheckModal = ({
                                             }
                                         }}
                                     >
-                                        Все равно зарегистрировать
+                                        {forceLabel}
                                     </Button>
                                 </Box>
                             </>

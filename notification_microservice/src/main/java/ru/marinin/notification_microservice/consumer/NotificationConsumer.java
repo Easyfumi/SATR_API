@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import ru.marinin.notification_microservice.model.TaskAssignmentNotification;
 import ru.marinin.notification_microservice.model.TaskDecisionNotification;
 import ru.marinin.notification_microservice.model.UserRegistrationNotification;
+import ru.marinin.notification_microservice.model.DeclarationRegisteredNotification;
 import ru.marinin.notification_microservice.service.EmailService;
 
 import java.util.Map;
@@ -47,6 +48,12 @@ public class NotificationConsumer {
             else if (messageMap.containsKey("newUserEmail")) {
                 UserRegistrationNotification notification = objectMapper.convertValue(messageValue, UserRegistrationNotification.class);
                 consumeUserRegistrationNotification(notification, acknowledgment);
+            }
+            // Проверяем наличие поля "declarationNumber" для DeclarationRegisteredNotification
+            else if (messageMap.containsKey("declarationNumber") && messageMap.containsKey("applicationNumber")) {
+                DeclarationRegisteredNotification notification =
+                        objectMapper.convertValue(messageValue, DeclarationRegisteredNotification.class);
+                consumeDeclarationRegisteredNotification(notification, acknowledgment);
             } else {
                 log.error("Неизвестный тип уведомления: {}", messageMap);
                 acknowledgment.acknowledge(); // Подтверждаем, чтобы не зациклиться
@@ -140,6 +147,34 @@ public class NotificationConsumer {
             log.error("Ошибка при обработке уведомления о регистрации пользователя: recipient={}, newUserEmail={}. Сообщение будет обработано повторно.", 
                     notification.getRecipientEmail(), notification.getNewUserEmail(), e);
             throw e; // Пробрасываем исключение для повторной обработки
+        }
+    }
+
+    private void consumeDeclarationRegisteredNotification(
+            DeclarationRegisteredNotification notification,
+            Acknowledgment acknowledgment) {
+        try {
+            log.info("Получено уведомление о регистрации декларации: recipient={}, declarationNumber={}",
+                    notification.getRecipientEmail(), notification.getDeclarationNumber());
+
+            emailService.sendDeclarationRegisteredNotification(
+                    notification.getRecipientEmail(),
+                    notification.getRecipientName(),
+                    notification.getApplicationNumber(),
+                    notification.getApplicationDate(),
+                    notification.getApplicantName(),
+                    notification.getDeclarationNumber(),
+                    notification.getExecutorName()
+            );
+
+            acknowledgment.acknowledge();
+
+            log.info("Уведомление о регистрации декларации обработано: recipient={}, declarationNumber={}",
+                    notification.getRecipientEmail(), notification.getDeclarationNumber());
+        } catch (Exception e) {
+            log.error("Ошибка при обработке уведомления о регистрации декларации: recipient={}, declarationNumber={}",
+                    notification.getRecipientEmail(), notification.getDeclarationNumber(), e);
+            throw e;
         }
     }
 }

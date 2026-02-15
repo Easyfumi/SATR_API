@@ -58,6 +58,18 @@ public class ApplicationConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/tasks", "/api/tasks/create", "/api/tasks/check-duplicates").hasAnyAuthority("EXPERT", "DIRECTOR")
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}", "/api/tasks/{id}/number", "/api/tasks/{id}/decision-date", 
                                 "/api/tasks/{id}/status", "/api/tasks/{id}/expert").hasAnyAuthority("EXPERT", "DIRECTOR")
+
+                        // Просмотр деклараций - все авторизованные кроме EMPTY
+                        .requestMatchers(HttpMethod.GET, "/api/declarations", "/api/declarations/{id}", "/api/declarations/my")
+                                .hasAnyAuthority("EXPERT", "ACCOUNTANT", "DIRECTOR", "REGISTRAR")
+
+                        // Создание и изменение деклараций - только EXPERT и DIRECTOR
+                        .requestMatchers(HttpMethod.POST, "/api/declarations", "/api/declarations/create", "/api/declarations/check-duplicates")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.PUT, "/api/declarations/{id}", "/api/declarations/{id}/number", "/api/declarations/{id}/status", "/api/declarations/{id}/expert")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/declarations/{id}")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
                         
                         // Привязка заявки к договору - только ACCOUNTANT
                         .requestMatchers(HttpMethod.PUT, "/api/tasks/{id}/contract").hasAuthority("ACCOUNTANT")

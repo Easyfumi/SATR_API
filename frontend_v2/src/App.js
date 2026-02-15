@@ -16,6 +16,9 @@ import TaskEditPage from './pages/tasks/TaskEditPage';
 import CreateTaskPage from './pages/tasks/CreateTaskPage';
 import DeclarationPage from './pages/declaration/DeclarationPage';
 import MyDeclarationPage from './pages/declaration/MyDeclarationPage';
+import CreateDeclarationPage from './pages/declaration/CreateDeclarationPage';
+import DeclarationDetailsPage from './pages/declaration/DeclarationDetailsPage';
+import DeclarationEditPage from './pages/declaration/DeclarationEditPage';
 import CertificatesPage from './pages/certificates/CertificatesPage';
 import MyCertificatesPage from './pages/certificates/MyCertificatesPage';
 import TaskDetailsPage from './pages/tasks/TaskDetailsPage';
@@ -61,6 +64,9 @@ function App() {
             <Route path="/tasks/:id" element={<TaskDetailsPage />} />
             <Route path="/decl" element={<DeclarationPage />} />
             <Route path="/my-decl" element={<MyDeclarationPage />} />
+            <Route path="/decl/create" element={<CreateDeclarationPage />} />
+            <Route path="/decl/:id" element={<DeclarationDetailsPage />} />
+            <Route path="/decl/edit/:id" element={<DeclarationEditPage />} />
             <Route path="/serts" element={<CertificatesPage />} />
             <Route path="/my-serts" element={<MyCertificatesPage />} />
             <Route path="/contracts" element={<ContractListPage />} />
