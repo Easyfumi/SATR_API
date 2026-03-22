@@ -10,6 +10,7 @@ import SignUp from './auth/SignUp';
 import Profile from './pages/users/Profile';
 import UsersPage from './pages/users/UsersPage';
 import UserDetailPage from './pages/users/UserDetailPage';
+import UserAnalyticsPage from './pages/users/UserAnalyticsPage';
 import TaskListPage from './pages/tasks/TaskListPage';
 import MyTasksPage from './pages/tasks/MyTasksPage';
 import TaskEditPage from './pages/tasks/TaskEditPage';
@@ -60,6 +61,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/users/profile" element={<Profile />} />
             <Route path="/users/all" element={<UsersPage />} />
+            <Route path="/users/analytics" element={<UserAnalyticsPage />} />
             <Route path="/users/:id" element={<UserDetailPage />} />
             <Route path="/tasks" element={<TaskListPage />} />
             <Route path="/my-tasks" element={<MyTasksPage />} />

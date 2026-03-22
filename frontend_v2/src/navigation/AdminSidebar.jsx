@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
+import InsightsIcon from '@mui/icons-material/Insights';
 import './AdminSidebar.css';
 import './Sidebar.css';
 
@@ -10,6 +11,7 @@ const AdminSidebar = () => {
 
   const menuItems = [
     { path: "/users/all", text: "Пользователи", icon: <PeopleIcon /> },
+    { path: "/users/analytics", text: "Аналитика", icon: <InsightsIcon /> },
   ];
 
   return (

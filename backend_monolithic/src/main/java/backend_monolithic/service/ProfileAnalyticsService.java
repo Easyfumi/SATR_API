@@ -6,4 +6,5 @@ import java.time.LocalDate;
 
 public interface ProfileAnalyticsService {
     ProfileAnalyticsResponse getMyAnalytics(String jwt, LocalDate startDate, LocalDate endDate);
+    ProfileAnalyticsResponse getAnalyticsByUserId(Long userId, LocalDate startDate, LocalDate endDate);
 }

@@ -14,6 +14,7 @@ import backend_monolithic.service.UserService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,6 +99,25 @@ public class UserController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         ProfileAnalyticsResponse response = profileAnalyticsService.getMyAnalytics(jwt, startDate, endDate);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/analytics")
+    public ResponseEntity<?> getUserAnalytics(
+            @PathVariable("id") Long id,
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            User requester = userService.getUserProfile(jwt);
+            if (requester.getRoles() == null || !requester.getRoles().contains(Role.DIRECTOR)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Доступ разрешен только пользователям с ролью 'Руководитель'"));
+            }
+            ProfileAnalyticsResponse response = profileAnalyticsService.getAnalyticsByUserId(id, startDate, endDate);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     // DTO для запроса

@@ -12,6 +12,15 @@ export const getProfileAnalytics = async (startDate, endDate) => {
       }
     });
   };
+
+export const getUserAnalytics = async (userId, startDate, endDate) => {
+    return api.get(`/users/${userId}/analytics`, {
+      params: {
+        startDate,
+        endDate
+      }
+    });
+  };
   
   export const getAllUsers = async () => {
     return api.get('/users/all');

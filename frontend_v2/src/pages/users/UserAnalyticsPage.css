@@ -1,0 +1,46 @@
+.user-analytics-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.user-analytics-picker label {
+  color: var(--deep-frost);
+  font-weight: 600;
+}
+
+.user-analytics-picker select {
+  min-width: 380px;
+  max-width: 100%;
+  border: 1px solid #b6c9d7;
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #2E4A62;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.user-analytics-picker select:hover {
+  border-color: #94b4c8;
+}
+
+.user-analytics-picker select:focus {
+  outline: none;
+  border-color: #6c95af;
+  box-shadow: 0 0 0 3px rgba(108, 149, 175, 0.16);
+}
+
+@media (max-width: 768px) {
+  .user-analytics-picker {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-analytics-picker select {
+    min-width: 100%;
+    width: 100%;
+  }
+}

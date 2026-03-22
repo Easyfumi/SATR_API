@@ -33,6 +33,12 @@ public class ProfileAnalyticsServiceImplementation implements ProfileAnalyticsSe
 
     @Override
     public ProfileAnalyticsResponse getMyAnalytics(String jwt, LocalDate startDate, LocalDate endDate) {
+        User user = userService.getUserProfile(jwt);
+        return getAnalyticsByUserId(user.getId(), startDate, endDate);
+    }
+
+    @Override
+    public ProfileAnalyticsResponse getAnalyticsByUserId(Long userId, LocalDate startDate, LocalDate endDate) {
         LocalDate from = startDate != null ? startDate : LocalDate.now().withDayOfMonth(1);
         LocalDate to = endDate != null ? endDate : LocalDate.now();
         if (to.isBefore(from)) {
@@ -41,8 +47,8 @@ public class ProfileAnalyticsServiceImplementation implements ProfileAnalyticsSe
             to = temp;
         }
 
-        User user = userService.getUserProfile(jwt);
-        Long userId = user.getId();
+        userService.getUserById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
         long activeTasks = taskRepository.countByAssignedUserIdAndStatusNotIn(userId, TASK_NOT_ACTIVE_STATUSES);
         long activeDeclarations = declarationRepository.countByAssignedUserIdAndStatusNot(
