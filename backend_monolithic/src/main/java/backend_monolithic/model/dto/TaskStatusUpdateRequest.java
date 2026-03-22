@@ -8,4 +8,6 @@ import lombok.Data;
 public class TaskStatusUpdateRequest {
     @NotNull(message = "Статус обязателен")
     private TaskStatus status;
+
+    private String documentNumber;
 }

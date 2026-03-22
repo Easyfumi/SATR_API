@@ -4,6 +4,8 @@ import backend_monolithic.model.Task;
 import backend_monolithic.model.User;
 import backend_monolithic.model.dto.TaskFilter;
 import backend_monolithic.model.enums.TaskStatus;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -25,6 +27,18 @@ public class TaskSpecifications {
             return criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("number")),
                     "%" + number.toLowerCase() + "%"
+            );
+        };
+    }
+
+    public static Specification<Task> withDocumentNumber(String documentNumber) {
+        return (root, query, criteriaBuilder) -> {
+            if (documentNumber == null || documentNumber.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("documentNumber")),
+                    "%" + documentNumber.toLowerCase() + "%"
             );
         };
     }
@@ -263,6 +277,7 @@ public class TaskSpecifications {
         } else {
             // Иначе используем отдельные фильтры
             spec = spec.and(withNumber(filter.getNumber()))
+                    .and(withDocumentNumber(filter.getDocumentNumber()))
                     .and(withApplicant(filter.getApplicant()))
                     .and(withManufacturer(filter.getManufacturer()))
                     .and(withMark(filter.getMark()))
@@ -293,6 +308,12 @@ public class TaskSpecifications {
                     searchPattern
             );
 
+            // Условие для поиска по номеру ОТТС/ОТШ
+            Predicate documentNumberPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("documentNumber")),
+                    searchPattern
+            );
+
             // Условие для поиска по назначенному пользователю
             Predicate assignedUserPredicate = criteriaBuilder.conjunction();
 
@@ -317,21 +338,26 @@ public class TaskSpecifications {
                 assignedUserPredicate = criteriaBuilder.in(root.get("assignedUserId")).value(userSubquery);
             }
 
+            // LEFT JOIN, чтобы поиск по номеру заявки работал и для задач без договора
+            Join<Object, Object> contractJoin = root.join("contract", JoinType.LEFT);
+            Join<Object, Object> contractApplicantJoin = contractJoin.join("applicant", JoinType.LEFT);
+
             // Условие для поиска по номеру договора
             Predicate contractNumberPredicate = criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("contract").get("number")),
+                    criteriaBuilder.lower(criteriaBuilder.coalesce(contractJoin.get("number"), "")),
                     searchPattern
             );
 
             // Условие для поиска по заявителю (через договор)
             Predicate contractApplicantPredicate = criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("contract").get("applicant").get("name")),
+                    criteriaBuilder.lower(criteriaBuilder.coalesce(contractApplicantJoin.get("name"), "")),
                     searchPattern
             );
 
             // Объединяем все условия через OR
             return criteriaBuilder.or(
                     numberPredicate,
+                    documentNumberPredicate,
                     assignedUserPredicate,
                     contractNumberPredicate,
                     contractApplicantPredicate

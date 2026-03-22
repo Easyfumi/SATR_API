@@ -36,6 +36,7 @@ const MyTasksPage = () => {
     const [filters, setFilters] = useState({
         quickSearch: '',
         number: '',
+        documentNumber: '',
         applicant: '',
         manufacturer: '',
         mark: '',
@@ -156,12 +157,18 @@ const MyTasksPage = () => {
             const searchLower = filters.quickSearch.toLowerCase();
             filteredData = filteredData.filter(task => 
                 (task.number && task.number.toLowerCase().includes(searchLower)) ||
+                (task.documentNumber && task.documentNumber.toLowerCase().includes(searchLower)) ||
                 (task.contract?.number && task.contract.number.toLowerCase().includes(searchLower))
             );
         }
         if (filters.number) {
             filteredData = filteredData.filter(task => 
                 task.number && task.number.toLowerCase().includes(filters.number.toLowerCase())
+            );
+        }
+        if (filters.documentNumber) {
+            filteredData = filteredData.filter(task =>
+                task.documentNumber && task.documentNumber.toLowerCase().includes(filters.documentNumber.toLowerCase())
             );
         }
         if (filters.applicant) {
@@ -257,6 +264,7 @@ const MyTasksPage = () => {
         const resetFilters = {
             quickSearch: '',
             number: '',
+            documentNumber: '',
             applicant: '',
             manufacturer: '',
             mark: '',
@@ -279,6 +287,7 @@ const MyTasksPage = () => {
 
         if (filters.quickSearch) activeFilters.push({ label: 'Быстрый поиск', value: filters.quickSearch });
         if (filters.number) activeFilters.push({ label: 'Номер', value: filters.number });
+        if (filters.documentNumber) activeFilters.push({ label: 'Номер документа', value: filters.documentNumber });
         if (filters.applicant) activeFilters.push({ label: 'Заявитель', value: filters.applicant });
         if (filters.manufacturer) activeFilters.push({ label: 'Производитель', value: filters.manufacturer });
         if (filters.mark) activeFilters.push({ label: 'Марка', value: filters.mark });
@@ -416,7 +425,7 @@ const MyTasksPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру заявки или номеру договора..."
+                            placeholder="Поиск по номеру заявки/документа или номеру договора..."
                             className="search-input"
                             value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
@@ -448,6 +457,16 @@ const MyTasksPage = () => {
                                     value={filters.number}
                                     onChange={(e) => handleFilterChange('number', e.target.value)}
                                     placeholder="Введите номер"
+                                />
+                            </div>
+
+                            <div className="filter-group">
+                                <label>Номер документа</label>
+                                <input
+                                    type="text"
+                                    value={filters.documentNumber}
+                                    onChange={(e) => handleFilterChange('documentNumber', e.target.value)}
+                                    placeholder="Введите номер ОТТС/ОТШ"
                                 />
                             </div>
 
@@ -721,6 +740,18 @@ const MyTasksPage = () => {
 
                                     {/* Информация об исполнителе, договоре и оплате */}
                                     <div className="expert-contract-section">
+                                        <div className="contract-row">
+                                            <span className={`info-label ${!task.documentNumber ? 'task-top-value-missing' : ''}`}>
+                                                {task.docType === 'ОТТС' ? 'Номер ОТТС:' : 'Номер ОТШ:'}{' '}
+                                            </span>
+                                            <span className="info-value">
+                                                {task.documentNumber ? (
+                                                    <span className="contract-number-value">{task.documentNumber}</span>
+                                                ) : (
+                                                    <span className="task-top-value-missing">не присвоен</span>
+                                                )}
+                                            </span>
+                                        </div>
                                         <div className="contract-row">
                                             <span className={`info-label ${!task.contract ? 'task-top-value-missing' : ''}`}>
                                                 Номер договора:{' '}

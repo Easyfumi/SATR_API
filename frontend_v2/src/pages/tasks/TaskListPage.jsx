@@ -36,6 +36,7 @@ const TaskListPage = () => {
     const [filters, setFilters] = useState({
         quickSearch: '',
         number: '',
+        documentNumber: '',
         applicant: '',
         manufacturer: '',
         mark: '',
@@ -208,6 +209,7 @@ const TaskListPage = () => {
             ...filters,
             quickSearch: value,
             number: '',
+            documentNumber: '',
             assignedUser: ''
         };
 
@@ -260,6 +262,7 @@ const TaskListPage = () => {
         const resetFilters = {
             quickSearch: '',
             number: '',
+            documentNumber: '',
             applicant: '',
             manufacturer: '',
             mark: '',
@@ -283,6 +286,7 @@ const TaskListPage = () => {
 
         if (filters.quickSearch) activeFilters.push({ label: 'Быстрый поиск', value: filters.quickSearch });
         if (filters.number) activeFilters.push({ label: 'Номер', value: filters.number });
+        if (filters.documentNumber) activeFilters.push({ label: 'Номер документа', value: filters.documentNumber });
         if (filters.applicant) activeFilters.push({ label: 'Заявитель', value: filters.applicant });
         if (filters.manufacturer) activeFilters.push({ label: 'Производитель', value: filters.manufacturer });
         if (filters.mark) activeFilters.push({ label: 'Марка', value: filters.mark });
@@ -481,7 +485,7 @@ const TaskListPage = () => {
                         <SearchIcon className="search-icon" />
                         <input
                             type="text"
-                            placeholder="Поиск по номеру заявки, исполнителю или номеру договора..."
+                            placeholder="Поиск по номеру заявки/документа, исполнителю или номеру договора..."
                             className="search-input"
                             value={filters.quickSearch}
                             onChange={(e) => handleQuickSearch(e.target.value)}
@@ -513,6 +517,16 @@ const TaskListPage = () => {
                                     value={filters.number}
                                     onChange={(e) => handleFilterChange('number', e.target.value)}
                                     placeholder="Введите номер"
+                                />
+                            </div>
+
+                            <div className="filter-group">
+                                <label>Номер документа</label>
+                                <input
+                                    type="text"
+                                    value={filters.documentNumber}
+                                    onChange={(e) => handleFilterChange('documentNumber', e.target.value)}
+                                    placeholder="Введите номер ОТТС/ОТШ"
                                 />
                             </div>
 
@@ -760,9 +774,20 @@ const TaskListPage = () => {
 
                                     {/* Строка с данными в grid-контейнере */}
                                     <div className="info-grid">
-                                        <div className="grid-item">
-                                            <div className="grid-label-invisible">Тип</div>
-                                            <div className="grid-value">{task.docType}</div>
+                                        <div className="grid-item grid-item-first">
+                                            <div className="grid-value">
+                                                {task.docType && (
+                                                    <div className="task-doc-info">
+                                                        <div className="task-doc-type">{task.docType}</div>
+                                                        {task.previousProcessType && (
+                                                            <div className="task-procedure-type">{task.previousProcessType}</div>
+                                                        )}
+                                                        {task.previousNumber && (
+                                                            <div className="task-previous-number">{task.previousNumber}</div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="grid-item">
                                             <div className="grid-label">Марка</div>
@@ -786,6 +811,18 @@ const TaskListPage = () => {
 
                                     {/* Информация об исполнителе, договоре и оплате */}
                                     <div className="expert-contract-section">
+                                        <div className="contract-row">
+                                            <span className={`info-label ${!task.documentNumber ? 'task-top-value-missing' : ''}`}>
+                                                {task.docType === 'ОТТС' ? 'Номер ОТТС:' : 'Номер ОТШ:'}{' '}
+                                            </span>
+                                            <span className="info-value">
+                                                {task.documentNumber ? (
+                                                    <span className="contract-number-value">{task.documentNumber}</span>
+                                                ) : (
+                                                    <span className="task-top-value-missing">не присвоен</span>
+                                                )}
+                                            </span>
+                                        </div>
                                         <div className="contract-row">
                                             <span className={`info-label ${!task.contract ? 'task-top-value-missing' : ''}`}>
                                                 Номер договора:{' '}

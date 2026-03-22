@@ -31,6 +31,9 @@ public class Task {
     @Column(unique = true)
     private String number;
 
+    @Column(unique = true)
+    private String documentNumber;
+
     private LocalDate applicationDate;
 
     private String docType;

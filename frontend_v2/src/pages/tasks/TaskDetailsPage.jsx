@@ -46,6 +46,7 @@ const TaskDetailsPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [isStatusChanged, setIsStatusChanged] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [newDocumentNumber, setNewDocumentNumber] = useState('');
   const [experts, setExperts] = useState([]);
   const [selectedExpertId, setSelectedExpertId] = useState('');
   const [isExpertChanged, setIsExpertChanged] = useState(false);
@@ -296,6 +297,9 @@ const TaskDetailsPage = () => {
   const handleStatusSelect = (status) => {
     setSelectedStatus(status);
     setIsStatusChanged(true);
+    if (status !== 'PROJECT') {
+      setNewDocumentNumber('');
+    }
     handleStatusMenuClose();
   };
 
@@ -305,10 +309,14 @@ const TaskDetailsPage = () => {
     setIsUpdatingStatus(true);
     try {
       const response = await api.put(`/tasks/${id}/status`, {
-        status: selectedStatus
+        status: selectedStatus,
+        documentNumber: selectedStatus === 'PROJECT'
+          ? (newDocumentNumber || task.documentNumber)
+          : null
       });
       setTask(response.data);
       setIsStatusChanged(false);
+      setNewDocumentNumber('');
       setAlertMessage({
         type: 'success',
         text: 'Статус успешно обновлен'
@@ -327,7 +335,12 @@ const TaskDetailsPage = () => {
 
   const handleCancelStatusChange = () => {
     setSelectedStatus(task.status);
+    setNewDocumentNumber('');
     setIsStatusChanged(false);
+  };
+
+  const getDocumentLabel = () => {
+    return task?.docType === 'ОТТС' ? 'Номер ОТТС' : 'Номер ОТШ';
   };
 
   const handleExpertChange = (event) => {
@@ -451,7 +464,10 @@ const TaskDetailsPage = () => {
                       variant="contained"
                       size="small"
                       onClick={handleSaveStatus}
-                      disabled={isUpdatingStatus}
+                      disabled={
+                        isUpdatingStatus
+                        || (selectedStatus === 'PROJECT' && !(newDocumentNumber || task.documentNumber))
+                      }
                       className="save-status-button"
                     >
                       {isUpdatingStatus ? <CircularProgress size={20} /> : 'Сохранить'}
@@ -468,6 +484,18 @@ const TaskDetailsPage = () => {
                 )}
               </div>
             </div>
+
+            {selectedStatus === 'PROJECT' && !task.documentNumber && (
+              <div className="task-row">
+                <span className="task-label">{getDocumentLabel()}</span>
+                <TextField
+                  size="small"
+                  value={newDocumentNumber}
+                  onChange={(e) => setNewDocumentNumber(e.target.value)}
+                  placeholder={`Введите ${getDocumentLabel().toLowerCase()}`}
+                />
+              </div>
+            )}
 
             <div className="task-row">
               <span className="task-label">Исполнитель</span>
@@ -680,6 +708,11 @@ const TaskDetailsPage = () => {
             <div className="task-row">
               <span className="task-label">Тип одобрения:</span>
               <span className="task-value">{task.docType}</span>
+            </div>
+
+            <div className="task-row">
+              <span className="task-label">{getDocumentLabel()}:</span>
+              <span className="task-value">{task.documentNumber || 'Не указан'}</span>
             </div>
 
             <div className="task-row">

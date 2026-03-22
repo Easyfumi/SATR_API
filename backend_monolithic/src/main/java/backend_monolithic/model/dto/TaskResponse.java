@@ -16,6 +16,7 @@ import java.util.List;
 public class TaskResponse {
     private Long id;
     private String number;
+    private String documentNumber;
     private String docType;
     private String applicant;
     private String manufacturer;

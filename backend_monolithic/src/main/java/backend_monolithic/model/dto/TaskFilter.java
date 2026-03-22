@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Data
 public class TaskFilter {
     private String number;
+    private String documentNumber;
     private String applicant;
     private String manufacturer;
     private String mark;

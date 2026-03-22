@@ -155,11 +155,22 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     @Transactional
-    public TaskResponse updateStatus(Long taskId, TaskStatus newStatus) {
+    public TaskResponse updateStatus(Long taskId, TaskStatus newStatus, String documentNumber) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
 
         validateStatusTransition(task.getStatus(), newStatus);
+
+        if (newStatus == TaskStatus.PROJECT) {
+            String normalizedDocumentNumber = documentNumber != null ? documentNumber.trim() : "";
+            if (normalizedDocumentNumber.isBlank()) {
+                throw new BusinessException("Номер документа обязателен для статуса 'Проект'");
+            }
+            if (taskRepository.existsByDocumentNumberAndIdNot(normalizedDocumentNumber, taskId)) {
+                throw new DuplicateNumberException("Номер документа " + normalizedDocumentNumber + " уже существует");
+            }
+            task.setDocumentNumber(normalizedDocumentNumber);
+        }
 
         task.setStatus(newStatus);
 
@@ -348,6 +359,7 @@ public class TaskServiceImplementation implements TaskService {
         TaskResponse response = new TaskResponse();
         response.setId(task.getId());
         response.setNumber(task.getNumber());
+        response.setDocumentNumber(task.getDocumentNumber());
         response.setDocType(task.getDocType());
         response.setApplicant(task.getApplicant() != null ? task.getApplicant().getName() : null);
         response.setManufacturer(task.getManufacturer() != null ? task.getManufacturer().getName() : null);

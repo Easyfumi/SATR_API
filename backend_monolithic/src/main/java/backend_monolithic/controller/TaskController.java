@@ -126,7 +126,7 @@ public class TaskController {
             @PathVariable Long id,
             @Valid @RequestBody TaskStatusUpdateRequest request) {
         try {
-            TaskResponse response = taskService.updateStatus(id, request.getStatus());
+            TaskResponse response = taskService.updateStatus(id, request.getStatus(), request.getDocumentNumber());
             return ResponseEntity.ok(response);
         } catch (TaskNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -180,6 +180,7 @@ public class TaskController {
             @RequestHeader("Authorization") String jwt,
             @RequestParam(required = false) String quickSearch,
             @RequestParam(required = false) String number,
+            @RequestParam(required = false) String documentNumber,
             @RequestParam(required = false) String applicant,
             @RequestParam(required = false) String manufacturer,
             @RequestParam(required = false) String mark,
@@ -198,6 +199,7 @@ public class TaskController {
         TaskFilter filter = new TaskFilter();
         filter.setQuickSearch(quickSearch);
         filter.setNumber(number);
+        filter.setDocumentNumber(documentNumber);
         filter.setApplicant(applicant);
         filter.setManufacturer(manufacturer);
         filter.setMark(mark);
