@@ -85,8 +85,8 @@ public class EmailService {
                 "</html>";
     }
 
-    public void sendTaskDecisionNotification(String recipientEmail, String recipientName, 
-                                            String taskNumber, java.time.LocalDate decisionDate, 
+    public void sendTaskDecisionNotification(String recipientEmail, String recipientName,
+                                            String taskNumber, java.time.LocalDate applicationDate,
                                             String applicantName) {
         try {
             log.debug("Начало отправки email о решении: recipient={}, taskNumber={}", recipientEmail, taskNumber);
@@ -98,7 +98,7 @@ public class EmailService {
             helper.setTo(recipientEmail);
             helper.setSubject("Решение по заявке готово");
             
-            String emailContent = buildTaskDecisionEmailContent(recipientName, taskNumber, decisionDate, applicantName);
+            String emailContent = buildTaskDecisionEmailContent(recipientName, taskNumber, applicationDate, applicantName);
             helper.setText(emailContent, true);
 
             log.debug("Отправка email через SMTP: recipient={}", recipientEmail);
@@ -116,10 +116,10 @@ public class EmailService {
         }
     }
 
-    private String buildTaskDecisionEmailContent(String recipientName, String taskNumber, 
-                                                 java.time.LocalDate decisionDate, String applicantName) {
-        String formattedDate = decisionDate != null ? 
-            decisionDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "Не указана";
+    private String buildTaskDecisionEmailContent(String recipientName, String taskNumber,
+                                                 java.time.LocalDate applicationDate, String applicantName) {
+        String formattedDate = applicationDate != null ?
+            applicationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "Не указана";
         
         return "<!DOCTYPE html>" +
                 "<html>" +

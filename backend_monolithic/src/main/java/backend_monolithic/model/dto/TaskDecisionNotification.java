@@ -14,6 +14,6 @@ public class TaskDecisionNotification {
     private String recipientName;
     private Long taskId;
     private String taskNumber;
-    private LocalDate decisionDate;
+    private LocalDate applicationDate;
     private String applicantName;
 }

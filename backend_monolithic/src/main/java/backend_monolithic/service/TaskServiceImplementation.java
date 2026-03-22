@@ -218,7 +218,7 @@ public class TaskServiceImplementation implements TaskService {
             notification.setRecipientName(buildShortName(accountant));
             notification.setTaskId(task.getId());
             notification.setTaskNumber(task.getNumber() != null ? task.getNumber() : "ID: " + task.getId());
-            notification.setDecisionDate(task.getDecisionAt());
+            notification.setApplicationDate(task.getApplicationDate());
             notification.setApplicantName(task.getApplicant() != null ? task.getApplicant().getName() : "Не указан");
             
             notificationProducerService.sendTaskDecisionNotification(notification);

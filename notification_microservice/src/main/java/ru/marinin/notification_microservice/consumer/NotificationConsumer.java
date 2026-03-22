@@ -40,8 +40,8 @@ public class NotificationConsumer {
                 TaskAssignmentNotification notification = objectMapper.convertValue(messageValue, TaskAssignmentNotification.class);
                 consumeTaskAssignmentNotification(notification, acknowledgment);
             } 
-            // Проверяем наличие поля "decisionDate" для TaskDecisionNotification
-            else if (messageMap.containsKey("decisionDate")) {
+            // Проверяем наличие поля "applicationDate" для TaskDecisionNotification
+            else if (messageMap.containsKey("applicationDate")) {
                 TaskDecisionNotification notification = objectMapper.convertValue(messageValue, TaskDecisionNotification.class);
                 consumeTaskDecisionNotification(notification, acknowledgment);
             } 
@@ -112,7 +112,7 @@ public class NotificationConsumer {
                     notification.getRecipientEmail(),
                     notification.getRecipientName(),
                     notification.getTaskNumber(),
-                    notification.getDecisionDate(),
+                    notification.getApplicationDate(),
                     notification.getApplicantName()
             );
             
