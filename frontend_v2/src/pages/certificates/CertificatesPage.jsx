@@ -24,6 +24,13 @@ const CertificatesPage = () => {
     const [error, setError] = useState(null);
     const [quickSearch, setQuickSearch] = useState('');
 
+    const formatExpertName = (expert) => {
+        if (!expert) return null;
+        return expert.patronymic
+            ? `${expert.secondName} ${expert.firstName[0]}.${expert.patronymic[0]}.`
+            : `${expert.secondName} ${expert.firstName[0]}.`;
+    };
+
     const navItems = [
         { path: '/tasks', label: 'ОТТС / ОТШ' },
         { path: '/decl', label: 'Декларации' },
@@ -58,6 +65,8 @@ const CertificatesPage = () => {
             || certificate.manufacturer?.toLowerCase().includes(search)
             || certificate.typeName?.toLowerCase().includes(search)
             || certificate.mark?.toLowerCase().includes(search)
+            || formatExpertName(certificate.assignedUser)?.toLowerCase().includes(search)
+            || formatExpertName(certificate.registeredByUser)?.toLowerCase().includes(search)
         ));
     }, [certificates, quickSearch]);
 
@@ -139,9 +148,17 @@ const CertificatesPage = () => {
                                             <div className="task-list-assignee">
                                                 Исполнитель:{' '}
                                                 <span className="task-top-value">
-                                                    {certificate.assignedUser
-                                                        ? `${certificate.assignedUser.secondName} ${certificate.assignedUser.firstName[0]}.${certificate.assignedUser.patronymic?.[0] || ''}`
-                                                        : <span className="task-top-value-missing">не назначен</span>}
+                                                    {formatExpertName(certificate.assignedUser)
+                                                        || <span className="task-top-value-missing">не назначен</span>}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="task-top-col task-top-col-assignee">
+                                            <div className="task-list-assignee">
+                                                Зарегестрирован:{' '}
+                                                <span className="task-top-value">
+                                                    {formatExpertName(certificate.registeredByUser)
+                                                        || <span className="task-top-value-missing">не назначен</span>}
                                                 </span>
                                             </div>
                                         </div>

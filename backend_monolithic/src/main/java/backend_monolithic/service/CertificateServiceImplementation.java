@@ -64,7 +64,9 @@ public class CertificateServiceImplementation implements CertificateService {
     @Override
     public List<CertificateResponse> getMyCertificates(String jwt) {
         User user = userService.getUserProfile(jwt);
-        return certificateRepository.findByAssignedUserIdOrderByCreatedAtDesc(user.getId()).stream()
+        return certificateRepository
+                .findByAssignedUserIdOrRegisteredByUserIdOrderByCreatedAtDesc(user.getId(), user.getId())
+                .stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
     }
@@ -181,6 +183,37 @@ public class CertificateServiceImplementation implements CertificateService {
     }
 
     @Override
+    @Transactional
+    public CertificateResponse updateCertificateRegistrar(Long certificateId, Long registeredByUserId) {
+        Certificate certificate = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new EntityNotFoundException("Сертификат не найден"));
+
+        if (registeredByUserId == null) {
+            certificate.setRegisteredByUserId(null);
+        } else {
+            User user = userService.getUserById(registeredByUserId)
+                    .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+            if (user.getRoles() == null || !user.getRoles().contains(Role.EXPERT)) {
+                throw new BusinessException("Пользователь не является экспертом");
+            }
+            certificate.setRegisteredByUserId(registeredByUserId);
+        }
+
+        return mapEntityToResponse(certificateRepository.save(certificate));
+    }
+
+    @Override
+    @Transactional
+    public CertificateResponse updateCertificateNotes(Long certificateId, String notes) {
+        Certificate certificate = certificateRepository.findById(certificateId)
+                .orElseThrow(() -> new EntityNotFoundException("Сертификат не найден"));
+
+        String normalizedNotes = notes == null ? null : notes.trim();
+        certificate.setNotes((normalizedNotes == null || normalizedNotes.isEmpty()) ? null : normalizedNotes);
+        return mapEntityToResponse(certificateRepository.save(certificate));
+    }
+
+    @Override
     public List<CertificateDuplicateInfo> checkDuplicates(CertificateRequest request) {
         List<Certificate> existing = certificateRepository.findByStatusNot(CertificateStatus.CERTIFICATE_REGISTERED);
         Certificate incoming = mapRequestToEntityForComparison(request);
@@ -247,8 +280,10 @@ public class CertificateServiceImplementation implements CertificateService {
         response.setStandardSection(certificate.getStandardSection());
         response.setStatus(certificate.getStatus() != null ? certificate.getStatus().name() : null);
         response.setAssignedUserId(certificate.getAssignedUserId());
+        response.setRegisteredByUserId(certificate.getRegisteredByUserId());
         response.setCertificateNumber(certificate.getCertificateNumber());
         response.setCertificateRegisteredAt(certificate.getCertificateRegisteredAt());
+        response.setNotes(certificate.getNotes());
         response.setCreatedAt(certificate.getCreatedAt());
 
         if (certificate.getCreatedBy() != null) {
@@ -259,6 +294,11 @@ public class CertificateServiceImplementation implements CertificateService {
         if (certificate.getAssignedUserId() != null) {
             userService.getUserById(certificate.getAssignedUserId())
                     .ifPresent(user -> response.setAssignedUser(new UserInfo(user)));
+        }
+
+        if (certificate.getRegisteredByUserId() != null) {
+            userService.getUserById(certificate.getRegisteredByUserId())
+                    .ifPresent(user -> response.setRegisteredByUser(new UserInfo(user)));
         }
 
         return response;

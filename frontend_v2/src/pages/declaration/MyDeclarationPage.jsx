@@ -117,7 +117,7 @@ const MyDeclarationPage = () => {
                                 onClick={() => navigate(`/decl/${declaration.id}`)}
                             >
                                 <div className="task-card-header">
-                                    <div className="task-top-line task-top-line-compact">
+                                    <div className="task-top-line task-top-line-wide">
                                         <div className="task-top-col task-top-col-number">
                                             <div className={`registration-status ${declaration.number ? 'registered' : 'unregistered'}`}>
                                                 {declaration.number ? (
@@ -129,6 +129,16 @@ const MyDeclarationPage = () => {
                                                 ) : (
                                                     <span className="task-top-value-missing">не зарегистрирована</span>
                                                 )}
+                                            </div>
+                                        </div>
+                                        <div className="task-top-col task-top-col-assignee">
+                                            <div className="task-list-assignee">
+                                                Исполнитель:{' '}
+                                                <span className="task-top-value">
+                                                    {declaration.assignedUser
+                                                        ? `${declaration.assignedUser.secondName} ${declaration.assignedUser.firstName[0]}.${declaration.assignedUser.patronymic?.[0] || ''}`
+                                                        : <span className="task-top-value-missing">не назначен</span>}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="task-top-col task-top-col-status">

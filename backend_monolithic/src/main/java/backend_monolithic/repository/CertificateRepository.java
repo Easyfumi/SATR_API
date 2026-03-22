@@ -13,6 +13,6 @@ public interface CertificateRepository extends JpaRepository<Certificate, Long> 
 
     List<Certificate> findByStatusNot(CertificateStatus status);
 
-    List<Certificate> findByAssignedUserIdOrderByCreatedAtDesc(Long assignedUserId);
+    List<Certificate> findByAssignedUserIdOrRegisteredByUserIdOrderByCreatedAtDesc(Long assignedUserId, Long registeredByUserId);
 }
 

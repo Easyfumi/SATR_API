@@ -47,6 +47,7 @@ public class Certificate {
     private String standardSection;
 
     private Long assignedUserId;
+    private Long registeredByUserId;
     private Long createdBy;
     private LocalDateTime createdAt;
 
@@ -56,5 +57,7 @@ public class Certificate {
     @Column(unique = true)
     private String certificateNumber;
     private LocalDate certificateRegisteredAt;
+    @Column(length = 2000)
+    private String notes;
 }
 

@@ -23,6 +23,13 @@ const MyCertificatesPage = () => {
     const [error, setError] = useState(null);
     const [quickSearch, setQuickSearch] = useState('');
 
+    const formatExpertName = (expert) => {
+        if (!expert) return null;
+        return expert.patronymic
+            ? `${expert.secondName} ${expert.firstName[0]}.${expert.patronymic[0]}.`
+            : `${expert.secondName} ${expert.firstName[0]}.`;
+    };
+
     const navItems = [
         { path: '/my-tasks', label: 'ОТТС / ОТШ' },
         { path: '/my-decl', label: 'Декларации' },
@@ -56,6 +63,8 @@ const MyCertificatesPage = () => {
             || certificate.applicant?.toLowerCase().includes(search)
             || certificate.typeName?.toLowerCase().includes(search)
             || certificate.mark?.toLowerCase().includes(search)
+            || formatExpertName(certificate.assignedUser)?.toLowerCase().includes(search)
+            || formatExpertName(certificate.registeredByUser)?.toLowerCase().includes(search)
         ));
     }, [certificates, quickSearch]);
 
@@ -106,7 +115,7 @@ const MyCertificatesPage = () => {
             ) : (
                 <div className="tasks-list">
                     {filteredCertificates.length === 0 ? (
-                        <div className="no-tasks-message">У вас нет назначенных сертификатов</div>
+                        <div className="no-tasks-message">Сертификаты не найдены</div>
                     ) : (
                         filteredCertificates.map((certificate) => (
                             <div
@@ -115,7 +124,7 @@ const MyCertificatesPage = () => {
                                 onClick={() => navigate(`/serts/${certificate.id}`)}
                             >
                                 <div className="task-card-header">
-                                    <div className="task-top-line task-top-line-compact">
+                                    <div className="task-top-line task-top-line-wide">
                                         <div className="task-top-col task-top-col-number">
                                             <div className={`registration-status ${certificate.number ? 'registered' : 'unregistered'}`}>
                                                 {certificate.number ? (
@@ -127,6 +136,24 @@ const MyCertificatesPage = () => {
                                                 ) : (
                                                     <span className="task-top-value-missing">не зарегистрирована</span>
                                                 )}
+                                            </div>
+                                        </div>
+                                        <div className="task-top-col task-top-col-assignee">
+                                            <div className="task-list-assignee">
+                                                Исполнитель:{' '}
+                                                <span className="task-top-value">
+                                                    {formatExpertName(certificate.assignedUser)
+                                                        || <span className="task-top-value-missing">не назначен</span>}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="task-top-col task-top-col-assignee">
+                                            <div className="task-list-assignee">
+                                                Зарегестрирован:{' '}
+                                                <span className="task-top-value">
+                                                    {formatExpertName(certificate.registeredByUser)
+                                                        || <span className="task-top-value-missing">не назначен</span>}
+                                                </span>
                                             </div>
                                         </div>
                                         <div className="task-top-col task-top-col-status">
@@ -152,6 +179,15 @@ const MyCertificatesPage = () => {
                                     <div className="grid-item">
                                         <div className="grid-label">Заявитель</div>
                                         <div className="grid-value">{certificate.applicant}</div>
+                                    </div>
+                                </div>
+
+                                <div className="expert-contract-section">
+                                    <div className="contract-row">
+                                        <span className="info-label">Номер сертификата: </span>
+                                        <span className="info-value">
+                                            {certificate.certificateNumber || <span className="task-top-value-missing">не присвоен</span>}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

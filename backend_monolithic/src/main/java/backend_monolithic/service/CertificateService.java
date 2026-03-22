@@ -16,6 +16,8 @@ public interface CertificateService {
     CertificateResponse setCertificateNumber(Long certificateId, String number, LocalDate applicationDate);
     CertificateResponse updateStatus(Long certificateId, CertificateStatus status, String certificateNumber);
     CertificateResponse updateCertificateExpert(Long certificateId, Long assignedUserId);
+    CertificateResponse updateCertificateRegistrar(Long certificateId, Long registeredByUserId);
+    CertificateResponse updateCertificateNotes(Long certificateId, String notes);
     List<CertificateDuplicateInfo> checkDuplicates(CertificateRequest request);
 }
 

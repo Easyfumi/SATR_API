@@ -30,9 +30,12 @@ public class CertificateResponse {
     private String status;
     private Long assignedUserId;
     private UserInfo assignedUser;
+    private Long registeredByUserId;
+    private UserInfo registeredByUser;
 
     private String certificateNumber;
     private LocalDate certificateRegisteredAt;
+    private String notes;
 
     private LocalDateTime createdAt;
     private String createdBy;

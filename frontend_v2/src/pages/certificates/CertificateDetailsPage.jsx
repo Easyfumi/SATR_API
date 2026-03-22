@@ -49,6 +49,12 @@ const CertificateDetailsPage = () => {
     const [selectedExpertId, setSelectedExpertId] = useState('');
     const [isExpertChanged, setIsExpertChanged] = useState(false);
     const [isUpdatingExpert, setIsUpdatingExpert] = useState(false);
+    const [selectedRegistrarId, setSelectedRegistrarId] = useState('');
+    const [isRegistrarChanged, setIsRegistrarChanged] = useState(false);
+    const [isUpdatingRegistrar, setIsUpdatingRegistrar] = useState(false);
+    const [certificateNotes, setCertificateNotes] = useState('');
+    const [isNotesChanged, setIsNotesChanged] = useState(false);
+    const [isUpdatingNotes, setIsUpdatingNotes] = useState(false);
 
     const fetchCertificate = useCallback(async () => {
         setLoading(true);
@@ -57,8 +63,12 @@ const CertificateDetailsPage = () => {
             setCertificate(response.data);
             setSelectedStatus(response.data.status);
             setSelectedExpertId(response.data.assignedUserId || '');
+            setSelectedRegistrarId(response.data.registeredByUserId || '');
+            setCertificateNotes(response.data.notes || '');
             setIsStatusChanged(false);
             setIsExpertChanged(false);
+            setIsRegistrarChanged(false);
+            setIsNotesChanged(false);
             setError(null);
         } catch (e) {
             setError('Не удалось загрузить данные сертификата');
@@ -155,6 +165,36 @@ const CertificateDetailsPage = () => {
             showAlert('error', e.response?.data?.message || 'Ошибка обновления исполнителя');
         } finally {
             setIsUpdatingExpert(false);
+        }
+    };
+
+    const handleSaveRegistrar = async () => {
+        setIsUpdatingRegistrar(true);
+        try {
+            await api.put(`/certificates/${id}/registrar`, {
+                registeredByUserId: selectedRegistrarId || null
+            });
+            await fetchCertificate();
+            showAlert('success', 'Поле "Зарегестрирован" обновлено');
+        } catch (e) {
+            showAlert('error', e.response?.data?.message || 'Ошибка обновления поля "Зарегестрирован"');
+        } finally {
+            setIsUpdatingRegistrar(false);
+        }
+    };
+
+    const handleSaveNotes = async () => {
+        setIsUpdatingNotes(true);
+        try {
+            await api.put(`/certificates/${id}/notes`, {
+                notes: certificateNotes
+            });
+            await fetchCertificate();
+            showAlert('success', 'Заметки обновлены');
+        } catch (e) {
+            showAlert('error', e.response?.data?.message || 'Ошибка обновления заметок');
+        } finally {
+            setIsUpdatingNotes(false);
         }
     };
 
@@ -281,6 +321,46 @@ const CertificateDetailsPage = () => {
                         </div>
 
                         <div className="task-row">
+                            <span className="task-label">Зарегестрирован</span>
+                            <div className="status-container">
+                                <FormControl size="small" className="expert-select-control">
+                                    <Select value={selectedRegistrarId} onChange={(e) => {
+                                        setSelectedRegistrarId(e.target.value);
+                                        setIsRegistrarChanged(true);
+                                    }}>
+                                        <MenuItem value=""><em>Не назначен</em></MenuItem>
+                                        {experts.map((expert) => (
+                                            <MenuItem key={expert.id} value={expert.id}>{formatExpertName(expert)}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                {isRegistrarChanged && (
+                                    <div className="status-actions">
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            className="save-status-button"
+                                            onClick={handleSaveRegistrar}
+                                            disabled={isUpdatingRegistrar}
+                                        >
+                                            {isUpdatingRegistrar ? <CircularProgress size={20} /> : 'Сохранить'}
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={() => {
+                                                setSelectedRegistrarId(certificate.registeredByUserId || '');
+                                                setIsRegistrarChanged(false);
+                                            }}
+                                        >
+                                            Отмена
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="task-row">
                             <span className="task-label">Номер заявки</span>
                             {certificate.number ? (
                                 <span className="task-value">
@@ -326,6 +406,47 @@ const CertificateDetailsPage = () => {
                         <div className="task-row">
                             <span className="task-label">Дата регистрации сертификата</span>
                             <span className="task-value">{formatDate(certificate.certificateRegisteredAt)}</span>
+                        </div>
+                        <div className="task-row">
+                            <span className="task-label">Заметки</span>
+                            <div className="status-container">
+                                <TextField
+                                    size="small"
+                                    multiline
+                                    minRows={3}
+                                    maxRows={8}
+                                    fullWidth
+                                    value={certificateNotes}
+                                    onChange={(e) => {
+                                        setCertificateNotes(e.target.value);
+                                        setIsNotesChanged(true);
+                                    }}
+                                    placeholder="Введите заметки"
+                                />
+                                {isNotesChanged && (
+                                    <div className="status-actions">
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            className="save-status-button"
+                                            onClick={handleSaveNotes}
+                                            disabled={isUpdatingNotes}
+                                        >
+                                            {isUpdatingNotes ? <CircularProgress size={20} /> : 'Сохранить'}
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={() => {
+                                                setCertificateNotes(certificate.notes || '');
+                                                setIsNotesChanged(false);
+                                            }}
+                                        >
+                                            Отмена
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

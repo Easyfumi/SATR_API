@@ -140,6 +140,32 @@ public class CertificateController {
         }
     }
 
+    @PutMapping("/{id}/registrar")
+    public ResponseEntity<?> updateCertificateRegistrar(
+            @PathVariable Long id,
+            @RequestBody CertificateRegistrarUpdateRequest request) {
+        try {
+            return ResponseEntity.ok(certificateService.updateCertificateRegistrar(id, request.getRegisteredByUserId()));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/notes")
+    public ResponseEntity<?> updateCertificateNotes(
+            @PathVariable Long id,
+            @RequestBody CertificateNotesUpdateRequest request) {
+        try {
+            return ResponseEntity.ok(certificateService.updateCertificateNotes(id, request.getNotes()));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/check-duplicates")
     public ResponseEntity<List<CertificateDuplicateInfo>> checkDuplicates(
             @Valid @RequestBody CertificateRequest request) {
