@@ -65,6 +65,8 @@ const TaskDetailsPage = () => {
     RECEIVED: 'Заявка получена',
     REGISTERED: 'Заявка зарегистрирована',
     DECISION_DONE: 'Решение по заявке готово',
+    PREPARING_LAYOUT: 'Подготовка макета',
+    DOCUMENT_VERIFICATION: 'Проверка документов',
     DOCUMENTS_WAITING: 'Ожидание документов',
     REJECTION: 'Отказ в проведении работ',
     CANCELLED: 'Аннулирована',

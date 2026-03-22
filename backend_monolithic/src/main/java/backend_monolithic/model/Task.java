@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import backend_monolithic.model.Representative;
 import backend_monolithic.model.enums.TaskStatus;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,6 +65,8 @@ public class Task {
     private Long assignedUserId;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(length = 64)
     private TaskStatus status;
 
     private LocalDateTime createdAt;

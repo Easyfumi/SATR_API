@@ -36,6 +36,8 @@ const DuplicateCheckModal = ({
         RECEIVED: 'Заявка получена',
         REGISTERED: 'Заявка зарегистрирована',
         DECISION_DONE: 'Решение по заявке готово',
+        PREPARING_LAYOUT: 'Подготовка макета',
+        DOCUMENT_VERIFICATION: 'Проверка документов',
         DOCUMENTS_WAITING: 'Ожидание документов',
         REJECTION: 'Отказ в проведении работ',
         CANCELLED: 'Аннулирована',
@@ -57,6 +59,8 @@ const DuplicateCheckModal = ({
             'RECEIVED': '#1976d2', // Синий
             'REGISTERED': '#2e7d32', // Зеленый
             'DECISION_DONE': '#ed6c02', // Оранжевый
+            'PREPARING_LAYOUT': '#7b1fa2', // Фиолетовый
+            'DOCUMENT_VERIFICATION': '#2e7d32', // Зеленый
             'DOCUMENTS_WAITING': '#ffb300', // Желтый
             'REJECTION': '#d32f2f', // Красный
             'CANCELLED': '#757575', // Серый

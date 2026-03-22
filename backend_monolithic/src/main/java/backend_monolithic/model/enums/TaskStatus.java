@@ -7,6 +7,8 @@ public enum TaskStatus {
     RECEIVED("Получена"),
     REGISTERED("Зарегистрирована"),
     DECISION_DONE("Решение подготовлено"),
+    PREPARING_LAYOUT("Подготовка макета"),
+    DOCUMENT_VERIFICATION("Проверка документов"),
     DOCUMENTS_WAITING("Ожидание документов"),
     REJECTION("Отказ"),
     CANCELLED("Аннулирована"),
