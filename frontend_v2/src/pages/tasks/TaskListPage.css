@@ -227,6 +227,31 @@
     justify-content: flex-end;
 }
 
+.task-top-line-wide .task-top-col-number {
+    flex: 0 0 28%;
+}
+
+.task-top-line-wide .task-top-col-assignee {
+    flex: 1 1 auto;
+}
+
+.task-top-line-wide .task-top-col-status {
+    flex: 0 0 auto;
+    min-width: 220px;
+    justify-content: flex-end;
+}
+
+.task-top-line-compact .task-top-col-number {
+    flex: 1 1 auto;
+}
+
+.task-top-line-compact .task-top-col-status {
+    flex: 0 0 auto;
+    min-width: 220px;
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
 .task-list-assignee {
     font-size: 0.9rem;
     color: #475569;
@@ -348,6 +373,10 @@
     grid-template-columns: minmax(0, 240px) minmax(0, 170px) minmax(0, 170px) minmax(0, 120px) minmax(0, 360px);
     gap: 12px;
     margin-bottom: 8px;
+}
+
+.info-grid-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .grid-item {
@@ -700,6 +729,11 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .task-top-line-wide .task-top-col-status,
+    .task-top-line-compact .task-top-col-status {
+        min-width: auto;
     }
     
     .task-status-section {

@@ -117,7 +117,7 @@ const MyDeclarationPage = () => {
                                 onClick={() => navigate(`/decl/${declaration.id}`)}
                             >
                                 <div className="task-card-header">
-                                    <div className="task-top-line">
+                                    <div className="task-top-line task-top-line-compact">
                                         <div className="task-top-col task-top-col-number">
                                             <div className={`registration-status ${declaration.number ? 'registered' : 'unregistered'}`}>
                                                 {declaration.number ? (
@@ -138,7 +138,7 @@ const MyDeclarationPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="info-grid">
+                                <div className="info-grid info-grid-four">
                                     <div className="grid-item">
                                         <div className="grid-label">Категория ТС</div>
                                         <div className="grid-value">{declaration.categories?.join(', ') || 'Не указана'}</div>

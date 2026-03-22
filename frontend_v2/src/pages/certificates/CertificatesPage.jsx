@@ -121,7 +121,7 @@ const CertificatesPage = () => {
                                 onClick={() => navigate(`/serts/${certificate.id}`)}
                             >
                                 <div className="task-card-header">
-                                    <div className="task-top-line">
+                                    <div className="task-top-line task-top-line-wide">
                                         <div className="task-top-col task-top-col-number">
                                             <div className={`registration-status ${certificate.number ? 'registered' : 'unregistered'}`}>
                                                 {certificate.number ? (
@@ -153,7 +153,7 @@ const CertificatesPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="info-grid">
+                                <div className="info-grid info-grid-four">
                                     <div className="grid-item">
                                         <div className="grid-label">Категория ТС</div>
                                         <div className="grid-value">{certificate.categories?.join(', ') || 'Не указана'}</div>
