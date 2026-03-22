@@ -3,12 +3,16 @@ package backend_monolithic.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import backend_monolithic.model.User;
+import backend_monolithic.model.dto.ProfileAnalyticsResponse;
 import backend_monolithic.model.dto.UserInfo;
 import backend_monolithic.model.enums.Role;
+import backend_monolithic.service.ProfileAnalyticsService;
 import backend_monolithic.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final ProfileAnalyticsService profileAnalyticsService;
 
     @GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(
@@ -84,6 +89,15 @@ public class UserController {
                 .map(UserInfo::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(expertInfos);
+    }
+
+    @GetMapping("/profile/analytics")
+    public ResponseEntity<ProfileAnalyticsResponse> getProfileAnalytics(
+            @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        ProfileAnalyticsResponse response = profileAnalyticsService.getMyAnalytics(jwt, startDate, endDate);
+        return ResponseEntity.ok(response);
     }
 
     // DTO для запроса

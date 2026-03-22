@@ -74,6 +74,7 @@ public class Task {
 
     private LocalDateTime createdAt;
     private LocalDate decisionAt;
+    private LocalDate completedAt;
 
     // Убираем TaskContract, так как теперь связь прямая
     // @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

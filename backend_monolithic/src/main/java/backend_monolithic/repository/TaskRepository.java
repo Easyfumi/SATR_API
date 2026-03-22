@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,4 +61,30 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
 
     // Находим задачи по диапазону дат создания
     List<Task> findByCreatedAtBetween(java.time.LocalDateTime start, java.time.LocalDateTime end);
+
+    long countByAssignedUserIdAndStatusNotIn(Long assignedUserId, Collection<TaskStatus> statuses);
+
+    long countByAssignedUserIdAndStatusAndCompletedAtBetween(
+            Long assignedUserId,
+            TaskStatus status,
+            LocalDate start,
+            LocalDate end
+    );
+
+    @Query("""
+            select count(t)
+            from Task t
+            where t.assignedUserId = :assignedUserId
+              and t.status = :status
+              and (
+                    (t.completedAt between :start and :end)
+                    or (t.completedAt is null and t.decisionAt between :start and :end)
+              )
+            """)
+    long countCompletedInPeriod(
+            @Param("assignedUserId") Long assignedUserId,
+            @Param("status") TaskStatus status,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }

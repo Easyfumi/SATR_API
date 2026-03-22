@@ -29,6 +29,7 @@ public class TaskResponse {
     private String representative;
     private LocalDate applicationDate;
     private LocalDate decisionAt;
+    private LocalDate completedAt;
     private LocalDateTime createdAt;
     private String status;
     private String createdBy;

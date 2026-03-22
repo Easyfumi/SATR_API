@@ -3,6 +3,15 @@ import api from './api';
 export const getProfile = async () => {
     return api.get('/users/profile');
   };
+
+export const getProfileAnalytics = async (startDate, endDate) => {
+    return api.get('/users/profile/analytics', {
+      params: {
+        startDate,
+        endDate
+      }
+    });
+  };
   
   export const getAllUsers = async () => {
     return api.get('/users/all');

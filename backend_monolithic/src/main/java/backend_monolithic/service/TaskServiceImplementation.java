@@ -176,6 +176,7 @@ public class TaskServiceImplementation implements TaskService {
 
         if (newStatus == TaskStatus.COMPLETED) {
             task.setDecisionAt(LocalDate.now());
+            task.setCompletedAt(LocalDate.now());
         }
 
         Task updatedTask = taskRepository.save(task);
@@ -372,6 +373,7 @@ public class TaskServiceImplementation implements TaskService {
         response.setRepresentative(task.getRepresentative() != null ? task.getRepresentative().getName() : null);
         response.setApplicationDate(task.getApplicationDate());
         response.setDecisionAt(task.getDecisionAt());
+        response.setCompletedAt(task.getCompletedAt());
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
         response.setAssignedUserId(task.getAssignedUserId());
