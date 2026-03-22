@@ -86,7 +86,7 @@ public class EmailService {
     }
 
     public void sendTaskDecisionNotification(String recipientEmail, String recipientName,
-                                            String taskNumber, java.time.LocalDate applicationDate,
+                                            Long taskId, String taskNumber, java.time.LocalDate applicationDate,
                                             String applicantName) {
         try {
             log.debug("Начало отправки email о решении: recipient={}, taskNumber={}", recipientEmail, taskNumber);
@@ -98,7 +98,7 @@ public class EmailService {
             helper.setTo(recipientEmail);
             helper.setSubject("Решение по заявке готово");
             
-            String emailContent = buildTaskDecisionEmailContent(recipientName, taskNumber, applicationDate, applicantName);
+            String emailContent = buildTaskDecisionEmailContent(recipientName, taskId, taskNumber, applicationDate, applicantName);
             helper.setText(emailContent, true);
 
             log.debug("Отправка email через SMTP: recipient={}", recipientEmail);
@@ -116,10 +116,11 @@ public class EmailService {
         }
     }
 
-    private String buildTaskDecisionEmailContent(String recipientName, String taskNumber,
+    private String buildTaskDecisionEmailContent(String recipientName, Long taskId, String taskNumber,
                                                  java.time.LocalDate applicationDate, String applicantName) {
         String formattedDate = applicationDate != null ?
             applicationDate.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy")) : "Не указана";
+        String taskLink = taskId != null ? "http://91.184.244.246/tasks/" + taskId : null;
         
         return "<!DOCTYPE html>" +
                 "<html>" +
@@ -152,7 +153,9 @@ public class EmailService {
                 "<p><span class=\"info-label\">Дата заявки:</span><span class=\"info-value\">" + formattedDate + "</span></p>" +
                 "<p><span class=\"info-label\">Наименование заявителя:</span><span class=\"info-value\">" + applicantName + "</span></p>" +
                 "</div>" +
-                "<p>Пожалуйста, проверьте систему для получения дополнительной информации.</p>" +
+                (taskLink != null
+                        ? "<p>Дополнительную информацию вы можете получить по ссылке <a href=\"" + taskLink + "\">" + taskLink + "</a>.</p>"
+                        : "<p>Дополнительную информацию вы можете получить в системе.</p>") +
                 "</div>" +
                 "<div class=\"footer\">" +
                 "<p>Это автоматическое сообщение. Пожалуйста, не отвечайте на это письмо.</p>" +

@@ -111,6 +111,7 @@ public class NotificationConsumer {
             emailService.sendTaskDecisionNotification(
                     notification.getRecipientEmail(),
                     notification.getRecipientName(),
+                    notification.getTaskId(),
                     notification.getTaskNumber(),
                     notification.getApplicationDate(),
                     notification.getApplicantName()
