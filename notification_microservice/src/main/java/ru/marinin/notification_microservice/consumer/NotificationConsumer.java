@@ -39,12 +39,7 @@ public class NotificationConsumer {
             if (messageMap.containsKey("message")) {
                 TaskAssignmentNotification notification = objectMapper.convertValue(messageValue, TaskAssignmentNotification.class);
                 consumeTaskAssignmentNotification(notification, acknowledgment);
-            } 
-            // Проверяем наличие поля "applicationDate" для TaskDecisionNotification
-            else if (messageMap.containsKey("applicationDate")) {
-                TaskDecisionNotification notification = objectMapper.convertValue(messageValue, TaskDecisionNotification.class);
-                consumeTaskDecisionNotification(notification, acknowledgment);
-            } 
+            }
             // Проверяем наличие поля "newUserEmail" для UserRegistrationNotification
             else if (messageMap.containsKey("newUserEmail")) {
                 UserRegistrationNotification notification = objectMapper.convertValue(messageValue, UserRegistrationNotification.class);
@@ -61,6 +56,11 @@ public class NotificationConsumer {
                 CertificateRegisteredNotification notification =
                         objectMapper.convertValue(messageValue, CertificateRegisteredNotification.class);
                 consumeCertificateRegisteredNotification(notification, acknowledgment);
+            }
+            // TaskDecisionNotification: проверяем специфичные поля, чтобы не перехватывать другие уведомления
+            else if (messageMap.containsKey("taskNumber") && messageMap.containsKey("applicationDate")) {
+                TaskDecisionNotification notification = objectMapper.convertValue(messageValue, TaskDecisionNotification.class);
+                consumeTaskDecisionNotification(notification, acknowledgment);
             } else {
                 log.error("Неизвестный тип уведомления: {}", messageMap);
                 acknowledgment.acknowledge(); // Подтверждаем, чтобы не зациклиться
