@@ -52,6 +52,7 @@ public class Task {
     private String mark;
     private String typeName;
     private String processType;
+    private LocalDate processExpiryDate;
     private String previousNumber;
     private String previousProcessType;
 

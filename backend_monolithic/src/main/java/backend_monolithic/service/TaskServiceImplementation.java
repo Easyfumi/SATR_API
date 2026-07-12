@@ -137,6 +137,7 @@ public class TaskServiceImplementation implements TaskService {
         task.setPreviousProcessType(request.getPreviousProcessType());
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
+        task.setProcessExpiryDate(request.getProcessExpiryDate());
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
         task.setAssignedUserId(request.getAssignedUserId());
 
@@ -327,6 +328,7 @@ public class TaskServiceImplementation implements TaskService {
         task.setPreviousProcessType(request.getPreviousProcessType());
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
+        task.setProcessExpiryDate(request.getProcessExpiryDate());
         task.setRepresentative(getOrCreateRepresentative(request.getRepresentativeName()));
         task.setAssignedUserId(request.getAssignedUserId());
         return task;
@@ -349,6 +351,7 @@ public class TaskServiceImplementation implements TaskService {
         task.setPreviousProcessType(request.getPreviousProcessType());
         task.setPreviousNumber(request.getPreviousNumber());
         task.setProcessType(request.getProcessType());
+        task.setProcessExpiryDate(request.getProcessExpiryDate());
         if (request.getRepresentativeName() != null && !request.getRepresentativeName().trim().isEmpty()) {
             task.setRepresentative(new Representative(request.getRepresentativeName()));
         }
@@ -368,6 +371,7 @@ public class TaskServiceImplementation implements TaskService {
         response.setMark(task.getMark());
         response.setTypeName(task.getTypeName());
         response.setProcessType(task.getProcessType());
+        response.setProcessExpiryDate(task.getProcessExpiryDate());
         response.setPreviousProcessType(task.getPreviousProcessType());
         response.setPreviousNumber(task.getPreviousNumber());
         response.setRepresentative(task.getRepresentative() != null ? task.getRepresentative().getName() : null);

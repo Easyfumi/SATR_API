@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { canViewTasksAndContracts } from '../../utils/roleUtils';
 import AccessDenied from '../../components/AccessDenied';
 import './TaskDetailsPage.css';
+import { formatProcessTypeDisplay } from '../../constants/taskProcessOptions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   TextField,
@@ -717,7 +718,9 @@ const TaskDetailsPage = () => {
 
             <div className="task-row">
               <span className="task-label">Процедура:</span>
-              <span className="task-value">{task.processType || 'Не указана'}</span>
+              <span className="task-value">
+                {formatProcessTypeDisplay(task.processType, task.processExpiryDate) || 'Не указана'}
+              </span>
             </div>
 
             <div className="task-row">

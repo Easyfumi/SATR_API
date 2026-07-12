@@ -19,6 +19,11 @@ import {
     Autocomplete
 } from '@mui/material';
 import DuplicateCheckModal from '../../pages/tasks/DuplicateCheckModal';
+import {
+    PROCESS_OPTIONS,
+    requiresProcessExpiryDate,
+    formatProcessTypeDisplay
+} from '../../constants/taskProcessOptions';
 
 const CreateTaskPage = () => {
     const { user } = useAuth();
@@ -48,6 +53,7 @@ const CreateTaskPage = () => {
         mark: '',
         typeName: '',
         processType: '',
+        processExpiryDate: '',
         procedureType: '', // Новое поле
         previousNumber: '', // Новое поле
         representativeName: '',
@@ -55,11 +61,15 @@ const CreateTaskPage = () => {
         // Убрано contractId - договор будет привязываться позже
     });
 
-    const processOptions = [
-        'со сроком действия до 3-х лет',
-        'со сроком действия до 1-ого года в соответствии с п. 35 ТР ТС',
-        'на малую партию транспортных средств (шасси) в соответствии с п. 35 ТР ТС'
-    ];
+    const processOptions = PROCESS_OPTIONS;
+
+    const handleProcessTypeChange = (value) => {
+        setFormData({
+            ...formData,
+            processType: value,
+            processExpiryDate: requiresProcessExpiryDate(value) ? formData.processExpiryDate : ''
+        });
+    };
 
     const getCategoryLabel = (category) => {
         const labels = {
@@ -92,6 +102,12 @@ const CreateTaskPage = () => {
 
     const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (requiresProcessExpiryDate(formData.processType) && !formData.processExpiryDate) {
+        alert('Укажите дату старого срока действия');
+        return;
+    }
+
     setIsCheckingDuplicates(true);
 
     try {
@@ -103,6 +119,9 @@ const CreateTaskPage = () => {
             mark: formData.mark,
             typeName: formData.typeName,
             processType: formData.processType,
+            processExpiryDate: requiresProcessExpiryDate(formData.processType)
+                ? formData.processExpiryDate
+                : null,
             // Если установлена галочка "отсутствует", отправляем пустую строку
             representativeName: representativeAbsent ? '' : formData.representativeName,
             assignedUserId: formData.assignedUserId,
@@ -590,11 +609,13 @@ const CreateTaskPage = () => {
                         <FormControl fullWidth>
                             <Select
                                 value={formData.processType}
-                                onChange={(e) => setFormData({ ...formData, processType: e.target.value })}
+                                onChange={(e) => handleProcessTypeChange(e.target.value)}
                                 displayEmpty
                                 renderValue={(selected) => (
                                     <div className="selected-process">
-                                        {selected || <span className="placeholder-text">Выберите процедуру</span>}
+                                        {selected
+                                            ? formatProcessTypeDisplay(selected, formData.processExpiryDate)
+                                            : <span className="placeholder-text">Выберите процедуру</span>}
                                     </div>
                                 )}
                                 MenuProps={{
@@ -625,6 +646,24 @@ const CreateTaskPage = () => {
                             </Select>
                         </FormControl>
                     </div>
+
+                    {requiresProcessExpiryDate(formData.processType) && (
+                        <div className="form-row">
+                            <label className="form-label">Дата старого срока действия:</label>
+                            <TextField
+                                fullWidth
+                                type="date"
+                                value={formData.processExpiryDate}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    processExpiryDate: e.target.value
+                                })}
+                                required
+                                variant="outlined"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </div>
+                    )}
 
                     {/* Поле выбора процедуры */}
                     <div className="form-row">

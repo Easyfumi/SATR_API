@@ -2,6 +2,7 @@ package backend_monolithic.model.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -13,6 +14,7 @@ public class TaskRequest {
     private String mark;
     private String typeName;
     private String processType;
+    private LocalDate processExpiryDate;
     private String previousNumber;
     private String previousProcessType;
     private String representativeName;

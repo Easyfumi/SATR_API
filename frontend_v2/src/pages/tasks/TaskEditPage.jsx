@@ -5,6 +5,11 @@ import { useAuth } from '../../context/AuthContext';
 import { canModifyTasks } from '../../utils/roleUtils';
 import AccessDenied from '../../components/AccessDenied';
 import './TaskEditPage.css';
+import {
+    PROCESS_OPTIONS,
+    requiresProcessExpiryDate,
+    formatProcessTypeDisplay
+} from '../../constants/taskProcessOptions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -46,6 +51,7 @@ const TaskEditPage = () => {
         mark: '',
         typeName: '',
         processType: '',
+        processExpiryDate: '',
         procedureType: '',
         previousNumber: '',
         representativeName: '',
@@ -95,11 +101,7 @@ const TaskEditPage = () => {
         POSTPAID: 'Постоплата'
     };
 
-    const processOptions = [
-        'со сроком действия до 3-х лет',
-        'со сроком действия до 1-ого года в соответствии с п. 35 ТР ТС',
-        'на малую партию транспортных средств (шасси) в соответствии с п. 35 ТР ТС'
-    ];
+    const processOptions = PROCESS_OPTIONS;
 
     const procedureOptions = [
         'Оформление нового',
@@ -214,6 +216,7 @@ const TaskEditPage = () => {
                     mark: taskData.mark || '',
                     typeName: taskData.typeName || '',
                     processType: taskData.processType || '',
+                    processExpiryDate: taskData.processExpiryDate || '',
                     procedureType: taskData.previousProcessType || 'Оформление нового',
                     previousNumber: taskData.previousNumber || '',
                     representativeName: taskData.representative || '',
@@ -276,6 +279,14 @@ const TaskEditPage = () => {
         setFormData(prev => ({
             ...prev,
             [field]: event.target.value
+        }));
+    };
+
+    const handleProcessTypeChange = (value) => {
+        setFormData(prev => ({
+            ...prev,
+            processType: value,
+            processExpiryDate: requiresProcessExpiryDate(value) ? prev.processExpiryDate : ''
         }));
     };
 
@@ -406,6 +417,11 @@ const TaskEditPage = () => {
 
     // Сохранение - ИСПРАВЛЕННАЯ ЛОГИКА
 const handleSave = async () => {
+    if (requiresProcessExpiryDate(formData.processType) && !formData.processExpiryDate) {
+        alert('Укажите дату старого срока действия');
+        return;
+    }
+
     setSaving(true);
     try {
         const request = {
@@ -416,6 +432,9 @@ const handleSave = async () => {
             mark: formData.mark,
             typeName: formData.typeName,
             processType: formData.processType,
+            processExpiryDate: requiresProcessExpiryDate(formData.processType)
+                ? formData.processExpiryDate
+                : null,
             representativeName: representativeAbsent ? '' : formData.representativeName,
             assignedUserId: formData.assignedUserId,
             previousProcessType: formData.procedureType,
@@ -576,11 +595,13 @@ const handleSave = async () => {
                             <FormControl fullWidth className="edit-form-control" variant="outlined">
                                 <Select
                                     value={formData.processType}
-                                    onChange={handleInputChange('processType')}
+                                    onChange={(e) => handleProcessTypeChange(e.target.value)}
                                     displayEmpty
                                     renderValue={(selected) => (
                                         <div className="selected-process">
-                                            {selected || <span className="placeholder-text">Выберите процедуру</span>}
+                                            {selected
+                                                ? formatProcessTypeDisplay(selected, formData.processExpiryDate)
+                                                : <span className="placeholder-text">Выберите процедуру</span>}
                                         </div>
                                     )}
                                 >
@@ -598,6 +619,23 @@ const handleSave = async () => {
                                 </Select>
                             </FormControl>
                         </div>
+
+                        {requiresProcessExpiryDate(formData.processType) && (
+                            <div className="task-row">
+                                <span className="task-label">Дата старого срока действия:</span>
+                                <FormControl fullWidth className="edit-form-control">
+                                    <TextField
+                                        type="date"
+                                        value={formData.processExpiryDate}
+                                        onChange={handleInputChange('processExpiryDate')}
+                                        variant="outlined"
+                                        className="bordered-field"
+                                        required
+                                        InputLabelProps={{ shrink: true }}
+                                    />
+                                </FormControl>
+                            </div>
+                        )}
 
                         <div className="task-row">
                             <span className="task-label">Тип процедуры:</span>

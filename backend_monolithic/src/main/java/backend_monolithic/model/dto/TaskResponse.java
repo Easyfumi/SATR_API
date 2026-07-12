@@ -24,6 +24,7 @@ public class TaskResponse {
     private String mark;
     private String typeName;
     private String processType;
+    private LocalDate processExpiryDate;
     private String previousProcessType;
     private String previousNumber;
     private String representative;
