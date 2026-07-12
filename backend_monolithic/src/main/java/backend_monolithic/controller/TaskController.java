@@ -121,6 +121,23 @@ public class TaskController {
         }
     }
 
+    @PutMapping("/{id}/document-number")
+    public ResponseEntity<?> setDocumentNumber(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskDocumentNumberRequest request) {
+        try {
+            TaskResponse response = taskService.setDocumentNumber(id, request.getDocumentNumber());
+            return ResponseEntity.ok(response);
+        } catch (DuplicateNumberException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (TaskNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}/status")  // Changed from PATCH to PUT
     public ResponseEntity<?> updateStatus(
             @PathVariable Long id,

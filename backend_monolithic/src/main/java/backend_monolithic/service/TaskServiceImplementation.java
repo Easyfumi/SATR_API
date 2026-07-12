@@ -162,21 +162,16 @@ public class TaskServiceImplementation implements TaskService {
 
         validateStatusTransition(task.getStatus(), newStatus);
 
+        assignDocumentNumberIfProvided(task, taskId, documentNumber);
+
         if (newStatus == TaskStatus.PROJECT) {
-            String normalizedDocumentNumber = documentNumber != null ? documentNumber.trim() : "";
-            if (normalizedDocumentNumber.isBlank()) {
-                throw new BusinessException("Номер документа обязателен для статуса 'Проект'");
-            }
-            if (taskRepository.existsByDocumentNumberAndIdNot(normalizedDocumentNumber, taskId)) {
-                throw new DuplicateNumberException("Номер документа " + normalizedDocumentNumber + " уже существует");
-            }
-            task.setDocumentNumber(normalizedDocumentNumber);
+            requireDocumentNumber(task, "статуса 'Проект'");
         }
 
         task.setStatus(newStatus);
 
         if (newStatus == TaskStatus.COMPLETED) {
-            task.setDecisionAt(LocalDate.now());
+            requireDocumentNumber(task, "завершения заявки");
             task.setCompletedAt(LocalDate.now());
         }
 
@@ -238,6 +233,27 @@ public class TaskServiceImplementation implements TaskService {
         }
         
         return mapEntityToResponse(task);
+    }
+
+    @Override
+    @Transactional
+    public TaskResponse setDocumentNumber(Long taskId, String documentNumber) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
+
+        if (task.getDecisionAt() == null) {
+            throw new BusinessException("Номер документа можно указать только после установки даты решения");
+        }
+
+        if (task.getDocumentNumber() != null && !task.getDocumentNumber().isBlank()) {
+            throw new BusinessException("Номер документа уже назначен");
+        }
+
+        assignDocumentNumberIfProvided(task, taskId, documentNumber);
+        requireDocumentNumber(task, "сохранения номера документа");
+
+        Task updatedTask = taskRepository.save(task);
+        return mapEntityToResponse(updatedTask);
     }
 
     @Override
@@ -482,6 +498,25 @@ public class TaskServiceImplementation implements TaskService {
     private void validateStatusTransition(TaskStatus currentStatus, TaskStatus newStatus) {
         if (currentStatus == TaskStatus.COMPLETED) {
             throw new BusinessException("Нельзя изменить статус завершенной задачи");
+        }
+    }
+
+    private void assignDocumentNumberIfProvided(Task task, Long taskId, String documentNumber) {
+        if (documentNumber == null || documentNumber.isBlank()) {
+            return;
+        }
+
+        String normalizedDocumentNumber = documentNumber.trim();
+        if (taskRepository.existsByDocumentNumberAndIdNot(normalizedDocumentNumber, taskId)) {
+            throw new DuplicateNumberException("Номер документа " + normalizedDocumentNumber + " уже существует");
+        }
+
+        task.setDocumentNumber(normalizedDocumentNumber);
+    }
+
+    private void requireDocumentNumber(Task task, String actionDescription) {
+        if (task.getDocumentNumber() == null || task.getDocumentNumber().isBlank()) {
+            throw new BusinessException("Номер документа обязателен для " + actionDescription);
         }
     }
 

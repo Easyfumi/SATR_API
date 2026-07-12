@@ -16,6 +16,7 @@ public interface TaskService {
     TaskResponse updateStatus(Long taskId, TaskStatus newStatus, String documentNumber);
     TaskResponse setTaskNumber(Long taskId, String number, LocalDate applicationDate);
     TaskResponse setDecisionDate(Long taskId, LocalDate decisionDate);
+    TaskResponse setDocumentNumber(Long taskId, String documentNumber);
     TaskResponse updateTaskContract(Long taskId, Long contractId);
     TaskResponse updateTaskExpert(Long taskId, Long assignedUserId);
     void deleteTask(Long taskId);
