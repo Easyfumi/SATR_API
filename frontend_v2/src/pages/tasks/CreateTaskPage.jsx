@@ -134,10 +134,10 @@ const CreateTaskPage = () => {
         // Сохраняем request на случай дубликатов
         setPendingRequest(request);
 
-        await api.post('/tasks', request);
+        const response = await api.post('/tasks', request);
 
-        // Если успешно - переходим к списку заявок
-        navigate('/tasks');
+        // Если успешно - переходим к созданной заявке
+        navigate(`/tasks/${response.data.id}`);
     } catch (error) {
         if (error.response && error.response.status === 409) {
             // Найдены дубликаты
@@ -156,11 +156,11 @@ const CreateTaskPage = () => {
         if (!pendingRequest) return;
 
         try {
-            await api.post('/tasks/create', pendingRequest);
+            const response = await api.post('/tasks/create', pendingRequest);
             setShowDuplicateModal(false);
             setPendingRequest(null);
             setDuplicates([]);
-            navigate('/tasks');
+            navigate(`/tasks/${response.data.id}`);
         } catch (error) {
             console.error('Error force creating task:', error);
             alert('Ошибка при создании заявки: ' + (error.response?.data?.message || error.message));

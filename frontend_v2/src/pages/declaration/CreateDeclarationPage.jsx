@@ -181,8 +181,8 @@ const CreateDeclarationPage = () => {
                 representativeName: representativeAbsent ? '' : formData.representativeName
             };
             setPendingRequest(request);
-            await api.post('/declarations', request);
-            navigate('/decl');
+            const response = await api.post('/declarations', request);
+            navigate(`/decl/${response.data.id}`);
         } catch (error) {
             if (error.response?.status === 409) {
                 setDuplicates(error.response.data.duplicates || []);
@@ -197,9 +197,9 @@ const CreateDeclarationPage = () => {
 
     const handleForceCreate = async () => {
         if (!pendingRequest) return;
-        await api.post('/declarations/create', pendingRequest);
+        const response = await api.post('/declarations/create', pendingRequest);
         setShowDuplicateModal(false);
-        navigate('/decl');
+        navigate(`/decl/${response.data.id}`);
     };
 
     if (!canModifyTasks(user)) {

@@ -181,8 +181,8 @@ const CreateCertificatePage = () => {
                 representativeName: representativeAbsent ? '' : formData.representativeName
             };
             setPendingRequest(request);
-            await api.post('/certificates', request);
-            navigate('/serts');
+            const response = await api.post('/certificates', request);
+            navigate(`/serts/${response.data.id}`);
         } catch (error) {
             if (error.response?.status === 409) {
                 setDuplicates(error.response.data.duplicates || []);
@@ -197,9 +197,9 @@ const CreateCertificatePage = () => {
 
     const handleForceCreate = async () => {
         if (!pendingRequest) return;
-        await api.post('/certificates/create', pendingRequest);
+        const response = await api.post('/certificates/create', pendingRequest);
         setShowDuplicateModal(false);
-        navigate('/serts');
+        navigate(`/serts/${response.data.id}`);
     };
 
     if (!canModifyTasks(user)) {
