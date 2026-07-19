@@ -627,13 +627,26 @@ const TaskDetailsPage = () => {
                       size="small"
                       value={newNumber}
                       onChange={(e) => {
-                        setNewNumber(e.target.value);
+                        setNewNumber(e.target.value.replace(/\D/g, ''));
                         setIsNumberChanged(true);
                       }}
                       placeholder="Введите номер"
                       variant="outlined"
                       className="task-number-field"
-                      inputProps={{ className: 'task-number-input' }}
+                      slotProps={{
+                        htmlInput: {
+                          className: 'task-number-input',
+                          inputMode: 'numeric',
+                          pattern: '[0-9]*'
+                        },
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              {task.docType === 'ОТТС' ? 'Е' : 'К'}
+                            </InputAdornment>
+                          )
+                        }
+                      }}
                       disabled={isUpdating}
                     />
                     <span className="task-number-separator">от</span>

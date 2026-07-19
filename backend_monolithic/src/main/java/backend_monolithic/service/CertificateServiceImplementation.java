@@ -111,8 +111,9 @@ public class CertificateServiceImplementation implements CertificateService {
     @Override
     @Transactional
     public CertificateResponse setCertificateNumber(Long certificateId, String number, LocalDate applicationDate) {
-        if (certificateRepository.existsByNumber(number)) {
-            throw new DuplicateNumberException("Номер " + number + " уже существует");
+        String applicationNumber = number + "С";
+        if (certificateRepository.existsByNumber(applicationNumber)) {
+            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
         }
 
         Certificate certificate = certificateRepository.findById(certificateId)
@@ -122,7 +123,7 @@ public class CertificateServiceImplementation implements CertificateService {
             throw new BusinessException("Номер уже назначен");
         }
 
-        certificate.setNumber(number);
+        certificate.setNumber(applicationNumber);
         certificate.setApplicationDate(applicationDate);
         certificate.setStatus(CertificateStatus.JOURNAL_REGISTERED);
         return mapEntityToResponse(certificateRepository.save(certificate));

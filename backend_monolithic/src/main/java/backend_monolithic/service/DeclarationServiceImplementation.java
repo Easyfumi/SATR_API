@@ -109,8 +109,9 @@ public class DeclarationServiceImplementation implements DeclarationService {
     @Override
     @Transactional
     public DeclarationResponse setDeclarationNumber(Long declarationId, String number, LocalDate applicationDate) {
-        if (declarationRepository.existsByNumber(number)) {
-            throw new DuplicateNumberException("Номер " + number + " уже существует");
+        String applicationNumber = number + "Д";
+        if (declarationRepository.existsByNumber(applicationNumber)) {
+            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
         }
 
         Declaration declaration = declarationRepository.findById(declarationId)
@@ -120,7 +121,7 @@ public class DeclarationServiceImplementation implements DeclarationService {
             throw new BusinessException("Номер уже назначен");
         }
 
-        declaration.setNumber(number);
+        declaration.setNumber(applicationNumber);
         declaration.setApplicationDate(applicationDate);
         declaration.setStatus(DeclarationStatus.JOURNAL_REGISTERED);
         return mapEntityToResponse(declarationRepository.save(declaration));

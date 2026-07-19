@@ -182,10 +182,6 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     @Transactional
     public TaskResponse setTaskNumber(Long taskId, String number, LocalDate applicationDate) {
-        if (taskRepository.existsByNumber(number)) {
-            throw new DuplicateNumberException("Номер " + number + " уже существует");
-        }
-
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
 
@@ -193,7 +189,18 @@ public class TaskServiceImplementation implements TaskService {
             throw new BusinessException("Номер уже назначен");
         }
 
-        task.setNumber(number);
+        String suffix = switch (task.getDocType()) {
+            case "ОТТС" -> "Е";
+            case "ОТШ" -> "К";
+            default -> throw new BusinessException("Неизвестный тип одобрения");
+        };
+        String applicationNumber = number + suffix;
+
+        if (taskRepository.existsByNumber(applicationNumber)) {
+            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
+        }
+
+        task.setNumber(applicationNumber);
         task.setApplicationDate(applicationDate);
         task.setStatus(TaskStatus.REGISTERED);
         task = taskRepository.save(task);

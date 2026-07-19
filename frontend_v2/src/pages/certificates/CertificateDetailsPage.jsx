@@ -5,6 +5,7 @@ import {
     Button,
     CircularProgress,
     FormControl,
+    InputAdornment,
     Menu,
     MenuItem,
     Select,
@@ -372,8 +373,14 @@ const CertificateDetailsPage = () => {
                                         <TextField
                                             size="small"
                                             value={newNumber}
-                                            onChange={(e) => setNewNumber(e.target.value)}
+                                            onChange={(e) => setNewNumber(e.target.value.replace(/\D/g, ''))}
                                             placeholder="Введите номер"
+                                            slotProps={{
+                                                htmlInput: { inputMode: 'numeric', pattern: '[0-9]*' },
+                                                input: {
+                                                    endAdornment: <InputAdornment position="end">С</InputAdornment>
+                                                }
+                                            }}
                                         />
                                         <span className="task-number-separator">от</span>
                                         <div className="modern-date-field">
