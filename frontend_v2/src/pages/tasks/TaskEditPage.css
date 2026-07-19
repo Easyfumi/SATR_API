@@ -199,3 +199,50 @@
 .contract-display {
   width: 100%;
 }
+
+.decision-file-edit-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.decision-file-edit-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.decision-file-edit-info h3 {
+  margin: 0 0 6px;
+}
+
+.decision-file-edit-name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.decision-file-edit-meta {
+  margin-top: 4px;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.decision-file-edit-card .no-contract {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.decision-file-edit-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .decision-file-edit-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

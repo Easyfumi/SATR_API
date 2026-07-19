@@ -49,6 +49,16 @@ public class ApplicationConfiguration {
                         
                         // Получение списка экспертов - вспомогательный эндпоинт для EXPERT, ACCOUNTANT, DIRECTOR
                         .requestMatchers("/api/users/experts").hasAnyAuthority("EXPERT", "ACCOUNTANT", "DIRECTOR")
+
+                        // Файл решения по заявке: изменение только для экспертов и руководителей
+                        .requestMatchers(HttpMethod.POST, "/tasks/{id}/decision-file")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.DELETE, "/tasks/{id}/decision-file")
+                                .hasAnyAuthority("EXPERT", "DIRECTOR")
+                        .requestMatchers(HttpMethod.GET,
+                                "/tasks/{id}/decision-file",
+                                "/tasks/{id}/decision-file/preview")
+                                .hasAnyAuthority("EXPERT", "ACCOUNTANT", "DIRECTOR", "REGISTRAR")
                         
                         // Просмотр заявок (tasks) - все авторизованные кроме EMPTY
                         .requestMatchers(HttpMethod.GET, "/api/tasks", "/api/tasks/{id}", "/api/tasks/search", "/api/tasks/my")

@@ -374,4 +374,72 @@ public class EmailService {
                 "</body>" +
                 "</html>";
     }
+
+    public void sendTaskDocumentNumberAssignedNotification(
+            String recipientEmail,
+            String recipientName,
+            Long taskId,
+            String applicationNumber,
+            String documentNumber,
+            String docType,
+            String executorName) {
+        String documentType = "ОТШ".equals(docType) ? "ОТШ" : "ОТТС";
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail, senderName);
+            helper.setTo(recipientEmail);
+            helper.setSubject("Присвоен номер " + documentType);
+            helper.setText(buildTaskDocumentNumberAssignedEmailContent(
+                    recipientName,
+                    taskId,
+                    applicationNumber,
+                    documentNumber,
+                    documentType,
+                    executorName
+            ), true);
+
+            mailSender.send(mimeMessage);
+            log.info("Email о присвоении номера {} отправлен: recipient={}, documentNumber={}",
+                    documentType, recipientEmail, documentNumber);
+        } catch (MessagingException e) {
+            log.error("Ошибка отправки email о присвоении номера {}: recipient={}, documentNumber={}",
+                    documentType, recipientEmail, documentNumber, e);
+            throw new RuntimeException("Не удалось отправить email о присвоении номера " + documentType, e);
+        } catch (Exception e) {
+            log.error("Неожиданная ошибка отправки email о присвоении номера {}: recipient={}, documentNumber={}",
+                    documentType, recipientEmail, documentNumber, e);
+            throw new RuntimeException("Не удалось отправить email о присвоении номера " + documentType, e);
+        }
+    }
+
+    private String buildTaskDocumentNumberAssignedEmailContent(
+            String recipientName,
+            Long taskId,
+            String applicationNumber,
+            String documentNumber,
+            String documentType,
+            String executorName) {
+        String taskLink = taskId != null ? "http://91.184.244.246/tasks/" + taskId : null;
+        String greeting = recipientName != null && !recipientName.isBlank()
+                ? "Здравствуйте, " + recipientName + "!"
+                : "Здравствуйте!";
+
+        return "<!DOCTYPE html>" +
+                "<html>" +
+                "<head><meta charset=\"UTF-8\"></head>" +
+                "<body style=\"font-family: Arial, sans-serif; color:#333;\">" +
+                "<h2>Присвоен номер " + documentType + "</h2>" +
+                "<p>" + greeting + "</p>" +
+                "<p><strong>Номер заявки: " + applicationNumber + ".</strong></p>" +
+                "<p><strong>Присвоенный номер " + documentType + ": " + documentNumber + ".</strong></p>" +
+                "<p><strong>Исполнитель: " + executorName + ".</strong></p>" +
+                (taskLink != null
+                        ? "<p>Заявка доступна по ссылке <a href=\"" + taskLink + "\">" + taskLink + "</a>.</p>"
+                        : "") +
+                "<p>Это автоматическое сообщение. Пожалуйста, не отвечайте на него.</p>" +
+                "</body>" +
+                "</html>";
+    }
 }

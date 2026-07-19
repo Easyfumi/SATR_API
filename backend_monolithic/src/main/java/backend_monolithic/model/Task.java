@@ -75,6 +75,11 @@ public class Task {
     private LocalDateTime createdAt;
     private LocalDate decisionAt;
     private LocalDate completedAt;
+    private String decisionFileOriginalName;
+    private String decisionFileStoredName;
+    private String decisionFileContentType;
+    private Long decisionFileSize;
+    private LocalDateTime decisionFileUploadedAt;
 
     // Убираем TaskContract, так как теперь связь прямая
     // @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

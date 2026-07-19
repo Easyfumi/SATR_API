@@ -36,6 +36,7 @@ public class TaskResponse {
     private String createdBy;
     private Long assignedUserId;
     private UserInfo assignedUser;
+    private DecisionFileInfo decisionFile;
 
     // ТЕПЕРЬ ТОЛЬКО ОДИН ДОГОВОР вместо списка!
     private ContractSimple contract;

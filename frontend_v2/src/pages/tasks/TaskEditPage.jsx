@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -16,6 +16,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import SearchIcon from '@mui/icons-material/Search';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import DescriptionIcon from '@mui/icons-material/Description';
 import {
     TextField,
     Button,
@@ -41,6 +43,9 @@ const TaskEditPage = () => {
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState(null);
+    const [isDeletingDecisionFile, setIsDeletingDecisionFile] = useState(false);
+    const [isUploadingDecisionFile, setIsUploadingDecisionFile] = useState(false);
+    const decisionFileInputRef = useRef(null);
 
     // Состояния для формы
     const [formData, setFormData] = useState({
@@ -475,6 +480,65 @@ const handleSave = async () => {
         } finally {
             setDeleting(false);
         }
+    };
+
+    const validateDecisionFile = (file) => {
+        const extension = file.name.split('.').pop()?.toLowerCase();
+        if (!['pdf', 'doc', 'docx'].includes(extension)) {
+            return 'Разрешены только файлы PDF, DOC и DOCX';
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            return 'Размер файла не должен превышать 5 МБ';
+        }
+        return null;
+    };
+
+    const handleDecisionFileUpload = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (!file) return;
+
+        const validationError = validateDecisionFile(file);
+        if (validationError) {
+            alert(validationError);
+            return;
+        }
+
+        setIsUploadingDecisionFile(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await api.post(`/tasks/${id}/decision-file`, formData);
+            setTask(current => ({ ...current, decisionFile: response.data }));
+            alert('Файл решения загружен');
+        } catch (uploadError) {
+            alert(uploadError.response?.data?.message || 'Не удалось загрузить файл решения');
+        } finally {
+            setIsUploadingDecisionFile(false);
+        }
+    };
+
+    const handleDeleteDecisionFile = async () => {
+        if (!window.confirm('Удалить файл решения? После этого можно будет загрузить новый файл.')) {
+            return;
+        }
+
+        setIsDeletingDecisionFile(true);
+        try {
+            await api.delete(`/tasks/${id}/decision-file`);
+            setTask(current => ({ ...current, decisionFile: null }));
+        } catch (deleteError) {
+            alert(deleteError.response?.data?.message || 'Не удалось удалить файл решения');
+        } finally {
+            setIsDeletingDecisionFile(false);
+        }
+    };
+
+    const formatFileSize = (size) => {
+        if (size == null) return 'Размер не указан';
+        return size < 1024 * 1024
+            ? `${Math.ceil(size / 1024)} КБ`
+            : `${(size / (1024 * 1024)).toFixed(2)} МБ`;
     };
 
     const formatDateTime = (dateTime) => {
@@ -916,7 +980,67 @@ const handleSave = async () => {
                 </div>
             </div>
 
-            {/* Остальные секции (Договор и Системная информация) остаются без изменений */}
+            {task.decisionAt && (
+                <div className="task-details-card decision-file-edit-card">
+                    <div className="decision-file-edit-info">
+                        <DescriptionIcon />
+                        <div>
+                            <h3>Файл решения</h3>
+                            {task.decisionFile ? (
+                                <>
+                                    <div className="decision-file-edit-name">
+                                        {task.decisionFile.originalFileName}
+                                    </div>
+                                    <div className="decision-file-edit-meta">
+                                        {formatFileSize(task.decisionFile.size)}
+                                        {task.decisionFile.uploadedAt
+                                            ? ` · загружен ${formatDateTime(task.decisionFile.uploadedAt)}`
+                                            : ''}
+                                    </div>
+                                </>
+                            ) : (
+                                <span className="no-contract">Файл не загружен</span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="decision-file-edit-actions">
+                        <input
+                            ref={decisionFileInputRef}
+                            type="file"
+                            hidden
+                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            onChange={handleDecisionFileUpload}
+                        />
+                        {task.decisionFile ? (
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                startIcon={isDeletingDecisionFile
+                                    ? <CircularProgress size={16} color="inherit" />
+                                    : <DeleteIcon />}
+                                onClick={handleDeleteDecisionFile}
+                                disabled={isDeletingDecisionFile}
+                            >
+                                Удалить
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                startIcon={isUploadingDecisionFile
+                                    ? <CircularProgress size={16} color="inherit" />
+                                    : <UploadFileIcon />}
+                                onClick={() => decisionFileInputRef.current?.click()}
+                                disabled={isUploadingDecisionFile}
+                            >
+                                Загрузить новый файл
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Договор и системная информация */}
             {/* Договор */}
             <div className="task-details-card">
                 <div className="task-row contract-section">

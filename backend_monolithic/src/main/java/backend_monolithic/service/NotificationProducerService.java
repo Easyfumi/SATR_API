@@ -4,6 +4,7 @@ import backend_monolithic.model.dto.TaskAssignmentNotification;
 import backend_monolithic.model.dto.CertificateRegisteredNotification;
 import backend_monolithic.model.dto.DeclarationRegisteredNotification;
 import backend_monolithic.model.dto.TaskDecisionNotification;
+import backend_monolithic.model.dto.TaskDocumentNumberAssignedNotification;
 import backend_monolithic.model.dto.UserRegistrationNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,33 @@ public class NotificationProducerService {
             log.error("Ошибка при отправке уведомления о решении в Kafka: recipient={}, taskId={}",
                     notification.getRecipientEmail(), notification.getTaskId(), e);
             throw new RuntimeException("Не удалось отправить уведомление о решении в Kafka", e);
+        }
+    }
+
+    public void sendTaskDocumentNumberAssignedNotification(
+            TaskDocumentNumberAssignedNotification notification) {
+        try {
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(
+                    notificationsTopic,
+                    notification.getRecipientEmail(),
+                    notification
+            );
+
+            SendResult<String, Object> result = future.get(10, TimeUnit.SECONDS);
+
+            log.info("Уведомление о присвоении номера {} отправлено: recipient={}, taskId={}, offset={}, partition={}",
+                    notification.getDocType(),
+                    notification.getRecipientEmail(),
+                    notification.getTaskId(),
+                    result.getRecordMetadata().offset(),
+                    result.getRecordMetadata().partition());
+        } catch (Exception e) {
+            log.error("Ошибка отправки уведомления о присвоении номера {}: recipient={}, taskId={}",
+                    notification.getDocType(),
+                    notification.getRecipientEmail(),
+                    notification.getTaskId(),
+                    e);
+            throw new RuntimeException("Не удалось отправить уведомление о присвоении номера документа", e);
         }
     }
 

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { canViewTasksAndContracts } from '../../utils/roleUtils';
+import { canModifyTasks, canViewTasksAndContracts } from '../../utils/roleUtils';
 import AccessDenied from '../../components/AccessDenied';
 import './TaskDetailsPage.css';
 import { formatProcessTypeDisplay } from '../../constants/taskProcessOptions';
@@ -19,7 +19,11 @@ import {
   Alert,
   FormControl,
   Select,
-  Checkbox
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
 } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -27,6 +31,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import LinkIcon from '@mui/icons-material/Link';
 import UnlinkIcon from '@mui/icons-material/LinkOff';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import DownloadIcon from '@mui/icons-material/Download';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const TaskDetailsPage = () => {
   const { user } = useAuth();
@@ -64,6 +72,11 @@ const TaskDetailsPage = () => {
   const [isUpdatingContract, setIsUpdatingContract] = useState(false);
   const [contractSearch, setContractSearch] = useState('');
   const [alertMessage, setAlertMessage] = useState(null);
+  const [isUploadingDecisionFile, setIsUploadingDecisionFile] = useState(false);
+  const [isDownloadingDecisionFile, setIsDownloadingDecisionFile] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const decisionFileInputRef = useRef(null);
 
   const statusLabels = {
     RECEIVED: 'Заявка получена',
@@ -91,6 +104,12 @@ const TaskDetailsPage = () => {
     fetchTask();
     fetchExperts();
   }, [id]);
+
+  useEffect(() => () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  }, [previewUrl]);
 
   // Проверка доступа (после всех хуков)
   if (!canViewTasksAndContracts(user)) {
@@ -124,6 +143,98 @@ const TaskDetailsPage = () => {
     } catch (err) {
       console.error('Ошибка загрузки исполнителей:', err);
     }
+  };
+
+  const validateDecisionFile = (file) => {
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!['pdf', 'doc', 'docx'].includes(extension)) {
+      return 'Разрешены только файлы PDF, DOC и DOCX';
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return 'Размер файла не должен превышать 5 МБ';
+    }
+    return null;
+  };
+
+  const handleDecisionFileUpload = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const validationError = validateDecisionFile(file);
+    if (validationError) {
+      setAlertMessage({ type: 'error', text: validationError });
+      return;
+    }
+
+    setIsUploadingDecisionFile(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      await api.post(`/tasks/${id}/decision-file`, formData);
+      await fetchTask();
+      setAlertMessage({ type: 'success', text: 'Файл решения загружен' });
+    } catch (err) {
+      setAlertMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Не удалось загрузить файл решения'
+      });
+    } finally {
+      setIsUploadingDecisionFile(false);
+    }
+  };
+
+  const handleDecisionFileDownload = async () => {
+    setIsDownloadingDecisionFile(true);
+    try {
+      const response = await api.get(`/tasks/${id}/decision-file`, { responseType: 'blob' });
+      const url = URL.createObjectURL(response.data);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = task.decisionFile?.originalFileName || 'decision-file';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setAlertMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Не удалось скачать файл решения'
+      });
+    } finally {
+      setIsDownloadingDecisionFile(false);
+    }
+  };
+
+  const handleDecisionFilePreview = async () => {
+    try {
+      const response = await api.get(`/tasks/${id}/decision-file/preview`, { responseType: 'blob' });
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl(URL.createObjectURL(response.data));
+      setIsPreviewOpen(true);
+    } catch (err) {
+      setAlertMessage({
+        type: 'error',
+        text: err.response?.data?.message || 'Не удалось открыть предпросмотр'
+      });
+    }
+  };
+
+  const closeDecisionFilePreview = () => {
+    setIsPreviewOpen(false);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+  };
+
+  const formatFileSize = (size) => {
+    if (size == null) return 'Размер не указан';
+    return size < 1024 * 1024
+      ? `${Math.ceil(size / 1024)} КБ`
+      : `${(size / (1024 * 1024)).toFixed(2)} МБ`;
   };
 
   // Загрузка всех договоров для поиска
@@ -694,7 +805,31 @@ const TaskDetailsPage = () => {
             <div className="task-row">
               <span className="task-label">Решение по заявке</span>
               {task.decisionAt && isDateSet(task.decisionAt) ? (
-                <span className="task-value">{formatDate(task.decisionAt)}</span>
+                <div className="decision-date-display">
+                  <span className="task-value">{formatDate(task.decisionAt)}</span>
+                  {!task.decisionFile && canModifyTasks(user) && (
+                    <>
+                      <input
+                        ref={decisionFileInputRef}
+                        type="file"
+                        hidden
+                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        onChange={handleDecisionFileUpload}
+                      />
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={isUploadingDecisionFile
+                          ? <CircularProgress size={16} />
+                          : <UploadFileIcon />}
+                        onClick={() => decisionFileInputRef.current?.click()}
+                        disabled={isUploadingDecisionFile}
+                      >
+                        Загрузить файл
+                      </Button>
+                    </>
+                  )}
+                </div>
               ) : (
                 <div className="input-action-container">
                   <div className="modern-date-field">
@@ -865,6 +1000,56 @@ const TaskDetailsPage = () => {
         </div>
       </div>
 
+      {isDecisionDateFilled && (
+        <div className="task-details-card">
+          <div className="decision-file-section">
+            <div className="decision-file-heading">
+              <DescriptionIcon />
+              <div>
+                <h3>Файл решения</h3>
+                {task.decisionFile ? (
+                  <div className="decision-file-meta">
+                    <span>{task.decisionFile.originalFileName}</span>
+                    <span>
+                      {formatFileSize(task.decisionFile.size)}
+                      {task.decisionFile.uploadedAt
+                        ? ` · загружен ${formatDateTime(task.decisionFile.uploadedAt)}`
+                        : ''}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="no-contract">Файл не загружен</span>
+                )}
+              </div>
+            </div>
+
+            {task.decisionFile && (
+              <div className="decision-file-actions">
+                {task.decisionFile.previewAvailable && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<VisibilityIcon />}
+                    onClick={handleDecisionFilePreview}
+                  >
+                    Посмотреть
+                  </Button>
+                )}
+                <Button
+                  variant="contained"
+                  startIcon={isDownloadingDecisionFile
+                    ? <CircularProgress size={16} color="inherit" />
+                    : <DownloadIcon />}
+                  onClick={handleDecisionFileDownload}
+                  disabled={isDownloadingDecisionFile}
+                >
+                  Скачать
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Блок договора (one-to-many) */}
       <div className="task-details-card">
         <div className="task-row contract-section">
@@ -1034,6 +1219,34 @@ const TaskDetailsPage = () => {
           ))
         )}
       </Menu>
+
+      <Dialog
+        open={isPreviewOpen}
+        onClose={closeDecisionFilePreview}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle>Файл решения: {task.decisionFile?.originalFileName}</DialogTitle>
+        <DialogContent className="decision-file-preview-dialog">
+          {previewUrl && (
+            <iframe
+              src={previewUrl}
+              title="Предпросмотр файла решения"
+              className="decision-file-preview-frame"
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDecisionFilePreview}>Закрыть</Button>
+          <Button
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={handleDecisionFileDownload}
+          >
+            Скачать
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

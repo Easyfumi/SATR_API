@@ -40,6 +40,7 @@ public class TaskServiceImplementation implements TaskService {
     private final ContractRepository contractRepository;
     private final UserService userService;
     private final NotificationProducerService notificationProducerService;
+    private final TaskDecisionFileService taskDecisionFileService;
 
     @Override
     @Transactional
@@ -264,6 +265,7 @@ public class TaskServiceImplementation implements TaskService {
         requireDocumentNumber(task, "сохранения номера документа");
 
         Task updatedTask = taskRepository.save(task);
+        sendTaskDocumentNumberAssignedNotifications(updatedTask);
         return mapEntityToResponse(updatedTask);
     }
 
@@ -322,6 +324,7 @@ public class TaskServiceImplementation implements TaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Задача не найдена"));
 
         // Explicitly detach from contract to keep the bidirectional relation consistent.
+        taskDecisionFileService.deleteTaskDirectory(task);
         task.setContract(null);
         taskRepository.delete(task);
     }
@@ -408,6 +411,15 @@ public class TaskServiceImplementation implements TaskService {
         response.setCreatedAt(task.getCreatedAt());
         response.setStatus(task.getStatus() != null ? task.getStatus().name() : null);
         response.setAssignedUserId(task.getAssignedUserId());
+        if (task.getDecisionFileStoredName() != null) {
+            response.setDecisionFile(new DecisionFileInfo(
+                    task.getDecisionFileOriginalName(),
+                    task.getDecisionFileContentType(),
+                    task.getDecisionFileSize(),
+                    task.getDecisionFileUploadedAt(),
+                    "application/pdf".equals(task.getDecisionFileContentType())
+            ));
+        }
 
         // Обработка createdBy
         if (task.getCreatedBy() != null) {
@@ -562,6 +574,32 @@ public class TaskServiceImplementation implements TaskService {
 
         return representativeRepository.findByName(name)
                 .orElseGet(() -> representativeRepository.save(new Representative(name)));
+    }
+
+    private void sendTaskDocumentNumberAssignedNotifications(Task task) {
+        String applicationNumber = task.getNumber() != null && !task.getNumber().isBlank()
+                ? task.getNumber()
+                : "ID: " + task.getId();
+        String executorName = "Не назначен";
+        if (task.getAssignedUserId() != null) {
+            executorName = userService.getUserById(task.getAssignedUserId())
+                    .map(this::buildShortName)
+                    .orElse("Не назначен");
+        }
+
+        List<User> accountants = userService.getUsersByRole(Role.ACCOUNTANT);
+        for (User accountant : accountants) {
+            TaskDocumentNumberAssignedNotification notification =
+                    new TaskDocumentNumberAssignedNotification();
+            notification.setRecipientEmail(accountant.getEmail());
+            notification.setRecipientName(buildShortName(accountant));
+            notification.setTaskId(task.getId());
+            notification.setApplicationNumber(applicationNumber);
+            notification.setDocumentNumber(task.getDocumentNumber());
+            notification.setDocType(task.getDocType());
+            notification.setExecutorName(executorName);
+            notificationProducerService.sendTaskDocumentNumberAssignedNotification(notification);
+        }
     }
 
     private String buildShortName(User user) {

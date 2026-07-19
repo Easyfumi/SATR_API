@@ -9,6 +9,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import ru.marinin.notification_microservice.model.TaskAssignmentNotification;
 import ru.marinin.notification_microservice.model.TaskDecisionNotification;
+import ru.marinin.notification_microservice.model.TaskDocumentNumberAssignedNotification;
 import ru.marinin.notification_microservice.model.UserRegistrationNotification;
 import ru.marinin.notification_microservice.model.DeclarationRegisteredNotification;
 import ru.marinin.notification_microservice.model.CertificateRegisteredNotification;
@@ -44,6 +45,14 @@ public class NotificationConsumer {
             else if (messageMap.containsKey("newUserEmail")) {
                 UserRegistrationNotification notification = objectMapper.convertValue(messageValue, UserRegistrationNotification.class);
                 consumeUserRegistrationNotification(notification, acknowledgment);
+            }
+            // Проверяем наличие номера документа для уведомления о присвоении номера ОТТС/ОТШ
+            else if (messageMap.containsKey("documentNumber")
+                    && messageMap.containsKey("applicationNumber")
+                    && messageMap.containsKey("taskId")) {
+                TaskDocumentNumberAssignedNotification notification =
+                        objectMapper.convertValue(messageValue, TaskDocumentNumberAssignedNotification.class);
+                consumeTaskDocumentNumberAssignedNotification(notification, acknowledgment);
             }
             // Проверяем наличие поля "declarationNumber" для DeclarationRegisteredNotification
             else if (messageMap.containsKey("declarationNumber") && messageMap.containsKey("applicationNumber")) {
@@ -210,6 +219,41 @@ public class NotificationConsumer {
         } catch (Exception e) {
             log.error("Ошибка при обработке уведомления о регистрации сертификата: recipient={}, certificateNumber={}",
                     notification.getRecipientEmail(), notification.getCertificateNumber(), e);
+            throw e;
+        }
+    }
+
+    private void consumeTaskDocumentNumberAssignedNotification(
+            TaskDocumentNumberAssignedNotification notification,
+            Acknowledgment acknowledgment) {
+        try {
+            log.info("Получено уведомление о присвоении номера {}: recipient={}, taskId={}, documentNumber={}",
+                    notification.getDocType(),
+                    notification.getRecipientEmail(),
+                    notification.getTaskId(),
+                    notification.getDocumentNumber());
+
+            emailService.sendTaskDocumentNumberAssignedNotification(
+                    notification.getRecipientEmail(),
+                    notification.getRecipientName(),
+                    notification.getTaskId(),
+                    notification.getApplicationNumber(),
+                    notification.getDocumentNumber(),
+                    notification.getDocType(),
+                    notification.getExecutorName()
+            );
+
+            acknowledgment.acknowledge();
+            log.info("Уведомление о присвоении номера {} обработано: recipient={}, taskId={}",
+                    notification.getDocType(),
+                    notification.getRecipientEmail(),
+                    notification.getTaskId());
+        } catch (Exception e) {
+            log.error("Ошибка обработки уведомления о присвоении номера {}: recipient={}, taskId={}",
+                    notification.getDocType(),
+                    notification.getRecipientEmail(),
+                    notification.getTaskId(),
+                    e);
             throw e;
         }
     }
