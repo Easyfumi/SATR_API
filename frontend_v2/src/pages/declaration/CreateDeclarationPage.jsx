@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     Autocomplete,
     Button,
@@ -29,18 +29,20 @@ const declarationStatusLabels = {
 const CreateDeclarationPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [experts, setExperts] = useState([]);
+    const copiedApplication = location.state?.copiedApplication;
 
     const [formData, setFormData] = useState({
-        applicantName: '',
-        manufacturerName: '',
-        representativeName: '',
-        categories: [],
-        mark: '',
-        typeName: '',
-        modifications: '',
-        commercialNames: '',
-        standardSection: '',
+        applicantName: copiedApplication?.applicantName || '',
+        manufacturerName: copiedApplication?.manufacturerName || '',
+        representativeName: copiedApplication?.representativeName || '',
+        categories: copiedApplication?.categories || [],
+        mark: copiedApplication?.mark || '',
+        typeName: copiedApplication?.typeName || '',
+        modifications: copiedApplication?.modifications || '',
+        commercialNames: copiedApplication?.commercialNames || '',
+        standardSection: copiedApplication?.standardSection || '',
         assignedUserId: null
     });
 
@@ -50,7 +52,9 @@ const CreateDeclarationPage = () => {
 
     const [manufacturerSameAsApplicant, setManufacturerSameAsApplicant] = useState(false);
     const [representativeSameAsApplicant, setRepresentativeSameAsApplicant] = useState(false);
-    const [representativeAbsent, setRepresentativeAbsent] = useState(false);
+    const [representativeAbsent, setRepresentativeAbsent] = useState(
+        Boolean(copiedApplication && !copiedApplication.representativeName)
+    );
 
     const [showDuplicateModal, setShowDuplicateModal] = useState(false);
     const [duplicates, setDuplicates] = useState([]);

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditIcon from '@mui/icons-material/Edit';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -175,11 +176,34 @@ const DeclarationDetailsPage = () => {
                 </Alert>
             )}
 
-            <div>
+            <div className="details-navigation">
                 <Link to="/decl" className="back-button">
                     <ArrowBackIcon />
                     К списку заявок
                 </Link>
+                {canModifyTasks(user) && (
+                    <Button
+                        className="edit-button"
+                        startIcon={<ContentCopyIcon />}
+                        onClick={() => navigate('/decl/create', {
+                            state: {
+                                copiedApplication: {
+                                    applicantName: declaration.applicant || '',
+                                    manufacturerName: declaration.manufacturer || '',
+                                    representativeName: declaration.representative || '',
+                                    categories: declaration.categories || [],
+                                    mark: declaration.mark || '',
+                                    typeName: declaration.typeName || '',
+                                    modifications: declaration.modifications || '',
+                                    commercialNames: declaration.commercialNames || '',
+                                    standardSection: declaration.standardSection || ''
+                                }
+                            }
+                        })}
+                    >
+                        Скопировать заявку
+                    </Button>
+                )}
             </div>
 
             <div className="task-details-card">

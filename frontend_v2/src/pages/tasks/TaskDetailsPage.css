@@ -11,6 +11,23 @@
   margin-bottom: 25px;
 }
 
+.details-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.details-navigation .back-button {
+  margin-bottom: 0;
+}
+
+.details-navigation .edit-button {
+  margin-left: auto;
+  text-transform: none;
+}
+
 .task-details-card {
   margin-top: 25px;
 }
@@ -104,6 +121,16 @@
 
 .task-alert {
   margin-bottom: 16px;
+}
+
+.task-actions-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.task-actions-footer .edit-button {
+  text-transform: none;
 }
 
 .process-option {
@@ -366,6 +393,16 @@
   .back-button {
     font-size: 0.9rem;
     padding: 8px 12px;
+  }
+
+  .details-navigation {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .details-navigation .edit-button {
+    justify-content: center;
+    margin-left: 0;
   }
 
   .decision-file-section {
