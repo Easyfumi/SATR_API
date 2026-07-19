@@ -110,8 +110,12 @@ public class DeclarationServiceImplementation implements DeclarationService {
     @Transactional
     public DeclarationResponse setDeclarationNumber(Long declarationId, String number, LocalDate applicationDate) {
         String applicationNumber = number + "Д";
-        if (declarationRepository.existsByNumber(applicationNumber)) {
-            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
+        LocalDate yearStart = applicationDate.withDayOfYear(1);
+        LocalDate nextYearStart = yearStart.plusYears(1);
+        if (declarationRepository.existsByNumberAndApplicationDateGreaterThanEqualAndApplicationDateLessThan(
+                applicationNumber, yearStart, nextYearStart)) {
+            throw new DuplicateNumberException(
+                    "Номер " + applicationNumber + " уже существует в " + applicationDate.getYear() + " году");
         }
 
         Declaration declaration = declarationRepository.findById(declarationId)

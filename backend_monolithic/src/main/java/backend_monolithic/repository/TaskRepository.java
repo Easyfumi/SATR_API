@@ -17,7 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    boolean existsByNumber(String number);
+    boolean existsByNumberAndApplicationDateGreaterThanEqualAndApplicationDateLessThan(
+            String number,
+            LocalDate yearStart,
+            LocalDate nextYearStart
+    );
     boolean existsByDocumentNumberAndIdNot(String documentNumber, Long id);
 
     List<Task> findByStatusNot(TaskStatus status);

@@ -20,7 +20,6 @@ public class Certificate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
     private String number;
 
     private LocalDate applicationDate;

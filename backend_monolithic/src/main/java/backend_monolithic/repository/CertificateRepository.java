@@ -10,7 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface CertificateRepository extends JpaRepository<Certificate, Long> {
-    boolean existsByNumber(String number);
+    boolean existsByNumberAndApplicationDateGreaterThanEqualAndApplicationDateLessThan(
+            String number,
+            LocalDate yearStart,
+            LocalDate nextYearStart
+    );
     boolean existsByCertificateNumber(String certificateNumber);
     boolean existsByCertificateNumberAndIdNot(String certificateNumber, Long id);
 

@@ -195,9 +195,13 @@ public class TaskServiceImplementation implements TaskService {
             default -> throw new BusinessException("Неизвестный тип одобрения");
         };
         String applicationNumber = number + suffix;
+        LocalDate yearStart = applicationDate.withDayOfYear(1);
+        LocalDate nextYearStart = yearStart.plusYears(1);
 
-        if (taskRepository.existsByNumber(applicationNumber)) {
-            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
+        if (taskRepository.existsByNumberAndApplicationDateGreaterThanEqualAndApplicationDateLessThan(
+                applicationNumber, yearStart, nextYearStart)) {
+            throw new DuplicateNumberException(
+                    "Номер " + applicationNumber + " уже существует в " + applicationDate.getYear() + " году");
         }
 
         task.setNumber(applicationNumber);

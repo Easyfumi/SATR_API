@@ -112,8 +112,12 @@ public class CertificateServiceImplementation implements CertificateService {
     @Transactional
     public CertificateResponse setCertificateNumber(Long certificateId, String number, LocalDate applicationDate) {
         String applicationNumber = number + "С";
-        if (certificateRepository.existsByNumber(applicationNumber)) {
-            throw new DuplicateNumberException("Номер " + applicationNumber + " уже существует");
+        LocalDate yearStart = applicationDate.withDayOfYear(1);
+        LocalDate nextYearStart = yearStart.plusYears(1);
+        if (certificateRepository.existsByNumberAndApplicationDateGreaterThanEqualAndApplicationDateLessThan(
+                applicationNumber, yearStart, nextYearStart)) {
+            throw new DuplicateNumberException(
+                    "Номер " + applicationNumber + " уже существует в " + applicationDate.getYear() + " году");
         }
 
         Certificate certificate = certificateRepository.findById(certificateId)
