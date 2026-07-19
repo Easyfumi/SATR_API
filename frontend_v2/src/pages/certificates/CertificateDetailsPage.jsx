@@ -375,12 +375,19 @@ const CertificateDetailsPage = () => {
                                             value={newNumber}
                                             onChange={(e) => setNewNumber(e.target.value.replace(/\D/g, ''))}
                                             placeholder="Введите номер"
+                                            variant="outlined"
+                                            className="task-number-field"
                                             slotProps={{
-                                                htmlInput: { inputMode: 'numeric', pattern: '[0-9]*' },
+                                                htmlInput: {
+                                                    className: 'task-number-input',
+                                                    inputMode: 'numeric',
+                                                    pattern: '[0-9]*'
+                                                },
                                                 input: {
                                                     endAdornment: <InputAdornment position="end">С</InputAdornment>
                                                 }
                                             }}
+                                            disabled={isUpdatingNumber}
                                         />
                                         <span className="task-number-separator">от</span>
                                         <div className="modern-date-field">
