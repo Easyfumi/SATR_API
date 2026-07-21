@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,15 +72,18 @@ public class TaskServiceImplementation implements TaskService {
     @Override
     public List<TaskResponse> getAllTasks(String jwt) {
         return taskRepository.findAll().stream()
-                .sorted(Comparator.comparing(Task::getCreatedAt).reversed())
+                .sorted(Comparator
+                        .comparingInt((Task task) -> TaskStatus.listSortIndex(task.getStatus()))
+                        .thenComparing(Task::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public PageResponse<TaskResponse> getFilteredTasks(TaskFilter filter, String jwt, int page, int size) {
-        Specification<Task> spec = TaskSpecifications.buildSpecification(filter);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Specification<Task> spec = TaskSpecifications.buildSpecification(filter)
+                .and(TaskSpecifications.orderedByDefaultStatusPriority());
+        Pageable pageable = PageRequest.of(page, size);
 
         Page<Task> taskPage = taskRepository.findAll(spec, pageable);
 
@@ -103,8 +105,9 @@ public class TaskServiceImplementation implements TaskService {
     public PageResponse<TaskResponse> getMyTasks(String jwt, int page, int size) {
         User user = userService.getUserProfile(jwt);
         
-        Specification<Task> spec = TaskSpecifications.withAssignedUserId(user.getId());
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Specification<Task> spec = TaskSpecifications.withAssignedUserId(user.getId())
+                .and(TaskSpecifications.orderedByDefaultStatusPriority());
+        Pageable pageable = PageRequest.of(page, size);
 
         Page<Task> taskPage = taskRepository.findAll(spec, pageable);
 

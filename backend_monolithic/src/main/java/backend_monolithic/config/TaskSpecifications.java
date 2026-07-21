@@ -4,6 +4,8 @@ import backend_monolithic.model.Task;
 import backend_monolithic.model.User;
 import backend_monolithic.model.dto.TaskFilter;
 import backend_monolithic.model.enums.TaskStatus;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -110,6 +112,31 @@ public class TaskSpecifications {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.equal(root.get("assignedUserId"), assignedUserId);
+        };
+    }
+
+    /**
+     * Сортировка списков по статусу (см. TaskStatus.LIST_SORT_ORDER), затем по дате создания DESC.
+     * Не применяется к count-запросам пагинации.
+     */
+    public static Specification<Task> orderedByDefaultStatusPriority() {
+        return (root, query, criteriaBuilder) -> {
+            if (query.getResultType() != Long.class && query.getResultType() != long.class) {
+                CriteriaBuilder.Case<Integer> statusOrder = criteriaBuilder.selectCase();
+                TaskStatus[] order = TaskStatus.LIST_SORT_ORDER;
+                for (int i = 0; i < order.length; i++) {
+                    statusOrder = statusOrder.when(
+                            criteriaBuilder.equal(root.get("status"), order[i]),
+                            i
+                    );
+                }
+                Expression<Integer> orderExpr = statusOrder.otherwise(order.length);
+                query.orderBy(
+                        criteriaBuilder.asc(orderExpr),
+                        criteriaBuilder.desc(root.get("createdAt"))
+                );
+            }
+            return criteriaBuilder.conjunction();
         };
     }
 

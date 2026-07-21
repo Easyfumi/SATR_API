@@ -93,9 +93,9 @@ const TaskEditPage = () => {
         DOCUMENTS_WAITING: 'Ожидание документов',
         REJECTION: 'Отказ в проведении работ',
         CANCELLED: 'Аннулирована',
-        PROJECT: 'Переведено в проект',
-        SIGNED: 'Подписано',
-        FOR_REVISION: 'Возвращено на доработку',
+        PROJECT: 'Внутренняя проверка',
+        SIGNED: 'Исправление замечаний',
+        FOR_REVISION: 'Экспертиза РСТ',
         COMPLETED: 'Заявка выполнена',
         ARCHIVED: 'Передано в архив'
     };

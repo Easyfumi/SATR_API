@@ -18,6 +18,23 @@ public enum TaskStatus {
     COMPLETED("Завершена"),
     ARCHIVED("Передано в архив");
 
+    /** Порядок статусов по умолчанию в списках заявок (taskList / myTaskList). */
+    public static final TaskStatus[] LIST_SORT_ORDER = {
+            RECEIVED,
+            REGISTERED,
+            DECISION_DONE,
+            PREPARING_LAYOUT,
+            DOCUMENT_VERIFICATION,
+            DOCUMENTS_WAITING,
+            PROJECT,
+            SIGNED,
+            FOR_REVISION,
+            COMPLETED,
+            ARCHIVED,
+            REJECTION,
+            CANCELLED
+    };
+
     private final String displayName;
 
     TaskStatus(String displayName) {
@@ -26,6 +43,18 @@ public enum TaskStatus {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public static int listSortIndex(TaskStatus status) {
+        if (status == null) {
+            return LIST_SORT_ORDER.length;
+        }
+        for (int i = 0; i < LIST_SORT_ORDER.length; i++) {
+            if (LIST_SORT_ORDER[i] == status) {
+                return i;
+            }
+        }
+        return LIST_SORT_ORDER.length;
     }
 
     @JsonValue

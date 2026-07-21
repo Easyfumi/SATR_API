@@ -32,28 +32,14 @@
     box-shadow: 0 2px 8px var(--glacial-shadow);
 }
 
-.results-info-panel {
-    display: flex;
-    justify-content: space-between !important; /* Этот стиль сам по себе распределит элементы по краям */
-    align-items: center;
-    padding: 15px 20px;
-    background: #f8fafc;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #e2e8f0;
-}
-
-.results-count {
-    font-weight: 600;
-    color: #374151;
-}
-
 .page-size-selector {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-left: auto;
     font-size: 0.9rem;
     color: #64748b;
+    white-space: nowrap;
 }
 
 .page-size-selector select {
@@ -756,6 +742,11 @@
     .quick-search-section {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .page-size-selector {
+        margin-left: 0;
+        justify-content: flex-end;
     }
 
     .search-input-container {

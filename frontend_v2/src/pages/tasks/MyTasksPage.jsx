@@ -60,9 +60,9 @@ const MyTasksPage = () => {
         DOCUMENTS_WAITING: 'Ожидание документов',
         REJECTION: 'Отказ в проведении работ',
         CANCELLED: 'Аннулирована',
-        PROJECT: 'Переведено в проект',
-        SIGNED: 'Подписано',
-        FOR_REVISION: 'Возвращено на доработку',
+        PROJECT: 'Внутренняя проверка',
+        SIGNED: 'Исправление замечаний',
+        FOR_REVISION: 'Экспертиза РСТ',
         COMPLETED: 'Заявка выполнена',
         ARCHIVED: 'Передано в архив'
     };
@@ -78,9 +78,9 @@ const MyTasksPage = () => {
         { value: 'DOCUMENTS_WAITING', label: 'Ожидание документов' },
         { value: 'REJECTION', label: 'Отказ в проведении работ' },
         { value: 'CANCELLED', label: 'Аннулирована' },
-        { value: 'PROJECT', label: 'Переведено в проект' },
-        { value: 'SIGNED', label: 'Подписано' },
-        { value: 'FOR_REVISION', label: 'Возвращено на доработку' },
+        { value: 'PROJECT', label: 'Внутренняя проверка' },
+        { value: 'SIGNED', label: 'Исправление замечаний' },
+        { value: 'FOR_REVISION', label: 'Экспертиза РСТ' },
         { value: 'COMPLETED', label: 'Заявка выполнена' },
         { value: 'ARCHIVED', label: 'Передано в архив' }
     ];
@@ -361,7 +361,6 @@ const MyTasksPage = () => {
     };
 
     const currentTasks = getCurrentPageTasks();
-    const filteredTasksCount = applyFilters(tasks).length;
 
     // Генерация номеров страниц для отображения
     const getPageNumbers = () => {
@@ -446,6 +445,18 @@ const MyTasksPage = () => {
                                 <span className="filter-indicator"></span>
                             )}
                     </button>
+
+                    <div className="page-size-selector">
+                        <span>Показывать по:</span>
+                        <select
+                            value={pagination.pageSize}
+                            onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
+                        >
+                            {pageSizeOptions.map(size => (
+                                <option key={size} value={size}>{size}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 {/* Расширенные фильтры */}
@@ -617,24 +628,6 @@ const MyTasksPage = () => {
                     ))}
                 </div>
             )}
-
-            {/* Панель информации о результатах */}
-            <div className="results-info-panel">
-                <div className="results-count">
-                    Найдено заявок: {filteredTasksCount}
-                </div>
-                <div className="page-size-selector">
-                    <span>Показывать по:</span>
-                    <select
-                        value={pagination.pageSize}
-                        onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
-                    >
-                        {pageSizeOptions.map(size => (
-                            <option key={size} value={size}>{size}</option>
-                        ))}
-                    </select>
-                </div>
-            </div>
 
             {loading ? (
                 <div className="loading">Загрузка...</div>
