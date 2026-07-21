@@ -7,20 +7,23 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import HistoryIcon from '@mui/icons-material/History';
 import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import ListIcon from '@mui/icons-material/List';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+
 import './Sidebar.css';
 
 const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { 
+    { path: "/my-tasks", text: "Мои заявки", icon: <ListIcon /> },
+    {
       path: "/tasks",
-      text: "Главная", 
-      icon: <HomeIcon />,
+      text: "Все заявки",
+      icon: <ListAltIcon />,
       activePaths: ["/tasks", "/decl", "/serts"]
     },
-    { path: "/my-tasks", text: "Мои заявки", icon: <AssignmentIndIcon /> },
-    { path: "/users/profile", text: "Профиль", icon: <PersonIcon /> },
+    { path: "/users/profile", text: "Профиль", icon: <PersonIcon/> },
     { path: "/history", text: "История", icon: <HistoryIcon /> },
     { path: "/settings", text: "Настройки", icon: <SettingsIcon /> },
     { path: "/contracts", text: "Договоры", icon: <RequestQuoteIcon/> },

@@ -161,8 +161,6 @@ public class TaskServiceImplementation implements TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Задача не найдена"));
 
-        validateStatusTransition(task.getStatus(), newStatus);
-
         assignDocumentNumberIfProvided(task, taskId, documentNumber);
 
         if (newStatus == TaskStatus.PROJECT) {
@@ -174,6 +172,8 @@ public class TaskServiceImplementation implements TaskService {
         if (newStatus == TaskStatus.COMPLETED) {
             requireDocumentNumber(task, "завершения заявки");
             task.setCompletedAt(LocalDate.now());
+        } else {
+            task.setCompletedAt(null);
         }
 
         Task updatedTask = taskRepository.save(task);
@@ -515,12 +515,6 @@ public class TaskServiceImplementation implements TaskService {
             return String.format("ID: %d (%s)",
                     task.getId(),
                     task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-        }
-    }
-
-    private void validateStatusTransition(TaskStatus currentStatus, TaskStatus newStatus) {
-        if (currentStatus == TaskStatus.COMPLETED) {
-            throw new BusinessException("Нельзя изменить статус завершенной задачи");
         }
     }
 

@@ -38,7 +38,7 @@ export default function SignIn() {
       const loginSuccess = await login(response.data.jwt);
     
       if (loginSuccess) {
-        navigate('/tasks', { replace: true });
+        navigate('/my-tasks', { replace: true });
       }
 
     } catch (err) {

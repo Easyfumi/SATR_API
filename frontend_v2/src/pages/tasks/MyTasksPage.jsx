@@ -407,7 +407,7 @@ const MyTasksPage = () => {
                     ))}
                 </div>
 
-                <h2 className="page-title">Мои заявки</h2>
+                <h2 className="page-title">Мои заявки Одобрения типа транспортного средства / шасси</h2>
 
                 <Link
                     to="/tasks/create"
