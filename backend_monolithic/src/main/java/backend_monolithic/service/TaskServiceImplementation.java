@@ -102,10 +102,12 @@ public class TaskServiceImplementation implements TaskService {
     }
 
     @Override
-    public PageResponse<TaskResponse> getMyTasks(String jwt, int page, int size) {
+    public PageResponse<TaskResponse> getMyTasks(TaskFilter filter, String jwt, int page, int size) {
         User user = userService.getUserProfile(jwt);
-        
+        TaskFilter effectiveFilter = filter != null ? filter : new TaskFilter();
+
         Specification<Task> spec = TaskSpecifications.withAssignedUserId(user.getId())
+                .and(TaskSpecifications.buildSpecification(effectiveFilter))
                 .and(TaskSpecifications.orderedByDefaultStatusPriority());
         Pageable pageable = PageRequest.of(page, size);
 

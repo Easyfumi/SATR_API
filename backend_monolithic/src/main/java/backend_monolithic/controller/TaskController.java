@@ -255,9 +255,40 @@ public class TaskController {
     @GetMapping("/my")
     public ResponseEntity<PageResponse<TaskResponse>> getMyTasks(
             @RequestHeader("Authorization") String jwt,
+            @RequestParam(required = false) String quickSearch,
+            @RequestParam(required = false) String number,
+            @RequestParam(required = false) String documentNumber,
+            @RequestParam(required = false) String applicant,
+            @RequestParam(required = false) String manufacturer,
+            @RequestParam(required = false) String mark,
+            @RequestParam(required = false) String typeName,
+            @RequestParam(required = false) String representative,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) Boolean paymentStatus,
+            @RequestParam(required = false) Boolean hasContract,
+            @RequestParam(required = false) String contractNumber,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate applicationDateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate applicationDateTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        PageResponse<TaskResponse> response = taskService.getMyTasks(jwt, page, size);
+
+        TaskFilter filter = new TaskFilter();
+        filter.setQuickSearch(quickSearch);
+        filter.setNumber(number);
+        filter.setDocumentNumber(documentNumber);
+        filter.setApplicant(applicant);
+        filter.setManufacturer(manufacturer);
+        filter.setMark(mark);
+        filter.setTypeName(typeName);
+        filter.setRepresentative(representative);
+        filter.setStatus(status);
+        filter.setPaymentStatus(paymentStatus);
+        filter.setHasContract(hasContract);
+        filter.setContractNumber(contractNumber);
+        filter.setApplicationDateFrom(applicationDateFrom);
+        filter.setApplicationDateTo(applicationDateTo);
+
+        PageResponse<TaskResponse> response = taskService.getMyTasks(filter, jwt, page, size);
         return ResponseEntity.ok(response);
     }
 }

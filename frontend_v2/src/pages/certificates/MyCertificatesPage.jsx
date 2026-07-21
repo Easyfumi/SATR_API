@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import SearchIcon from '@mui/icons-material/Search';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -88,6 +89,10 @@ const MyCertificatesPage = () => {
                     ))}
                 </div>
                 <h2 className="page-title">Мои сертификаты</h2>
+                <Link to="/serts/create" className="create-task-button">
+                    <LibraryAddIcon className="create-task-icon" />
+                    <h1 className="create-task-text">Новая заявка</h1>
+                </Link>
             </div>
 
             <div className="search-filters-panel">

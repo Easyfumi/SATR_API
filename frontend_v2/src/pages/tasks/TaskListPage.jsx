@@ -110,27 +110,52 @@ const TaskListPage = () => {
     // Опции для выбора количества элементов на странице
     const pageSizeOptions = [10, 25, 50];
 
-    // Загрузка задач с фильтрами и пагинацией
+    const prepareSearchParams = useCallback((searchFilters = {}) => {
+        const cleanFilters = Object.fromEntries(
+            Object.entries(searchFilters).filter(([_, value]) => {
+                if (value === '' || value == null) return false;
+                if (typeof value === 'boolean') return true;
+                return value !== '';
+            })
+        );
+
+        const preparedFilters = { ...cleanFilters };
+
+        if (preparedFilters.hasContract === 'true') {
+            preparedFilters.hasContract = true;
+        } else if (preparedFilters.hasContract === 'false') {
+            preparedFilters.hasContract = false;
+        } else if (preparedFilters.hasContract === '') {
+            delete preparedFilters.hasContract;
+        }
+
+        if (preparedFilters.paymentStatus === 'true') {
+            preparedFilters.paymentStatus = true;
+        } else if (preparedFilters.paymentStatus === 'false') {
+            preparedFilters.paymentStatus = false;
+        } else if (preparedFilters.paymentStatus === '') {
+            delete preparedFilters.paymentStatus;
+        }
+
+        return preparedFilters;
+    }, []);
+
+    const getRequestFilters = useCallback((sourceFilters = filters) => {
+        if (sourceFilters.quickSearch?.trim()) {
+            return { quickSearch: sourceFilters.quickSearch.trim() };
+        }
+
+        const filtersWithoutQuickSearch = { ...sourceFilters };
+        delete filtersWithoutQuickSearch.quickSearch;
+        return prepareSearchParams(filtersWithoutQuickSearch);
+    }, [filters, prepareSearchParams]);
+
+    // Загрузка задач с фильтрами и пагинацией (всегда на сервере)
     const fetchTasks = useCallback(async (searchFilters = {}, page = 0, size = pagination.pageSize) => {
         setLoading(true);
         try {
-            // Удаляем пустые поля из фильтров, но сохраняем boolean значения
-            const cleanFilters = Object.fromEntries(
-                Object.entries(searchFilters).filter(([_, value]) => {
-                    if (value === '' || value == null) return false;
-                    if (typeof value === 'boolean') return true;
-                    return value !== '';
-                })
-            );
+            const preparedFilters = prepareSearchParams(searchFilters);
 
-            // Оставляем boolean значения как boolean (axios правильно сериализует их)
-            const preparedFilters = {};
-            Object.entries(cleanFilters).forEach(([key, value]) => {
-                preparedFilters[key] = value;
-            });
-
-            console.log('Отправляем запрос с параметрами:', { ...preparedFilters, page, size });
-            
             const response = await api.get('/tasks/search', {
                 params: {
                     ...preparedFilters,
@@ -139,47 +164,17 @@ const TaskListPage = () => {
                 }
             });
 
-            // Логируем ответ для отладки
-            console.log('Ответ от бэкенда:', response.data);
-            
             const data = response.data.content || response.data || [];
             const paginationData = response.data;
 
             setTasks(data);
 
-            if (paginationData) {
-                setPagination(prev => ({
-                    ...prev,
-                    currentPage: paginationData.currentPage || page,
-                    totalPages: paginationData.totalPages || 1,
-                    totalElements: paginationData.totalElements || data.length,
-                    pageSize: size
-                }));
-            }
-
-            setError(null);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
-            setError('Ошибка загрузки данных');
-            setTasks([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [pagination.pageSize]);
-
-    // Загрузка всех задач (без фильтров)
-    const fetchAllTasks = useCallback(async () => {
-        setLoading(true);
-        try {
-            const response = await api.get('/tasks');
-            const data = Array.isArray(response.data) ? response.data : [];
-            console.log('Все задачи:', data);
-            setTasks(data);
-
             setPagination(prev => ({
                 ...prev,
-                totalPages: Math.ceil(data.length / prev.pageSize),
-                totalElements: data.length
+                currentPage: paginationData?.currentPage ?? page,
+                totalPages: paginationData?.totalPages ?? 1,
+                totalElements: paginationData?.totalElements ?? data.length,
+                pageSize: size
             }));
 
             setError(null);
@@ -190,20 +185,12 @@ const TaskListPage = () => {
         } finally {
             setLoading(false);
         }
+    }, [pagination.pageSize, prepareSearchParams]);
+
+    useEffect(() => {
+        fetchTasks({}, 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        fetchAllTasks();
-    }, [fetchAllTasks]);
-
-    // useEffect для отладки
-    useEffect(() => {
-        if (tasks.length > 0) {
-            console.log('Первая задача в состоянии:', tasks[0]);
-            console.log('decisionAt первой задачи:', tasks[0].decisionAt);
-            console.log('Все поля задачи:', Object.keys(tasks[0]));
-        }
-    }, [tasks]);
 
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
@@ -218,11 +205,11 @@ const TaskListPage = () => {
         setFilters(newFilters);
 
         if (!value.trim()) {
-            fetchAllTasks();
+            fetchTasks({}, 0);
         } else {
-            fetchTasks({ quickSearch: value }, 0);
+            fetchTasks({ quickSearch: value.trim() }, 0);
         }
-    }, [filters, fetchTasks, fetchAllTasks]);
+    }, [filters, fetchTasks]);
 
     // Обработчик изменения фильтров
     const handleFilterChange = (field, value) => {
@@ -234,28 +221,8 @@ const TaskListPage = () => {
 
     // Применить фильтры
     const handleApplyFilters = () => {
-        const filtersWithoutQuickSearch = { ...filters };
-        delete filtersWithoutQuickSearch.quickSearch;
-
-        const preparedFilters = { ...filtersWithoutQuickSearch };
-        if (preparedFilters.hasContract === 'true') {
-            preparedFilters.hasContract = true;
-        } else if (preparedFilters.hasContract === 'false') {
-            preparedFilters.hasContract = false;
-        } else if (preparedFilters.hasContract === '') {
-            delete preparedFilters.hasContract;
-        }
-
-        // Преобразуем paymentStatus из строки в boolean
-        if (preparedFilters.paymentStatus === 'true') {
-            preparedFilters.paymentStatus = true;
-        } else if (preparedFilters.paymentStatus === 'false') {
-            preparedFilters.paymentStatus = false;
-        } else if (preparedFilters.paymentStatus === '') {
-            delete preparedFilters.paymentStatus;
-        }
-
-        console.log('Применяем фильтры:', preparedFilters);
+        const preparedFilters = getRequestFilters({ ...filters, quickSearch: '' });
+        setFilters(prev => ({ ...prev, quickSearch: '' }));
         fetchTasks(preparedFilters, 0);
     };
 
@@ -279,8 +246,7 @@ const TaskListPage = () => {
             contractNumber: ''
         };
         setFilters(resetFilters);
-        setPagination(prev => ({ ...prev, currentPage: 0 }));
-        fetchAllTasks();
+        fetchTasks({}, 0);
     };
 
     const getActiveFilters = () => {
@@ -324,39 +290,7 @@ const TaskListPage = () => {
     // Обработчики пагинации
     const handlePageChange = (newPage) => {
         if (newPage >= 0 && newPage < pagination.totalPages) {
-            setPagination(prev => ({ ...prev, currentPage: newPage }));
-
-            const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
-            if (hasActiveFilters) {
-                const filtersWithoutQuickSearch = { ...filters };
-                delete filtersWithoutQuickSearch.quickSearch;
-
-                const preparedFilters = { ...filtersWithoutQuickSearch };
-                if (preparedFilters.hasContract === 'true') {
-                    preparedFilters.hasContract = true;
-                } else if (preparedFilters.hasContract === 'false') {
-                    preparedFilters.hasContract = false;
-                } else if (preparedFilters.hasContract === '') {
-                    delete preparedFilters.hasContract;
-                }
-
-                // Преобразуем paymentStatus из строки в boolean
-                if (preparedFilters.paymentStatus === 'true') {
-                    preparedFilters.paymentStatus = true;
-                } else if (preparedFilters.paymentStatus === 'false') {
-                    preparedFilters.paymentStatus = false;
-                } else if (preparedFilters.paymentStatus === '') {
-                    delete preparedFilters.paymentStatus;
-                }
-
-                if (filters.quickSearch) {
-                    fetchTasks({ quickSearch: filters.quickSearch }, newPage);
-                } else {
-                    fetchTasks(preparedFilters, newPage);
-                }
-            } else {
-                fetchAllTasks();
-            }
+            fetchTasks(getRequestFilters(), newPage);
         }
     };
 
@@ -364,39 +298,9 @@ const TaskListPage = () => {
         setPagination(prev => ({
             ...prev,
             pageSize: newSize,
-            currentPage: 0,
-            totalPages: Math.ceil(prev.totalElements / newSize)
+            currentPage: 0
         }));
-
-        const hasActiveFilters = Object.values(filters).some(value => value !== '' && value != null);
-        if (hasActiveFilters) {
-            const filtersWithoutQuickSearch = { ...filters };
-            delete filtersWithoutQuickSearch.quickSearch;
-
-            const preparedFilters = { ...filtersWithoutQuickSearch };
-            if (preparedFilters.hasContract === 'true') {
-                preparedFilters.hasContract = true;
-            } else if (preparedFilters.hasContract === 'false') {
-                preparedFilters.hasContract = false;
-            } else if (preparedFilters.hasContract === '') {
-                delete preparedFilters.hasContract;
-            }
-
-            // Преобразуем paymentStatus из строки в boolean
-            if (preparedFilters.paymentStatus === 'true') {
-                preparedFilters.paymentStatus = true;
-            } else if (preparedFilters.paymentStatus === 'false') {
-                preparedFilters.paymentStatus = false;
-            } else if (preparedFilters.paymentStatus === '') {
-                delete preparedFilters.paymentStatus;
-            }
-
-            if (filters.quickSearch) {
-                fetchTasks({ quickSearch: filters.quickSearch }, 0, newSize);
-            } else {
-                fetchTasks(preparedFilters, 0, newSize);
-            }
-        }
+        fetchTasks(getRequestFilters(), 0, newSize);
     };
 
     const handleManualPageInput = (e) => {
@@ -409,18 +313,7 @@ const TaskListPage = () => {
         }
     };
 
-    // Получаем задачи для текущей страницы
-    const getCurrentPageTasks = () => {
-        if (tasks.length <= pagination.pageSize) {
-            return tasks;
-        }
-
-        const startIndex = pagination.currentPage * pagination.pageSize;
-        const endIndex = startIndex + pagination.pageSize;
-        return tasks.slice(startIndex, endIndex);
-    };
-
-    const currentTasks = getCurrentPageTasks();
+    const currentTasks = tasks;
 
     // Генерация номеров страниц для отображения
     const getPageNumbers = () => {

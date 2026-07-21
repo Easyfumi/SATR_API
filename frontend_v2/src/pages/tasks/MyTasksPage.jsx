@@ -109,33 +109,72 @@ const MyTasksPage = () => {
         { path: '/my-serts', label: 'Сертификаты' }
     ];
 
-    // Загрузка моих задач с пагинацией
-    const fetchMyTasks = useCallback(async (page = 0, size = pagination.pageSize) => {
+    const prepareSearchParams = useCallback((searchFilters = {}) => {
+        const cleanFilters = Object.fromEntries(
+            Object.entries(searchFilters).filter(([_, value]) => {
+                if (value === '' || value == null) return false;
+                if (typeof value === 'boolean') return true;
+                return value !== '';
+            })
+        );
+
+        const preparedFilters = { ...cleanFilters };
+
+        if (preparedFilters.hasContract === 'true') {
+            preparedFilters.hasContract = true;
+        } else if (preparedFilters.hasContract === 'false') {
+            preparedFilters.hasContract = false;
+        } else if (preparedFilters.hasContract === '') {
+            delete preparedFilters.hasContract;
+        }
+
+        if (preparedFilters.paymentStatus === 'true') {
+            preparedFilters.paymentStatus = true;
+        } else if (preparedFilters.paymentStatus === 'false') {
+            preparedFilters.paymentStatus = false;
+        } else if (preparedFilters.paymentStatus === '') {
+            delete preparedFilters.paymentStatus;
+        }
+
+        return preparedFilters;
+    }, []);
+
+    const getRequestFilters = useCallback((sourceFilters = filters) => {
+        if (sourceFilters.quickSearch?.trim()) {
+            return { quickSearch: sourceFilters.quickSearch.trim() };
+        }
+
+        const filtersWithoutQuickSearch = { ...sourceFilters };
+        delete filtersWithoutQuickSearch.quickSearch;
+        return prepareSearchParams(filtersWithoutQuickSearch);
+    }, [filters, prepareSearchParams]);
+
+    // Загрузка моих задач с фильтрами и пагинацией на сервере
+    const fetchMyTasks = useCallback(async (searchFilters = {}, page = 0, size = pagination.pageSize) => {
         setLoading(true);
         try {
+            const preparedFilters = prepareSearchParams(searchFilters);
+
             const response = await api.get('/tasks/my', {
                 params: {
+                    ...preparedFilters,
                     page,
                     size
                 }
             });
 
-            console.log('Ответ от бэкенда (мои заявки):', response.data);
-            
             const data = response.data.content || response.data || [];
             const paginationData = response.data;
 
             setTasks(data);
 
-            if (paginationData) {
-                setPagination(prev => ({
-                    ...prev,
-                    currentPage: paginationData.currentPage || page,
-                    totalPages: paginationData.totalPages || 1,
-                    totalElements: paginationData.totalElements || data.length,
-                    pageSize: size
-                }));
-            }
+            setPagination(prev => ({
+                ...prev,
+                currentPage: paginationData?.currentPage ?? page,
+                totalPages: paginationData?.totalPages ?? 1,
+                totalElements: paginationData?.totalElements ?? data.length,
+                pageSize: size
+            }));
 
             setError(null);
         } catch (error) {
@@ -145,108 +184,30 @@ const MyTasksPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [pagination.pageSize]);
+    }, [pagination.pageSize, prepareSearchParams]);
 
     useEffect(() => {
-        fetchMyTasks(0);
-    }, [fetchMyTasks]);
-
-    // Применение фильтров на клиенте
-    const applyFilters = useCallback((data) => {
-        let filteredData = data;
-
-        if (filters.quickSearch) {
-            const searchLower = filters.quickSearch.toLowerCase();
-            filteredData = filteredData.filter(task => 
-                (task.number && task.number.toLowerCase().includes(searchLower)) ||
-                (task.documentNumber && task.documentNumber.toLowerCase().includes(searchLower)) ||
-                (task.contract?.number && task.contract.number.toLowerCase().includes(searchLower))
-            );
-        }
-        if (filters.number) {
-            filteredData = filteredData.filter(task => 
-                task.number && task.number.toLowerCase().includes(filters.number.toLowerCase())
-            );
-        }
-        if (filters.documentNumber) {
-            filteredData = filteredData.filter(task =>
-                task.documentNumber && task.documentNumber.toLowerCase().includes(filters.documentNumber.toLowerCase())
-            );
-        }
-        if (filters.applicant) {
-            filteredData = filteredData.filter(task => 
-                task.applicant && task.applicant.toLowerCase().includes(filters.applicant.toLowerCase())
-            );
-        }
-        if (filters.manufacturer) {
-            filteredData = filteredData.filter(task => 
-                task.manufacturer && task.manufacturer.toLowerCase().includes(filters.manufacturer.toLowerCase())
-            );
-        }
-        if (filters.mark) {
-            filteredData = filteredData.filter(task => 
-                task.mark && task.mark.toLowerCase().includes(filters.mark.toLowerCase())
-            );
-        }
-        if (filters.typeName) {
-            filteredData = filteredData.filter(task => 
-                task.typeName && task.typeName.toLowerCase().includes(filters.typeName.toLowerCase())
-            );
-        }
-        if (filters.representative) {
-            filteredData = filteredData.filter(task => 
-                task.representative && task.representative.toLowerCase().includes(filters.representative.toLowerCase())
-            );
-        }
-        if (filters.status) {
-            filteredData = filteredData.filter(task => task.status === filters.status);
-        }
-        if (filters.paymentStatus === 'true') {
-            filteredData = filteredData.filter(task => 
-                task.contract && (task.contract.paymentStatus === 'PAIDFOR')
-            );
-        } else if (filters.paymentStatus === 'false') {
-            filteredData = filteredData.filter(task => 
-                !task.contract || task.contract.paymentStatus === 'NOTPAIDFOR' || task.contract.paymentStatus === 'PARTIALLYPAIDFOR'
-            );
-        }
-        if (filters.hasContract === 'true') {
-            filteredData = filteredData.filter(task => task.contract != null);
-        } else if (filters.hasContract === 'false') {
-            filteredData = filteredData.filter(task => task.contract == null);
-        }
-        if (filters.contractNumber) {
-            filteredData = filteredData.filter(task => 
-                task.contract?.number && task.contract.number.toLowerCase().includes(filters.contractNumber.toLowerCase())
-            );
-        }
-        if (filters.applicationDateFrom) {
-            const fromDate = new Date(filters.applicationDateFrom);
-            filteredData = filteredData.filter(task => {
-                if (!task.applicationDate) return false;
-                const taskDate = new Date(task.applicationDate);
-                return taskDate >= fromDate;
-            });
-        }
-        if (filters.applicationDateTo) {
-            const toDate = new Date(filters.applicationDateTo);
-            filteredData = filteredData.filter(task => {
-                if (!task.applicationDate) return false;
-                const taskDate = new Date(task.applicationDate);
-                return taskDate <= toDate;
-            });
-        }
-
-        return filteredData;
-    }, [filters]);
+        fetchMyTasks({}, 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Обработчик быстрого поиска
     const handleQuickSearch = useCallback((value) => {
-        setFilters(prev => ({
-            ...prev,
-            quickSearch: value
-        }));
-    }, []);
+        const newFilters = {
+            ...filters,
+            quickSearch: value,
+            number: '',
+            documentNumber: ''
+        };
+
+        setFilters(newFilters);
+
+        if (!value.trim()) {
+            fetchMyTasks({}, 0);
+        } else {
+            fetchMyTasks({ quickSearch: value.trim() }, 0);
+        }
+    }, [filters, fetchMyTasks]);
 
     // Обработчик изменения фильтров
     const handleFilterChange = (field, value) => {
@@ -258,7 +219,9 @@ const MyTasksPage = () => {
 
     // Применить фильтры
     const handleApplyFilters = () => {
-        fetchMyTasks(0);
+        const preparedFilters = getRequestFilters({ ...filters, quickSearch: '' });
+        setFilters(prev => ({ ...prev, quickSearch: '' }));
+        fetchMyTasks(preparedFilters, 0);
     };
 
     // Сбросить фильтры
@@ -280,8 +243,7 @@ const MyTasksPage = () => {
             contractNumber: ''
         };
         setFilters(resetFilters);
-        setPagination(prev => ({ ...prev, currentPage: 0 }));
-        fetchMyTasks(0);
+        fetchMyTasks({}, 0);
     };
 
     const getActiveFilters = () => {
@@ -324,7 +286,7 @@ const MyTasksPage = () => {
     // Обработчики пагинации
     const handlePageChange = (newPage) => {
         if (newPage >= 0 && newPage < pagination.totalPages) {
-            fetchMyTasks(newPage);
+            fetchMyTasks(getRequestFilters(), newPage);
         }
     };
 
@@ -334,7 +296,7 @@ const MyTasksPage = () => {
             pageSize: newSize,
             currentPage: 0
         }));
-        fetchMyTasks(0, newSize);
+        fetchMyTasks(getRequestFilters(), 0, newSize);
     };
 
     const handleManualPageInput = (e) => {
@@ -347,20 +309,7 @@ const MyTasksPage = () => {
         }
     };
 
-    // Получаем задачи для текущей страницы с применением фильтров
-    const getCurrentPageTasks = () => {
-        const filteredTasks = applyFilters(tasks);
-        
-        if (filteredTasks.length <= pagination.pageSize) {
-            return filteredTasks;
-        }
-
-        const startIndex = pagination.currentPage * pagination.pageSize;
-        const endIndex = startIndex + pagination.pageSize;
-        return filteredTasks.slice(startIndex, endIndex);
-    };
-
-    const currentTasks = getCurrentPageTasks();
+    const currentTasks = tasks;
 
     // Генерация номеров страниц для отображения
     const getPageNumbers = () => {

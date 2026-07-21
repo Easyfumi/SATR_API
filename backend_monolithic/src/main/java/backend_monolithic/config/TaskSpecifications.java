@@ -27,7 +27,7 @@ public class TaskSpecifications {
                 return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("number")),
+                    criteriaBuilder.lower(criteriaBuilder.coalesce(root.get("number"), "")),
                     "%" + number.toLowerCase() + "%"
             );
         };
@@ -331,13 +331,13 @@ public class TaskSpecifications {
 
             // Условие для поиска по номеру задачи
             Predicate numberPredicate = criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("number")),
+                    criteriaBuilder.lower(criteriaBuilder.coalesce(root.get("number"), "")),
                     searchPattern
             );
 
             // Условие для поиска по номеру ОТТС/ОТШ
             Predicate documentNumberPredicate = criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("documentNumber")),
+                    criteriaBuilder.lower(criteriaBuilder.coalesce(root.get("documentNumber"), "")),
                     searchPattern
             );
 

@@ -16,7 +16,12 @@ const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/my-tasks", text: "Мои заявки", icon: <ListIcon /> },
+    {
+      path: "/my-tasks",
+      text: "Мои заявки",
+      icon: <ListIcon />,
+      activePaths: ["/my-tasks", "/my-decl", "/my-serts"]
+    },
     {
       path: "/tasks",
       text: "Все заявки",
@@ -31,8 +36,8 @@ const Sidebar = () => {
 
     const isActive = (item) => {
     if (item.activePaths) {
-      return item.activePaths.some(path => 
-        location.pathname.startsWith(path)
+      return item.activePaths.some(path =>
+        location.pathname === path || location.pathname.startsWith(`${path}/`)
       );
     }
     return location.pathname === item.path;
