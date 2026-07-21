@@ -5,6 +5,7 @@ import backend_monolithic.model.enums.DeclarationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface DeclarationRepository extends JpaRepository<Declaration, Long> {
@@ -21,6 +22,8 @@ public interface DeclarationRepository extends JpaRepository<Declaration, Long> 
     List<Declaration> findByAssignedUserIdOrderByCreatedAtDesc(Long assignedUserId);
 
     long countByAssignedUserIdAndStatusNot(Long assignedUserId, DeclarationStatus status);
+
+    long countByAssignedUserIdAndStatusNotIn(Long assignedUserId, Collection<DeclarationStatus> statuses);
 
     long countByAssignedUserIdAndDeclarationRegisteredAtBetween(Long assignedUserId, LocalDate start, LocalDate end);
 }

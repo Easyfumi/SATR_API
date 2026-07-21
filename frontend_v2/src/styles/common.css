@@ -133,6 +133,11 @@
 .status-badge.signed { background: #c8e6c9; color: var(--success-color); }
 .status-badge.for_revision { background: var(--warning-bg); color: var(--warning-color); }
 .status-badge.completed { background: #dcedc8; color: #689f38; }
+.status-badge.archived { background: #eceff1; color: #546e7a; }
+.status-badge.journal_registered { background: var(--warning-bg); color: var(--warning-color); }
+.status-badge.fgis_entered { background: #e3f2fd; color: #1565c0; }
+.status-badge.declaration_registered { background: #dcedc8; color: #689f38; }
+.status-badge.certificate_registered { background: #dcedc8; color: #689f38; }
 
 /* Бейджи статусов оплаты */
 .payment-status-badge {

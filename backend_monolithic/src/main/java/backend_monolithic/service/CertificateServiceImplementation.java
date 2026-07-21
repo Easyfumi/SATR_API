@@ -139,7 +139,8 @@ public class CertificateServiceImplementation implements CertificateService {
         Certificate certificate = certificateRepository.findById(certificateId)
                 .orElseThrow(() -> new EntityNotFoundException("Сертификат не найден"));
 
-        if (certificate.getStatus() == CertificateStatus.CERTIFICATE_REGISTERED) {
+        if (certificate.getStatus() == CertificateStatus.CERTIFICATE_REGISTERED
+                && status != CertificateStatus.ARCHIVED) {
             throw new BusinessException("Нельзя изменить статус зарегистрированного сертификата");
         }
 
@@ -148,6 +149,13 @@ public class CertificateServiceImplementation implements CertificateService {
         }
 
         if (status == CertificateStatus.CERTIFICATE_REGISTERED) {
+            if (certificate.getStatus() == CertificateStatus.ARCHIVED
+                    && certificate.getCertificateNumber() != null
+                    && !certificate.getCertificateNumber().isBlank()) {
+                certificate.setStatus(CertificateStatus.CERTIFICATE_REGISTERED);
+                return mapEntityToResponse(certificateRepository.save(certificate));
+            }
+
             if (certificateNumber == null || certificateNumber.isBlank()) {
                 throw new BusinessException("Номер зарегистрированного сертификата обязателен");
             }

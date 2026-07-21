@@ -44,7 +44,8 @@ const DuplicateCheckModal = ({
         PROJECT: 'Переведено в проект',
         SIGNED: 'Подписано',
         FOR_REVISION: 'Возвращено на доработку',
-        COMPLETED: 'Заявка выполнена'
+        COMPLETED: 'Заявка выполнена',
+        ARCHIVED: 'Передано в архив'
     };
 
     // Функция для получения читаемого названия статуса
@@ -67,7 +68,8 @@ const DuplicateCheckModal = ({
             'PROJECT': '#7b1fa2', // Фиолетовый
             'SIGNED': '#2e7d32', // Зеленый
             'FOR_REVISION': '#ed6c02', // Оранжевый
-            'COMPLETED': '#2e7d32' // Зеленый
+            'COMPLETED': '#2e7d32', // Зеленый
+            'ARCHIVED': '#607d8b' // Серо-голубой
         };
         return colors[status] || '#757575';
     };

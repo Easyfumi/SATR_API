@@ -137,7 +137,8 @@ public class DeclarationServiceImplementation implements DeclarationService {
         Declaration declaration = declarationRepository.findById(declarationId)
                 .orElseThrow(() -> new EntityNotFoundException("Декларация не найдена"));
 
-        if (declaration.getStatus() == DeclarationStatus.DECLARATION_REGISTERED) {
+        if (declaration.getStatus() == DeclarationStatus.DECLARATION_REGISTERED
+                && status != DeclarationStatus.ARCHIVED) {
             throw new BusinessException("Нельзя изменить статус зарегистрированной декларации");
         }
 
@@ -146,6 +147,13 @@ public class DeclarationServiceImplementation implements DeclarationService {
         }
 
         if (status == DeclarationStatus.DECLARATION_REGISTERED) {
+            if (declaration.getStatus() == DeclarationStatus.ARCHIVED
+                    && declaration.getDeclarationNumber() != null
+                    && !declaration.getDeclarationNumber().isBlank()) {
+                declaration.setStatus(DeclarationStatus.DECLARATION_REGISTERED);
+                return mapEntityToResponse(declarationRepository.save(declaration));
+            }
+
             if (declarationNumber == null || declarationNumber.isBlank()) {
                 throw new BusinessException("Номер зарегистрированной декларации обязателен");
             }

@@ -7,7 +7,8 @@ public enum CertificateStatus {
     RECEIVED("Заявка получена"),
     JOURNAL_REGISTERED("Заявка зарегистрирована в журнале"),
     FGIS_ENTERED("Заявка занесена во ФГИС"),
-    CERTIFICATE_REGISTERED("Сертификат зарегистрирован");
+    CERTIFICATE_REGISTERED("Сертификат зарегистрирован"),
+    ARCHIVED("Передано в архив");
 
     private final String displayName;
 

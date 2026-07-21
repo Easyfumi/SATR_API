@@ -23,7 +23,18 @@ public class ProfileAnalyticsServiceImplementation implements ProfileAnalyticsSe
     private static final Set<TaskStatus> TASK_NOT_ACTIVE_STATUSES = Set.of(
             TaskStatus.CANCELLED,
             TaskStatus.REJECTION,
-            TaskStatus.COMPLETED
+            TaskStatus.COMPLETED,
+            TaskStatus.ARCHIVED
+    );
+
+    private static final Set<DeclarationStatus> DECLARATION_NOT_ACTIVE_STATUSES = Set.of(
+            DeclarationStatus.DECLARATION_REGISTERED,
+            DeclarationStatus.ARCHIVED
+    );
+
+    private static final Set<CertificateStatus> CERTIFICATE_NOT_ACTIVE_STATUSES = Set.of(
+            CertificateStatus.CERTIFICATE_REGISTERED,
+            CertificateStatus.ARCHIVED
     );
 
     private final UserService userService;
@@ -51,11 +62,14 @@ public class ProfileAnalyticsServiceImplementation implements ProfileAnalyticsSe
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
 
         long activeTasks = taskRepository.countByAssignedUserIdAndStatusNotIn(userId, TASK_NOT_ACTIVE_STATUSES);
-        long activeDeclarations = declarationRepository.countByAssignedUserIdAndStatusNot(
+        long activeDeclarations = declarationRepository.countByAssignedUserIdAndStatusNotIn(
                 userId,
-                DeclarationStatus.DECLARATION_REGISTERED
+                DECLARATION_NOT_ACTIVE_STATUSES
         );
-        long activeCertificates = certificateRepository.countActiveByUser(userId, CertificateStatus.CERTIFICATE_REGISTERED);
+        long activeCertificates = certificateRepository.countActiveByUser(
+                userId,
+                CERTIFICATE_NOT_ACTIVE_STATUSES
+        );
 
         long completedTasks = taskRepository.countCompletedInPeriod(
                 userId,

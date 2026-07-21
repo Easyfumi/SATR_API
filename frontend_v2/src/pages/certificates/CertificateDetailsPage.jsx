@@ -25,7 +25,8 @@ const statusLabels = {
     RECEIVED: 'Заявка получена',
     JOURNAL_REGISTERED: 'Заявка зарегистрирована в журнале',
     FGIS_ENTERED: 'Заявка занесена во ФГИС',
-    CERTIFICATE_REGISTERED: 'Сертификат зарегистрирован'
+    CERTIFICATE_REGISTERED: 'Сертификат зарегистрирован',
+    ARCHIVED: 'Передано в архив'
 };
 
 const CertificateDetailsPage = () => {
@@ -256,11 +257,9 @@ const CertificateDetailsPage = () => {
                                     <span className={`status-badge ${certificate.status?.toLowerCase()}`}>
                                         {statusLabels[selectedStatus] || selectedStatus}
                                     </span>
-                                    {certificate.status !== 'CERTIFICATE_REGISTERED' && (
-                                        <Button className="status-dropdown-button" size="small" onClick={(e) => setStatusAnchorEl(e.currentTarget)}>
-                                            <ArrowDropDownIcon />
-                                        </Button>
-                                    )}
+                                    <Button className="status-dropdown-button" size="small" onClick={(e) => setStatusAnchorEl(e.currentTarget)}>
+                                        <ArrowDropDownIcon />
+                                    </Button>
                                 </div>
                                 {isStatusChanged && (
                                     <div className="status-actions">
@@ -557,7 +556,7 @@ const CertificateDetailsPage = () => {
                 onClose={() => setStatusAnchorEl(null)}
                 className="status-menu"
             >
-                {['FGIS_ENTERED', 'CERTIFICATE_REGISTERED'].map((status) => (
+                {['FGIS_ENTERED', 'CERTIFICATE_REGISTERED', 'ARCHIVED'].map((status) => (
                     <MenuItem
                         key={status}
                         onClick={() => handleStatusSelect(status)}

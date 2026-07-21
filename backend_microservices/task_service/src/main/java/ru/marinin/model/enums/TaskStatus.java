@@ -10,7 +10,8 @@ public enum TaskStatus {
     PROJECT("PROJECT"),  // переведено в проект
     SIGNED("SIGNED"),  // подписано
     FOR_REVISION("FOR_REVISION"), // возвращено на доработку
-    COMPLETED("COMPLETED");  // заявка выполнена
+    COMPLETED("COMPLETED"),  // заявка выполнена
+    ARCHIVED("ARCHIVED");  // передано в архив
 
 
     TaskStatus(String done) {

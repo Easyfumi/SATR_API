@@ -63,7 +63,8 @@ const ContractDetailsPage = () => {
         PROJECT: 'Переведено в проект',
         SIGNED: 'Подписано',
         FOR_REVISION: 'Возвращено на доработку',
-        COMPLETED: 'Заявка выполнена'
+        COMPLETED: 'Заявка выполнена',
+        ARCHIVED: 'Передано в архив'
     };
 
     useEffect(() => {

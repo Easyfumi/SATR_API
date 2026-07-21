@@ -12,7 +12,8 @@ const statusLabels = {
     RECEIVED: 'Заявка получена',
     JOURNAL_REGISTERED: 'Заявка зарегистрирована в журнале',
     FGIS_ENTERED: 'Заявка занесена во ФГИС',
-    DECLARATION_REGISTERED: 'Декларация зарегистрирована'
+    DECLARATION_REGISTERED: 'Декларация зарегистрирована',
+    ARCHIVED: 'Передано в архив'
 };
 
 const DeclarationPage = () => {

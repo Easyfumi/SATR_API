@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface CertificateRepository extends JpaRepository<Certificate, Long> {
@@ -26,9 +27,9 @@ public interface CertificateRepository extends JpaRepository<Certificate, Long> 
             select count(distinct c.id)
             from Certificate c
             where (c.assignedUserId = :userId or c.registeredByUserId = :userId)
-              and c.status <> :status
+              and c.status not in :statuses
             """)
-    long countActiveByUser(@Param("userId") Long userId, @Param("status") CertificateStatus status);
+    long countActiveByUser(@Param("userId") Long userId, @Param("statuses") Collection<CertificateStatus> statuses);
 
     long countByRegisteredByUserIdAndCertificateRegisteredAtBetween(
             Long registeredByUserId,

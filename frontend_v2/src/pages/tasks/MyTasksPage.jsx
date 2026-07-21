@@ -63,7 +63,8 @@ const MyTasksPage = () => {
         PROJECT: 'Переведено в проект',
         SIGNED: 'Подписано',
         FOR_REVISION: 'Возвращено на доработку',
-        COMPLETED: 'Заявка выполнена'
+        COMPLETED: 'Заявка выполнена',
+        ARCHIVED: 'Передано в архив'
     };
 
     // Статусы для фильтра
@@ -80,7 +81,8 @@ const MyTasksPage = () => {
         { value: 'PROJECT', label: 'Переведено в проект' },
         { value: 'SIGNED', label: 'Подписано' },
         { value: 'FOR_REVISION', label: 'Возвращено на доработку' },
-        { value: 'COMPLETED', label: 'Заявка выполнена' }
+        { value: 'COMPLETED', label: 'Заявка выполнена' },
+        { value: 'ARCHIVED', label: 'Передано в архив' }
     ];
 
     // Статусы оплаты для фильтра

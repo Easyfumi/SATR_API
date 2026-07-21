@@ -15,7 +15,8 @@ public enum TaskStatus {
     PROJECT("Проект"),
     SIGNED("Подписано"),
     FOR_REVISION("На доработку"),
-    COMPLETED("Завершена");
+    COMPLETED("Завершена"),
+    ARCHIVED("Передано в архив");
 
     private final String displayName;
 
