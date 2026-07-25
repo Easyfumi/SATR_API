@@ -14,5 +14,6 @@ public class TaskDocumentNumberAssignedNotification {
     private String applicationNumber;
     private String documentNumber;
     private String docType;
+    private String applicantName;
     private String executorName;
 }

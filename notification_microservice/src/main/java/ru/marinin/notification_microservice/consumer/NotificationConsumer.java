@@ -240,6 +240,7 @@ public class NotificationConsumer {
                     notification.getApplicationNumber(),
                     notification.getDocumentNumber(),
                     notification.getDocType(),
+                    notification.getApplicantName(),
                     notification.getExecutorName()
             );
 

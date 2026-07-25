@@ -596,6 +596,7 @@ public class TaskServiceImplementation implements TaskService {
             notification.setApplicationNumber(applicationNumber);
             notification.setDocumentNumber(task.getDocumentNumber());
             notification.setDocType(task.getDocType());
+            notification.setApplicantName(task.getApplicant() != null ? task.getApplicant().getName() : "Не указан");
             notification.setExecutorName(executorName);
             notificationProducerService.sendTaskDocumentNumberAssignedNotification(notification);
         }

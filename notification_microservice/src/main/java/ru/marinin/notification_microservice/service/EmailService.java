@@ -382,6 +382,7 @@ public class EmailService {
             String applicationNumber,
             String documentNumber,
             String docType,
+            String applicantName,
             String executorName) {
         String documentType = "ОТШ".equals(docType) ? "ОТШ" : "ОТТС";
         try {
@@ -397,6 +398,7 @@ public class EmailService {
                     applicationNumber,
                     documentNumber,
                     documentType,
+                    applicantName,
                     executorName
             ), true);
 
@@ -420,11 +422,13 @@ public class EmailService {
             String applicationNumber,
             String documentNumber,
             String documentType,
+            String applicantName,
             String executorName) {
         String taskLink = taskId != null ? "http://91.184.244.246/tasks/" + taskId : null;
         String greeting = recipientName != null && !recipientName.isBlank()
                 ? "Здравствуйте, " + recipientName + "!"
                 : "Здравствуйте!";
+        String applicantText = (applicantName != null && !applicantName.isBlank()) ? applicantName : "Не указан";
 
         return "<!DOCTYPE html>" +
                 "<html>" +
@@ -434,6 +438,7 @@ public class EmailService {
                 "<p>" + greeting + "</p>" +
                 "<p><strong>Номер заявки: " + applicationNumber + ".</strong></p>" +
                 "<p><strong>Присвоенный номер " + documentType + ": " + documentNumber + ".</strong></p>" +
+                "<p><strong>Заявитель: " + applicantText + ".</strong></p>" +
                 "<p><strong>Исполнитель: " + executorName + ".</strong></p>" +
                 (taskLink != null
                         ? "<p>Заявка доступна по ссылке <a href=\"" + taskLink + "\">" + taskLink + "</a>.</p>"
